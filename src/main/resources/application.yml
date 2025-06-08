@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: spring-boot-demo
+  datasource:
+    url: jdbc:mysql://localhost:3306/ServiceHub?createDatabaseIfNotExist=true
+    username: root
+    password: bikram123@
+
+  jpa:
+    show-sql: true
+
