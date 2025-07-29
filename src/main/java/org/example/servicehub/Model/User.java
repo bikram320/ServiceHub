@@ -1,0 +1,67 @@
+package org.example.servicehub.Model;
+
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
+
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.util.LinkedHashSet;
+import java.util.Set;
+
+@Getter
+@Setter
+@Entity
+@Table(name = "users", schema = "servicehub")
+public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id", nullable = false)
+    private Long id;
+
+    @Column(name = "name", nullable = false)
+    private String name;
+
+    @Column(name = "email", nullable = false)
+    private String email;
+
+    @Column(name = "password", nullable = false)
+    private String password;
+
+    @Column(name = "phone", nullable = false, length = 15)
+    private String phone;
+
+    @Column(name = "address")
+    private String address;
+
+    @Column(name = "latitude", precision = 10, scale = 6)
+    private BigDecimal latitude;
+
+    @Column(name = "longitude", precision = 10, scale = 6)
+    private BigDecimal longitude;
+
+    @ColumnDefault("0")
+    @Column(name = "is_verified", nullable = false)
+    private Boolean isVerified = false;
+
+    @ColumnDefault("'PENDING'")
+    @Lob
+    @Column(name = "status", nullable = false)
+    private String status;
+
+    @ColumnDefault("'USER'")
+    @Column(name = "role", nullable = false, length = 50)
+    private String role;
+
+    @ColumnDefault("CURRENT_TIMESTAMP")
+    @Column(name = "created_at")
+    private Instant createdAt;
+
+    @OneToMany(mappedBy = "user")
+    private Set<Payment> payments = new LinkedHashSet<>();
+
+    @OneToMany(mappedBy = "user")
+    private Set<ServiceRequest> serviceRequests = new LinkedHashSet<>();
+
+}
