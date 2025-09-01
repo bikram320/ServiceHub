@@ -72,7 +72,7 @@ public class SecurityConfig {
                         c.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(c -> c
-                        // 🔓 Public endpoints
+                        //  Public endpoints
                         .requestMatchers(HttpMethod.POST, "/auth/login/**", "/auth/signup/**").permitAll()
                         .requestMatchers("/auth/refresh").permitAll()
                         .requestMatchers("/Home/**").permitAll()
