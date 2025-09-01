@@ -29,6 +29,6 @@ public class Admin {
     private String role;
 
     @OneToMany(mappedBy = "admin")
-    private Set<Adminaction> adminactions = new LinkedHashSet<>();
+    private Set<AdminAction> adminactions = new LinkedHashSet<>();
 
 }

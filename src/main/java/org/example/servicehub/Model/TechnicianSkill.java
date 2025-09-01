@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 @Entity
-@Table(name = "technicianskills", schema = "servicehub")
+@Table(name = "technicianSkilss", schema = "servicehub")
 public class TechnicianSkill {
     @EmbeddedId
     private TechnicianSkillId id;

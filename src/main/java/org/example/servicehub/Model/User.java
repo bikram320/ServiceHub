@@ -45,14 +45,13 @@ public class User {
     @Column(name = "is_verified", nullable = false)
     private Boolean isVerified = false;
 
-    @ColumnDefault("'PENDING'")
-    @Lob
-    @Column(name = "status", nullable = false)
-    private String status;
+    @Column(name = "status")
+    @Enumerated(EnumType.STRING)
+    private Status status;
 
-    @ColumnDefault("'USER'")
-    @Column(name = "role", nullable = false, length = 50)
-    private String role;
+    @Column(name = "role")
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "created_at")

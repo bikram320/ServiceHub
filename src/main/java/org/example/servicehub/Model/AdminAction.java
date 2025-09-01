@@ -10,8 +10,8 @@ import java.time.Instant;
 @Getter
 @Setter
 @Entity
-@Table(name = "adminactions", schema = "servicehub")
-public class Adminaction {
+@Table(name = "adminActions", schema = "servicehub")
+public class AdminAction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "action_id", nullable = false)
