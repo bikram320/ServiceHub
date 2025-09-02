@@ -22,7 +22,7 @@ public class EmailVerificationToken {
     private Long id;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "email", nullable = false, referencedColumnName = "email")
     private User user;

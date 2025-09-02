@@ -48,7 +48,13 @@ public class AuthController {
         user.setStatus(Status.PENDING);
         userRepository.save(user);
 
-        otpService.sendOtpEmail(user);
+        otpService.saveOtp(user);
+        return ResponseEntity.ok("OTP has been sent to your email");
+    }
+
+    @PostMapping("/signup/user/resend-otp")
+    public ResponseEntity<?> resendOtp(@RequestParam String email) throws MessagingException {
+        otpService.resendOtp(email);
         return ResponseEntity.ok("OTP has been sent to your email");
     }
 

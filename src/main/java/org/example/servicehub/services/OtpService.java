@@ -28,24 +28,44 @@ public class OtpService {
         return String.format("%06d", new Random().nextInt(999999));
     }
 
-    public void sendOtpEmail(User user) throws MessagingException {
-        String emailString = user.getEmail();  // extract email as String
+    public void saveOtp(User user) throws MessagingException {
         String otp = generateOtp();
 
         // Save OTP
         EmailVerificationToken token = new EmailVerificationToken();
         token.setUser(user);
         token.setOtp(otp);
-        token.setExpiryTime(LocalDateTime.now().plusMinutes(15));
+        token.setCreatedAt(LocalDateTime.now());
+        token.setExpiryTime(LocalDateTime.now().plusMinutes(5));
         emailVerificationTokenRepository.save(token);
 
+        sendOtpEmail(user.getEmail(), otp);
+    }
+
+    private void sendOtpEmail(String email, String otp) throws MessagingException {
         // Send email
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
-        helper.setTo(emailString);  // use the extracted String email
+        helper.setTo(email);  // use the extracted String email
         helper.setSubject("Your OTP Code");
         helper.setText("Your OTP is: " + otp);
         mailSender.send(message);
+    }
+
+    public void resendOtp(String email) throws MessagingException {
+
+        var existingOtp = emailVerificationTokenRepository.findByUser_Email(email)
+                .orElseThrow(() -> new RuntimeException("No OTP found for this email, please register first."));
+
+        // 2. Generate a new OTP
+        String newOtp = generateOtp();
+        existingOtp.setOtp(newOtp);
+        existingOtp.setExpiryTime(LocalDateTime.now().plusMinutes(5));
+        existingOtp.setCreatedAt(LocalDateTime.now());
+
+        emailVerificationTokenRepository.save(existingOtp);
+
+        sendOtpEmail(email, newOtp);
     }
 
     public Boolean verifyOtp(VerifyOtpRequest request) throws MessagingException {
