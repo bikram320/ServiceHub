@@ -29,7 +29,7 @@ public class User {
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "phone", nullable = false, length = 15)
+    @Column(name = "phone", length = 15)
     private String phone;
 
     @Column(name = "address")
@@ -42,8 +42,8 @@ public class User {
     private BigDecimal longitude;
 
     @ColumnDefault("0")
-    @Column(name = "is_verified", nullable = false)
-    private Boolean isVerified = false;
+    @Column(name = "email_verified", nullable = false)
+    private Boolean isEmailVerified = false;
 
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
