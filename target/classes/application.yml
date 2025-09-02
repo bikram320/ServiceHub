@@ -14,3 +14,11 @@ spring:
     accessTokenExpiration: 900 #15min
     refreshTokenExpiration: 604800 #7days
 
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: questx.bca@gmail.com
+    password: zwytmrpzuakvridm
+    properties.mail.smtp.auth: true
+    properties.mail.smtp.starttls.enable: true
+
