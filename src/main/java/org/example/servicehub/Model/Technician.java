@@ -41,9 +41,9 @@ public class Technician {
     @Column(name = "longitude", precision = 10, scale = 6)
     private BigDecimal longitude;
 
-    @Lob
-    @Column(name = "status", nullable = false)
-    private String status;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private Status status;
 
     @ColumnDefault("0")
     @Column(name = "is_verified", nullable = false)
@@ -53,9 +53,9 @@ public class Technician {
     @Column(name = "available", nullable = false)
     private Boolean available = false;
 
-    @ColumnDefault("'TECHNICIAN'")
-    @Column(name = "role", nullable = false, length = 50)
-    private String role;
+    @Column(name = "role")
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
     @Column(name = "rating")
     private Float rating;

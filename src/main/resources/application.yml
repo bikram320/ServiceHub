@@ -22,3 +22,8 @@ spring:
     properties.mail.smtp.auth: true
     properties.mail.smtp.starttls.enable: true
 
+  data:
+    redis:
+      host: localhost
+      port: 6379
+

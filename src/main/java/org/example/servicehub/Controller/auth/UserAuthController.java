@@ -1,4 +1,4 @@
-package org.example.servicehub.Controller;
+package org.example.servicehub.Controller.auth;
 
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.Cookie;
@@ -13,7 +13,7 @@ import org.example.servicehub.config.JwtConfig;
 import org.example.servicehub.config.PasswordConfig;
 import org.example.servicehub.dtos.JwtResponse;
 import org.example.servicehub.dtos.SignupRequest;
-import org.example.servicehub.dtos.UserLoginRequest;
+import org.example.servicehub.dtos.LoginRequest;
 import org.example.servicehub.dtos.VerifyOtpRequest;
 import org.example.servicehub.services.JwtService;
 import org.example.servicehub.services.OtpService;
@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.*;
 @AllArgsConstructor
 @RequestMapping("/auth")
 @RestController
-public class AuthController {
+public class UserAuthController {
 
     private final  AuthenticationManager authenticationManager;
     private final  UserRepository userRepository;
@@ -48,7 +48,7 @@ public class AuthController {
         user.setStatus(Status.PENDING);
         userRepository.save(user);
 
-        otpService.saveOtp(user);
+        otpService.saveOtp(request.getEmail());
         return ResponseEntity.ok("OTP has been sent to your email");
     }
 
@@ -69,14 +69,15 @@ public class AuthController {
         }
         var user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found"));
-
+        user.setIsEmailVerified(true);
+        userRepository.save(user);
         return generateAndSetCookie(user,response);
 
     }
 
     @PostMapping("/login/user")
     public ResponseEntity<?> login(
-            @Valid @RequestBody UserLoginRequest request,
+            @Valid @RequestBody LoginRequest request,
             HttpServletResponse response
     ){
         authenticationManager.authenticate(
