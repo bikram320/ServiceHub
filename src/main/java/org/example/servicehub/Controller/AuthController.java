@@ -59,15 +59,20 @@ public class AuthController {
     }
 
     @PostMapping("signup/user/verify-otp")
-    public ResponseEntity<?> verifyOtp(@RequestBody VerifyOtpRequest request) throws MessagingException {
+    public ResponseEntity<?> verifyOtp(
+            @RequestBody VerifyOtpRequest request ,
+            HttpServletResponse response) throws MessagingException
+    {
         Boolean verified = otpService.verifyOtp(request);
-        if(verified) {
-            return ResponseEntity.ok("OTP verified successfully");
-        }else {
-            return ResponseEntity.badRequest().body("OTP not verified");
+        if(!verified) {
+            return ResponseEntity.badRequest().body("OTP is not verified");
         }
-    }
+        var user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
+        return generateAndSetCookie(user,response);
+
+    }
 
     @PostMapping("/login/user")
     public ResponseEntity<?> login(
@@ -81,6 +86,10 @@ public class AuthController {
                 )
         );
         User user = userRepository.findByEmail(request.getEmail()).orElseThrow();
+        return generateAndSetCookie(user,response);
+    }
+
+    public ResponseEntity<?> generateAndSetCookie(User user , HttpServletResponse response){
         var accessToken =jwtService.generateAccessToken(user);
         var refreshToken =jwtService.generateRefreshToken(user);
 
