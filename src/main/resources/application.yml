@@ -1,6 +1,6 @@
 spring:
   application:
-    name: ServiceHub
+    name: QuestX
   datasource:
     url: jdbc:mysql://localhost:3306/servicehub?createDatabaseIfNotExist=true
     username: root
