@@ -12,7 +12,7 @@ import java.util.Set;
 @Setter
 @Entity
 @Table(name = "admins", schema = "servicehub")
-public class Admin {
+public class Admin implements JwtUser {
     @Id
     @ColumnDefault("1")
     @Column(name = "admin_id", nullable = false)
@@ -21,14 +21,22 @@ public class Admin {
     @Column(name = "name", nullable = false)
     private String name;
 
+    @Column(name = "email" , nullable = false)
+    private String email;
+
     @Column(name = "password", nullable = false)
     private String password;
 
-    @ColumnDefault("'ADMIN'")
-    @Column(name = "role", nullable = false, length = 50)
-    private String role;
+    @Column(name = "role")
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
+    @Override
+    public String getRole() {
+        return this.role.name();
+    }
 
     @OneToMany(mappedBy = "admin")
-    private Set<AdminAction> adminactions = new LinkedHashSet<>();
+    private Set<AdminAction> adminActions = new LinkedHashSet<>();
 
 }

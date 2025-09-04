@@ -1,7 +1,6 @@
 package org.example.QuestX.Controller.auth;
 
 import jakarta.mail.MessagingException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -9,7 +8,6 @@ import org.example.QuestX.Model.Role;
 import org.example.QuestX.Model.Status;
 import org.example.QuestX.Model.User;
 import org.example.QuestX.Repository.UserRepository;
-import org.example.QuestX.config.JwtConfig;
 import org.example.QuestX.config.PasswordConfig;
 import org.example.QuestX.dtos.JwtResponse;
 import org.example.QuestX.dtos.SignupRequest;
@@ -30,7 +28,6 @@ public class UserAuthController {
     private final  AuthenticationManager authenticationManager;
     private final  UserRepository userRepository;
     private final JwtService jwtService;
-    private final JwtConfig jwtConfig;
     private final PasswordConfig passwordConfig;
     private final OtpService otpService;
 
@@ -58,7 +55,7 @@ public class UserAuthController {
         return ResponseEntity.ok("OTP has been sent to your email");
     }
 
-    @PostMapping("signup/user/verify-otp")
+    @PostMapping("/signup/user/verify-otp")
     public ResponseEntity<?> verifyOtp(
             @RequestBody VerifyOtpRequest request ,
             HttpServletResponse response) throws MessagingException
@@ -71,7 +68,9 @@ public class UserAuthController {
                 .orElseThrow(() -> new RuntimeException("User not found"));
         user.setIsEmailVerified(true);
         userRepository.save(user);
-        return generateAndSetCookie(user,response);
+
+        JwtResponse jwtResponse = jwtService.generateAndSetCookie(user,response);
+        return ResponseEntity.ok(jwtResponse);
 
     }
 
@@ -87,20 +86,9 @@ public class UserAuthController {
                 )
         );
         User user = userRepository.findByEmail(request.getEmail()).orElseThrow();
-        return generateAndSetCookie(user,response);
+
+        JwtResponse jwtResponse = jwtService.generateAndSetCookie(user,response);
+        return ResponseEntity.ok(jwtResponse);
     }
 
-    public ResponseEntity<?> generateAndSetCookie(User user , HttpServletResponse response){
-        var accessToken =jwtService.generateAccessToken(user);
-        var refreshToken =jwtService.generateRefreshToken(user);
-
-        var cookie = new Cookie("Refresh", refreshToken.toString());
-        cookie.setPath("/");
-        cookie.setHttpOnly(true);
-        cookie.setSecure(true);
-        cookie.setMaxAge(jwtConfig.getRefreshTokenExpiration());
-        response.addCookie(cookie);
-
-        return ResponseEntity.ok(new JwtResponse(accessToken.toString()));
-    }
 }

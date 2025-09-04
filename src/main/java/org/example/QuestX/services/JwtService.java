@@ -3,9 +3,12 @@ package org.example.QuestX.services;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
-import org.example.QuestX.Model.User;
+import org.example.QuestX.Model.JwtUser;
 import org.example.QuestX.config.JwtConfig;
+import org.example.QuestX.dtos.JwtResponse;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -16,21 +19,35 @@ public class JwtService {
 
     private final JwtConfig jwtConfig;
 
-    public Jwt generateAccessToken(User user) {
+    public JwtResponse generateAndSetCookie(JwtUser jwtUser , HttpServletResponse response){
+        var accessToken =generateAccessToken(jwtUser);
+        var refreshToken =generateRefreshToken(jwtUser);
 
-        return generateToken(user, jwtConfig.getAccessTokenExpiration());
-    }
-    public Jwt generateRefreshToken(User user) {
-        return generateToken(user,jwtConfig.getRefreshTokenExpiration());
+        var cookie = new Cookie("Refresh", refreshToken.toString());
+        cookie.setPath("/");
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        cookie.setMaxAge(jwtConfig.getRefreshTokenExpiration());
+        response.addCookie(cookie);
+
+        return  new JwtResponse(accessToken.toString());
     }
 
-    private Jwt generateToken(User user , long tokenExpiration) {
+    public Jwt generateAccessToken(JwtUser jwtUser) {
+
+        return generateToken(jwtUser, jwtConfig.getAccessTokenExpiration());
+    }
+    public Jwt generateRefreshToken(JwtUser jwtUser) {
+        return generateToken(jwtUser,jwtConfig.getRefreshTokenExpiration());
+    }
+
+    private Jwt generateToken(JwtUser jwtUser , long tokenExpiration) {
 
         var claims = Jwts.claims()
-                .subject(user.getId().toString())
-                .add("email", user.getEmail())
-                .add("name", user.getName())
-                .add("role", user.getRole())
+                .subject(jwtUser.getId().toString())
+                .add("email", jwtUser.getEmail())
+                .add("name", jwtUser.getName())
+                .add("role", jwtUser.getRole())
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + 1000 * tokenExpiration))
                 .build();

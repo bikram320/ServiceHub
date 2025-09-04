@@ -14,7 +14,7 @@ import java.util.Set;
 @Setter
 @Entity
 @Table(name = "users", schema = "servicehub")
-public class User {
+public class User implements JwtUser {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id", nullable = false)
@@ -52,6 +52,11 @@ public class User {
     @Column(name = "role")
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    @Override
+    public String getRole() {
+        return this.role.name();
+    }
 
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "created_at")

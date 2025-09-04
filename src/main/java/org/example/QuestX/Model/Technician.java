@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.LinkedHashSet;
@@ -14,7 +15,7 @@ import java.util.Set;
 @Setter
 @Entity
 @Table(name = "technicians", schema = "servicehub")
-public class Technician {
+public class Technician implements JwtUser{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "tech_id", nullable = false)
@@ -46,8 +47,8 @@ public class Technician {
     private Status status;
 
     @ColumnDefault("0")
-    @Column(name = "is_verified", nullable = false)
-    private Boolean isVerified = false;
+    @Column(name = "email_verified", nullable = false)
+    private Boolean isEmailVerified = false;
 
     @ColumnDefault("0")
     @Column(name = "available", nullable = false)
@@ -56,6 +57,11 @@ public class Technician {
     @Column(name = "role")
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    @Override
+    public String getRole() {
+        return this.role.name();
+    }
 
     @Column(name = "rating")
     private Float rating;
