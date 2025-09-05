@@ -1,4 +1,4 @@
-package org.example.QuestX.services.UserDetailsService;
+package org.example.QuestX.services;
 
 import lombok.AllArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
