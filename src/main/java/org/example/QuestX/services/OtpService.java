@@ -3,7 +3,6 @@ package org.example.QuestX.services;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.AllArgsConstructor;
-import org.example.QuestX.Repository.UserRepository;
 import org.example.QuestX.dtos.VerifyOtpRequest;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -17,7 +16,6 @@ import java.util.concurrent.TimeUnit;
 @AllArgsConstructor
 public class OtpService {
 
-    private final UserRepository userRepository;
     private final JavaMailSender mailSender;
     private final RedisTemplate<String, String> redisTemplate;
 
@@ -25,29 +23,29 @@ public class OtpService {
         return String.format("%06d", new Random().nextInt(999999));
     }
 
-    public void saveOtp(String email) throws MessagingException {
+    public void sendOtpEmail(String email) throws MessagingException {
+
+        //Generate Otp
         String otp = generateOtp();
+
         //save otp in Redis
         redisTemplate.opsForValue().set(email, otp , 5 , TimeUnit.MINUTES);
 
-        sendOtpEmail(email, otp);
-    }
-
-    private void sendOtpEmail(String email, String otp) throws MessagingException {
-        // Send email
+        //Send Otp via email to User
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
-        helper.setTo(email);  // use the extracted String email
+        helper.setTo(email);
         helper.setSubject("Your OTP Code");
         helper.setText("Your OTP is: " + otp);
         mailSender.send(message);
     }
 
+
     public void resendOtp(String email) throws MessagingException {
-        saveOtp(email);
+        sendOtpEmail(email);
     }
 
-    public Boolean verifyOtp(VerifyOtpRequest request) throws MessagingException {
+    public Boolean verifyOtp(VerifyOtpRequest request) {
         String cachedOtp = redisTemplate.opsForValue().get(request.getEmail());
         if(cachedOtp != null && cachedOtp.equals(request.getOtp())){
             redisTemplate.delete(request.getEmail());

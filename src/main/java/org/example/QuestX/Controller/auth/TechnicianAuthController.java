@@ -46,7 +46,7 @@ public class TechnicianAuthController {
         technician.setStatus(Status.PENDING);
         technicianRepository.save(technician);
 
-        otpService.saveOtp(request.getEmail());
+        otpService.sendOtpEmail(request.getEmail());
         return ResponseEntity.ok("OTP successfully sent");
     }
 
