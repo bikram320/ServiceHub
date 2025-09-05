@@ -12,14 +12,11 @@ import org.example.QuestX.config.PasswordConfig;
 import org.example.QuestX.dtos.*;
 import org.example.QuestX.services.JwtService;
 import org.example.QuestX.services.OtpService;
-import org.example.QuestX.services.UserDetailsService.ResetTokenService;
+import org.example.QuestX.services.ResetPasswordService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
-import java.util.UUID;
 
 
 @AllArgsConstructor
@@ -32,7 +29,7 @@ public class UserAuthController {
     private final JwtService jwtService;
     private final PasswordConfig passwordConfig;
     private final OtpService otpService;
-    private final ResetTokenService resetTokenService;
+    private final ResetPasswordService resetPasswordService;
 
     @PostMapping("/signup/user")
     public ResponseEntity<?> signup(@RequestBody SignupRequest request) throws MessagingException {
@@ -107,20 +104,12 @@ public class UserAuthController {
     }
     @PostMapping("/login/user/forget-password/verify-otp")
     public ResponseEntity<?> verifyOtpForPasswordChange(@RequestBody VerifyOtpRequest request) {
-        Boolean verified = otpService.verifyOtp(request);
-        if(!verified) {
-            return ResponseEntity.badRequest().body("OTP is not verified");
-        }
-
-        String resetToken = UUID.randomUUID().toString();
-        resetTokenService.storeResetToken(request.getEmail(), resetToken);
-        return ResponseEntity.ok(Map.of("message", "OTP verified. Proceed to reset password.",
-                "resetToken", resetToken));
+        return ResponseEntity.ok(resetPasswordService.verifyOtpAndGenerateResetToken(request));
     }
 
     @PostMapping("/login/user/forget-password/reset-password")
     public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) {
-        boolean verified = resetTokenService.verifyResetToken(request.getEmail(),request.getResetToken());
+        boolean verified = resetPasswordService.verifyResetToken(request.getEmail(),request.getResetToken());
         if(!verified) {
             return ResponseEntity.badRequest().body("Reset token is not verified");
         }
@@ -130,7 +119,7 @@ public class UserAuthController {
         user.setPassword(passwordConfig.passwordEncoder().encode(request.getPassword()));
         userRepository.save(user);
 
-        resetTokenService.removeResetToken(request.getEmail());
+        resetPasswordService.removeResetToken(request.getEmail());
 
         return ResponseEntity.ok("Password has been Reset Successfully");
     }

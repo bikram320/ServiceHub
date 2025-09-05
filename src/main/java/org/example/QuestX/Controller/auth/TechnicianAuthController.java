@@ -9,12 +9,10 @@ import org.example.QuestX.Model.Status;
 import org.example.QuestX.Model.Technician;
 import org.example.QuestX.Repository.TechnicianRepository;
 import org.example.QuestX.config.PasswordConfig;
-import org.example.QuestX.dtos.JwtResponse;
-import org.example.QuestX.dtos.LoginRequest;
-import org.example.QuestX.dtos.SignupRequest;
-import org.example.QuestX.dtos.VerifyOtpRequest;
+import org.example.QuestX.dtos.*;
 import org.example.QuestX.services.JwtService;
 import org.example.QuestX.services.OtpService;
+import org.example.QuestX.services.ResetPasswordService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -31,6 +29,7 @@ public class TechnicianAuthController {
     private final PasswordConfig passwordConfig;
     private final OtpService otpService;
     private final JwtService jwtService;
+    private final ResetPasswordService resetPasswordService;
 
     @PostMapping("/signup/technician")
     public ResponseEntity<?> technicianSignup(@RequestBody SignupRequest request ) throws MessagingException {
@@ -52,7 +51,7 @@ public class TechnicianAuthController {
 
     @PostMapping("/signup/technician/verify-otp")
     public ResponseEntity<?> verifyOtp(@RequestBody VerifyOtpRequest request,
-                                       HttpServletResponse response) throws MessagingException {
+                                       HttpServletResponse response)  {
         boolean verified = otpService.verifyOtp(request);
         if(!verified) {
             return ResponseEntity.badRequest().body("OTP verification failed");
@@ -86,6 +85,42 @@ public class TechnicianAuthController {
         }
         JwtResponse jwtResponse = jwtService.generateAndSetCookie(technician,response);
         return ResponseEntity.ok(jwtResponse);
+    }
+
+    @PostMapping("/login/technician/forget-password")
+    public ResponseEntity<?> forgetPassword(
+            @RequestParam String email
+    ) throws MessagingException {
+
+        var technician = technicianRepository.findByEmail(email);
+        if(technician == null) {
+            return ResponseEntity.badRequest().body("User doesn't exist");
+        }
+        otpService.sendOtpEmail(technician.getEmail());
+        return ResponseEntity.ok("OTP has been sent to your email");
+    }
+    @PostMapping("/login/technician/forget-password/verify-otp")
+    public ResponseEntity<?> verifyOtpForPasswordChange(@RequestBody VerifyOtpRequest request) {
+        return ResponseEntity.ok(resetPasswordService.verifyOtpAndGenerateResetToken(request));
+
+    }
+
+    @PostMapping("/login/technician/forget-password/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) {
+        boolean verified = resetPasswordService.verifyResetToken(request.getEmail(),request.getResetToken());
+        if(!verified) {
+            return ResponseEntity.badRequest().body("Reset token is not verified");
+        }
+        var technician = technicianRepository.findByEmail(request.getEmail());
+        if (technician == null) {
+            return ResponseEntity.badRequest().body("User doesn't exist");
+        }
+        technician.setPassword(passwordConfig.passwordEncoder().encode(request.getPassword()));
+        technicianRepository.save(technician);
+
+        resetPasswordService.removeResetToken(request.getEmail());
+
+        return ResponseEntity.ok("Password has been Reset Successfully");
     }
 
 }
