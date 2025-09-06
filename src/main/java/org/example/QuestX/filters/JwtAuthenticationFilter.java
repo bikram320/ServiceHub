@@ -22,7 +22,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    public void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         var authHeader = request.getHeader("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
@@ -34,13 +34,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
-         var authentication = new UsernamePasswordAuthenticationToken(
-                 jwt.getUserId(), null,
-                 List.of(new SimpleGrantedAuthority("ROLE_"+jwt.getRole())));
+        var authentication = new UsernamePasswordAuthenticationToken(
+                jwt.getUserId(), null,
+                List.of(new SimpleGrantedAuthority("ROLE_" + jwt.getRole())));
         authentication.setDetails(
                 new WebAuthenticationDetailsSource().buildDetails(request)
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
+
         filterChain.doFilter(request, response);
 
     }

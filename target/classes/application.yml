@@ -27,3 +27,7 @@ spring:
       host: localhost
       port: 6379
 
+
+google:
+  api:
+    key: ${GOOGLE_MAPS_API_KEY}

@@ -6,7 +6,8 @@ import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.math.BigDecimal;
-import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -58,9 +59,15 @@ public class User implements JwtUser {
         return this.role.name();
     }
 
+    @Column(name = "profile_image_path")
+    private String profileImagePath;
+
+    @Column(name = "document_path")
+    private String documentPath;
+
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "created_at")
-    private Instant createdAt;
+    private LocalDate createdAt;
 
     @OneToMany(mappedBy = "user")
     private Set<Payment> payments = new LinkedHashSet<>();

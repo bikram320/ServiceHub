@@ -18,6 +18,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+
 
 @AllArgsConstructor
 @RequestMapping("/auth")
@@ -43,6 +45,7 @@ public class UserAuthController {
         user.setPassword(passwordConfig.passwordEncoder().encode(request.getPassword()));
         user.setRole(Role.USER);
         user.setStatus(Status.PENDING);
+        user.setCreatedAt(LocalDate.now());
         userRepository.save(user);
 
         otpService.sendOtpEmail(request.getEmail());

@@ -82,7 +82,6 @@ public class SecurityConfig {
                 .authorizeHttpRequests(c -> c
                         //  Public endpoints
                         .requestMatchers(HttpMethod.POST, "/auth/login/**", "/auth/signup/**").permitAll()
-                        .requestMatchers("/auth/refresh").permitAll()
                         .requestMatchers("/Home/**").permitAll()
 
                         // User endpoints
