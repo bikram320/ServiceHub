@@ -2,14 +2,19 @@ package org.example.QuestX.services;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.example.QuestX.Model.Skill;
 import org.example.QuestX.Model.User;
+import org.example.QuestX.Repository.SkillRepository;
+import org.example.QuestX.Repository.TechnicianRepository;
 import org.example.QuestX.Repository.UserRepository;
+import org.example.QuestX.dtos.GetTechnicianDataRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -19,6 +24,8 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final LocationService locationService;
+    private final TechnicianRepository technicianRepository;
+    private final SkillRepository skillRepository;
 
 
     // Update profile service
@@ -69,5 +76,21 @@ public class UserService {
         userRepository.save(user);
     }
 
+    public List<GetTechnicianDataRequest> getTechnicianBasedOnSkill(String skill){
+        Skill skillEntity = skillRepository.findByName(skill);
+        var technicians = technicianRepository.findTechniciansBySkillId(skillEntity.getId());
+
+        return technicians.stream()
+                .map(tech -> {
+                    GetTechnicianDataRequest dto = new GetTechnicianDataRequest();
+                    dto.setTechnicianName(tech.getName());
+                    dto.setTechnicianAddress(tech.getAddress());
+                    dto.setTechnicianPhone(tech.getPhone());
+                    dto.setTechnicianBio(tech.getBio());
+                    return dto;
+                })
+                .toList();
+
+    }
 
 }

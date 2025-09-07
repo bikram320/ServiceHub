@@ -4,10 +4,7 @@ import lombok.AllArgsConstructor;
 import org.example.QuestX.Repository.UserRepository;
 import org.example.QuestX.services.UserService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -31,6 +28,12 @@ public class UserController {
     ) throws IOException {
         userService.UpdateProfileSetup(email , phone, address, latitude, longitude, profile_image, valid_doc);
         return ResponseEntity.ok("Profile Updated Successfully");
+    }
+
+    @GetMapping("/getTechniciansBasedOnSkill")
+    public ResponseEntity<?> getTechniciansBasedOnSkill(@RequestParam String skill) {
+        var technician= userService.getTechnicianBasedOnSkill(skill);
+        return ResponseEntity.ok(technician);
     }
 
 }

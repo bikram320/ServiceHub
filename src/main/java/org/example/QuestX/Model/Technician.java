@@ -46,6 +46,9 @@ public class Technician implements JwtUser{
     @Column(name = "status")
     private Status status;
 
+    @Column(name = "bio")
+    private String Bio;
+
     @ColumnDefault("0")
     @Column(name = "email_verified", nullable = false)
     private Boolean isEmailVerified = false;
