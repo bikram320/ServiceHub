@@ -30,10 +30,12 @@ public class UserController {
         return ResponseEntity.ok("Profile Updated Successfully");
     }
 
-    @GetMapping("/getTechniciansBasedOnSkill")
+    @GetMapping("/get-technicians-based-on-skill")
     public ResponseEntity<?> getTechniciansBasedOnSkill(@RequestParam String skill) {
         var technician= userService.getTechnicianBasedOnSkill(skill);
         return ResponseEntity.ok(technician);
     }
 
+    @PostMapping("/book-technician-for-service")
+    public ResponseEntity<?> bookTechnicianForService()
 }

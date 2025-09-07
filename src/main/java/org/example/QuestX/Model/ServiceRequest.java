@@ -11,7 +11,7 @@ import java.time.Instant;
 @Getter
 @Setter
 @Entity
-@Table(name = "serviceRequests", schema = "servicehub")
+@Table(name = "service_requests", schema = "servicehub")
 public class ServiceRequest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -44,13 +44,6 @@ public class ServiceRequest {
 
     @Column(name = "fee_charged", nullable = false, precision = 10, scale = 2)
     private BigDecimal feeCharged;
-
-    @Column(name = "rating")
-    private Float rating;
-
-    @Lob
-    @Column(name = "feedback")
-    private String feedback;
 
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "created_at")
