@@ -8,10 +8,11 @@ import org.example.QuestX.Model.Role;
 import org.example.QuestX.Model.Status;
 import org.example.QuestX.Model.Technician;
 import org.example.QuestX.Repository.TechnicianRepository;
+import org.example.QuestX.Repository.UserRepository;
 import org.example.QuestX.config.PasswordConfig;
 import org.example.QuestX.dtos.*;
 import org.example.QuestX.services.JwtService;
-import org.example.QuestX.services.OtpService;
+import org.example.QuestX.services.MailService;
 import org.example.QuestX.services.ResetPasswordService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -27,9 +28,10 @@ public class TechnicianAuthController {
     private final AuthenticationManager authenticationManager;
     private final TechnicianRepository technicianRepository;
     private final PasswordConfig passwordConfig;
-    private final OtpService otpService;
+    private final MailService otpService;
     private final JwtService jwtService;
     private final ResetPasswordService resetPasswordService;
+    private final UserRepository userRepository;
 
     @PostMapping("/signup/technician")
     public ResponseEntity<?> technicianSignup(@RequestBody SignupRequest request ) throws MessagingException {
@@ -39,6 +41,10 @@ public class TechnicianAuthController {
 
         Technician technician = new Technician();
         technician.setName(request.getName());
+
+        if(technicianRepository.existsByEmail(request.getEmail())){
+            return ResponseEntity.badRequest().body("Email already exists");
+        }
         technician.setEmail(request.getEmail());
         technician.setPassword(passwordConfig.passwordEncoder().encode(request.getPassword()));
         technician.setRole(Role.TECHNICIAN);
@@ -94,7 +100,7 @@ public class TechnicianAuthController {
 
         var technician = technicianRepository.findByEmail(email);
         if(technician == null) {
-            return ResponseEntity.badRequest().body("User doesn't exist");
+            return ResponseEntity.badRequest().body("Technician doesn't exist");
         }
         otpService.sendOtpEmail(technician.getEmail());
         return ResponseEntity.ok("OTP has been sent to your email");
@@ -113,7 +119,7 @@ public class TechnicianAuthController {
         }
         var technician = technicianRepository.findByEmail(request.getEmail());
         if (technician == null) {
-            return ResponseEntity.badRequest().body("User doesn't exist");
+            return ResponseEntity.badRequest().body("Technician doesn't exist");
         }
         technician.setPassword(passwordConfig.passwordEncoder().encode(request.getPassword()));
         technicianRepository.save(technician);

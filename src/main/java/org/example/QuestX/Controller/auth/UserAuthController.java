@@ -10,8 +10,9 @@ import org.example.QuestX.Model.User;
 import org.example.QuestX.Repository.UserRepository;
 import org.example.QuestX.config.PasswordConfig;
 import org.example.QuestX.dtos.*;
+import org.example.QuestX.exception.UserNotFoundException;
 import org.example.QuestX.services.JwtService;
-import org.example.QuestX.services.OtpService;
+import org.example.QuestX.services.MailService;
 import org.example.QuestX.services.ResetPasswordService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -30,7 +31,7 @@ public class UserAuthController {
     private final  UserRepository userRepository;
     private final JwtService jwtService;
     private final PasswordConfig passwordConfig;
-    private final OtpService otpService;
+    private final MailService otpService;
     private final ResetPasswordService resetPasswordService;
 
     @PostMapping("/signup/user")
@@ -41,6 +42,9 @@ public class UserAuthController {
 
         User user = new User();
         user.setName(request.getName());
+        if(userRepository.existsByEmail(request.getEmail())) {
+            return ResponseEntity.badRequest().body("Email already exists");
+        }
         user.setEmail(request.getEmail());
         user.setPassword(passwordConfig.passwordEncoder().encode(request.getPassword()));
         user.setRole(Role.USER);
@@ -100,8 +104,8 @@ public class UserAuthController {
     ) throws MessagingException {
 
         var user = userRepository.findByEmail(email).orElseThrow(
-                ()-> new RuntimeException("User not found"));
-
+                ()-> new UserNotFoundException("User not found")
+        );
         otpService.sendOtpEmail(user.getEmail());
         return ResponseEntity.ok("OTP has been sent to your email");
     }
@@ -117,7 +121,7 @@ public class UserAuthController {
             return ResponseEntity.badRequest().body("Reset token is not verified");
         }
         var user = userRepository.findByEmail(request.getEmail()).orElseThrow(
-                ()-> new RuntimeException("User not found")
+                ()-> new UserNotFoundException("User not found")
         );
         user.setPassword(passwordConfig.passwordEncoder().encode(request.getPassword()));
         userRepository.save(user);

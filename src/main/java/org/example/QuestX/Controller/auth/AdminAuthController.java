@@ -9,6 +9,7 @@ import org.example.QuestX.dtos.LoginRequest;
 import org.example.QuestX.services.JwtService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,6 +32,9 @@ public class AdminAuthController {
                 )
         );
         Admin admin = adminRepository.findByEmail(request.getEmail());
+        if (admin == null) {
+            throw new BadCredentialsException("Invalid email or password");
+        }
 
         JwtResponse jwtResponse = jwtService.generateAndSetCookie(admin, response);
         return ResponseEntity.ok(jwtResponse);
