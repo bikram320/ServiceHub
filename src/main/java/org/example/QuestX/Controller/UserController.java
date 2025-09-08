@@ -1,7 +1,8 @@
 package org.example.QuestX.Controller;
 
+import jakarta.mail.MessagingException;
 import lombok.AllArgsConstructor;
-import org.example.QuestX.Repository.UserRepository;
+import org.example.QuestX.dtos.ServiceRequestDto;
 import org.example.QuestX.services.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -37,5 +38,9 @@ public class UserController {
     }
 
     @PostMapping("/book-technician-for-service")
-    public ResponseEntity<?> bookTechnicianForService()
+    public ResponseEntity<?> bookTechnicianForService(@RequestBody ServiceRequestDto request)
+    throws MessagingException {
+        userService.bookTechnicianForService(request);
+        return ResponseEntity.ok("Technician Booked Successfully");
+    }
 }

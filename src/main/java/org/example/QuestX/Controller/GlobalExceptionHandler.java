@@ -67,4 +67,11 @@ public class GlobalExceptionHandler {
         errors.put("message", exception.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errors);
     }
+
+    @ExceptionHandler(TimeConflictException.class)
+    public ResponseEntity<Map<String,String>> handleTimeConflictException(TimeConflictException exception) {
+        var errors = new HashMap<String, String>();
+        errors.put("message", exception.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errors);
+    }
 }

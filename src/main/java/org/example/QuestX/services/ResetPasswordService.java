@@ -3,7 +3,6 @@ package org.example.QuestX.services;
 import lombok.AllArgsConstructor;
 import org.example.QuestX.dtos.VerifyOtpRequest;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -15,7 +14,7 @@ import java.util.concurrent.TimeUnit;
 public class ResetPasswordService {
 
     private final RedisTemplate<String, String> redisTemplate;
-    private final OtpService otpService;
+    private final MailService otpService;
 
     public Map<String , String > verifyOtpAndGenerateResetToken(VerifyOtpRequest request){
         Boolean verified = otpService.verifyOtp(request);

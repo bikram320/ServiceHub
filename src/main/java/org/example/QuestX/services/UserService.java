@@ -1,19 +1,26 @@
 package org.example.QuestX.services;
 
+import jakarta.mail.MessagingException;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.example.QuestX.Model.Skill;
-import org.example.QuestX.Model.User;
+import org.example.QuestX.Model.*;
+import org.example.QuestX.Repository.ServiceRequestRepository;
 import org.example.QuestX.Repository.SkillRepository;
 import org.example.QuestX.Repository.TechnicianRepository;
 import org.example.QuestX.Repository.UserRepository;
 import org.example.QuestX.dtos.GetTechnicianDataRequest;
+import org.example.QuestX.dtos.ServiceRequestDto;
+import org.example.QuestX.exception.InvalidDateTimeException;
+import org.example.QuestX.exception.ServiceNotFoundException;
+import org.example.QuestX.exception.TechnicianNotFoundException;
+import org.example.QuestX.exception.UserNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -26,6 +33,8 @@ public class UserService {
     private final LocationService locationService;
     private final TechnicianRepository technicianRepository;
     private final SkillRepository skillRepository;
+    private final ServiceRequestRepository serviceRequestRepository;
+    private final MailService mailService;
 
 
     // Update profile service
@@ -36,7 +45,7 @@ public class UserService {
     ) throws IOException {
 
         User user = userRepository.findByEmail(email).orElseThrow((
-                () -> new RuntimeException("User Not Found")
+                () -> new UserNotFoundException("User Not Found")
                 ));
         if(phone!=null){
             user.setPhone(phone);
@@ -79,6 +88,9 @@ public class UserService {
     public List<GetTechnicianDataRequest> getTechnicianBasedOnSkill(String skill){
         Skill skillEntity = skillRepository.findByName(skill);
         var technicians = technicianRepository.findTechniciansBySkillId(skillEntity.getId());
+        if (technicians.isEmpty()) {
+            throw new TechnicianNotFoundException("Technician Not Found");
+        }
 
         return technicians.stream()
                 .map(tech -> {
@@ -90,6 +102,62 @@ public class UserService {
                     return dto;
                 })
                 .toList();
+
+    }
+
+    public void bookTechnicianForService(ServiceRequestDto request) throws MessagingException {
+        User user = userRepository.findByEmail(request.getUserEmail()).orElseThrow(
+                () -> new UserNotFoundException("User Not Found")
+        );
+        Technician technician = technicianRepository.findByEmail(request.getTechnicianEmail());
+        if (technician == null) {
+            throw new TechnicianNotFoundException("Technician Not Found");
+        }
+        Skill skill = skillRepository.findByName(request.getServiceName());
+        if (skill == null) {
+            throw new ServiceNotFoundException("Service Not Found");
+        }
+
+        ServiceRequest serviceRequest = new ServiceRequest();
+        serviceRequest.setUser(user);
+        serviceRequest.setTechnician(technician);
+        serviceRequest.setSkill(skill);
+
+        LocalDateTime appointmentTime = request.getAppointmentTime();
+
+        if (appointmentTime.isBefore(LocalDateTime.now())) {
+            throw new InvalidDateTimeException("Appointment Time is Invalid");
+        }
+
+        int hour = appointmentTime.getHour();
+        if (hour < 9 || hour >= 17) {
+            throw new InvalidDateTimeException("Appointment must be between 9 AM and 5 PM");
+        }
+
+        if (hour == 13) {
+            throw new InvalidDateTimeException("Technician is unavailable between 1 PM and 2 PM");
+        }
+
+        if (appointmentTime.getMinute() != 0 || appointmentTime.getSecond() != 0) {
+            throw new InvalidDateTimeException("Appointments must start at the beginning of the hour");
+        }
+        LocalDateTime appointmentEnd = appointmentTime.plusHours(1);
+        boolean conflict = serviceRequestRepository.existsByTechnicianAndAppointmentTimeBetween(
+                technician, appointmentTime, appointmentEnd.minusSeconds(1)
+        );
+        if (conflict) {
+            throw new InvalidDateTimeException("Technician is already booked for this time slot");
+        }
+
+        serviceRequest.setAppointmentTime(request.getAppointmentTime());
+        serviceRequest.setDescription(request.getDescription());
+        serviceRequest.setFeeCharged(request.getFee_charge());
+        serviceRequest.setStatus(ServiceStatus.PENDING);
+        serviceRequest.setCreatedAt(LocalDateTime.now());
+
+        serviceRequestRepository.save(serviceRequest);
+
+        mailService.sendMailToTechnician(user.getName(),technician.getEmail());
 
     }
 

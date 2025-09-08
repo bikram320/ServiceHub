@@ -7,6 +7,8 @@ import org.hibernate.annotations.ColumnDefault;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -24,7 +26,7 @@ public class ServiceRequest {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "tech_id", nullable = false)
-    private Technician tech;
+    private Technician technician;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "skill_id", nullable = false)
@@ -35,19 +37,19 @@ public class ServiceRequest {
     private String description;
 
     @Column(name = "appointment_time", nullable = false)
-    private Instant appointmentTime;
+    private LocalDateTime appointmentTime;
 
     @ColumnDefault("'PENDING'")
-    @Lob
+    @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    private String status;
+    private ServiceStatus status;
 
     @Column(name = "fee_charged", nullable = false, precision = 10, scale = 2)
     private BigDecimal feeCharged;
 
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "created_at")
-    private Instant createdAt;
+    private LocalDateTime createdAt;
 
     @OneToOne(mappedBy = "request")
     private Payment payment;
