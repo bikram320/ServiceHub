@@ -9,6 +9,7 @@ import org.example.QuestX.Repository.SkillRepository;
 import org.example.QuestX.Repository.TechnicianRepository;
 import org.example.QuestX.Repository.UserRepository;
 import org.example.QuestX.dtos.GetTechnicianDataRequest;
+import org.example.QuestX.dtos.ServiceDetailsDto;
 import org.example.QuestX.dtos.ServiceRequestDto;
 import org.example.QuestX.exception.InvalidDateTimeException;
 import org.example.QuestX.exception.ServiceNotFoundException;
@@ -21,7 +22,9 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 @AllArgsConstructor
@@ -159,6 +162,36 @@ public class UserService {
 
         mailService.sendMailToTechnician(user.getName(),technician.getEmail());
 
+    }
+
+    public List<ServiceDetailsDto> getCurrentServiceBooking(String email ){
+        User user = userRepository.findByEmail(email).orElseThrow(
+                () -> new UserNotFoundException("User Not Found")
+        );
+        List<ServiceStatus> activeStatuses = Arrays.asList(
+                ServiceStatus.PENDING,
+                ServiceStatus.IN_PROGRESS
+        );
+
+        List<ServiceRequest> serviceRequests =
+                serviceRequestRepository.findByUserAndStatusIn(user, activeStatuses);
+        if (serviceRequests.isEmpty()) {
+            throw new ServiceNotFoundException("Service Not Found");
+        }
+        return serviceRequests.stream()
+                .map( serviceRequest ->
+                {
+                    ServiceDetailsDto service = new ServiceDetailsDto();
+                    service.setTechnicianName(serviceRequest.getTechnician().getName());
+                    service.setTechnicianAddress(serviceRequest.getTechnician().getAddress());
+                    service.setServiceName(serviceRequest.getSkill().getName());
+                    service.setTechnicianEmail(serviceRequest.getTechnician().getEmail());
+                    service.setAppointmentTime(serviceRequest.getAppointmentTime());
+                    service.setFeeCharge(serviceRequest.getFeeCharged());
+                    service.setStatus(serviceRequest.getStatus());
+                    return service;
+                })
+                .collect(Collectors.toList());
     }
 
 }

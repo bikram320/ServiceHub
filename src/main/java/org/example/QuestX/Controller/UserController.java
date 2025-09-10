@@ -43,4 +43,10 @@ public class UserController {
         userService.bookTechnicianForService(request);
         return ResponseEntity.ok("Technician Booked Successfully");
     }
+    @GetMapping("/get-current-service-booking")
+    public ResponseEntity<?> getCurrentServiceBooking(@RequestParam String userEmail) {
+        var technicians = userService.getCurrentServiceBooking(userEmail);
+        return ResponseEntity.ok(technicians);
+    }
+
 }
