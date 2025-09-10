@@ -168,13 +168,28 @@ public class UserService {
         User user = userRepository.findByEmail(email).orElseThrow(
                 () -> new UserNotFoundException("User Not Found")
         );
-        List<ServiceStatus> activeStatuses = Arrays.asList(
+        List<ServiceStatus> Statuses = Arrays.asList(
                 ServiceStatus.PENDING,
                 ServiceStatus.IN_PROGRESS
         );
+        return getServiceBooking(user, Statuses);
+    }
+
+    public List<ServiceDetailsDto> getPreviousServiceBooking(String email ){
+        User user = userRepository.findByEmail(email).orElseThrow(
+                () -> new UserNotFoundException("User Not Found")
+        );
+        List<ServiceStatus> Statuses = Arrays.asList(
+                ServiceStatus.CANCELLED,
+                ServiceStatus.COMPLETED
+        );
+        return getServiceBooking(user, Statuses);
+    }
+
+    public List<ServiceDetailsDto> getServiceBooking(User user , List<ServiceStatus> Statuses){
 
         List<ServiceRequest> serviceRequests =
-                serviceRequestRepository.findByUserAndStatusIn(user, activeStatuses);
+                serviceRequestRepository.findByUserAndStatusIn(user, Statuses);
         if (serviceRequests.isEmpty()) {
             throw new ServiceNotFoundException("Service Not Found");
         }
@@ -193,6 +208,8 @@ public class UserService {
                 })
                 .collect(Collectors.toList());
     }
+
+
 
 
 

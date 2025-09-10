@@ -45,8 +45,13 @@ public class UserController {
     }
     @GetMapping("/get-current-service-booking")
     public ResponseEntity<?> getCurrentServiceBooking(@RequestParam String userEmail) {
-        var technicians = userService.getCurrentServiceBooking(userEmail);
-        return ResponseEntity.ok(technicians);
+        var currentServiceDetails = userService.getCurrentServiceBooking(userEmail);
+        return ResponseEntity.ok(currentServiceDetails);
+    }
+    @GetMapping("/get-previous-service-booking")
+    public ResponseEntity<?> getPreviousServiceBooking(@RequestParam String userEmail) {
+        var previousServiceDetails = userService.getPreviousServiceBooking(userEmail);
+        return ResponseEntity.ok(previousServiceDetails);
     }
 
 }
