@@ -66,7 +66,7 @@ public class TechnicianAuthController {
         technician.setIsEmailVerified(true);
         technicianRepository.save(technician);
 
-        JwtResponse jwtResponse = jwtService.generateAndSetCookie(technician,response);
+        JwtResponse jwtResponse = jwtService.generateAccessTokenAndSetCookie(technician,response);
         return ResponseEntity.ok(jwtResponse);
     }
 
@@ -89,7 +89,7 @@ public class TechnicianAuthController {
         if(technician == null) {
             return ResponseEntity.badRequest().body("Invalid email or password");
         }
-        JwtResponse jwtResponse = jwtService.generateAndSetCookie(technician,response);
+        JwtResponse jwtResponse = jwtService.generateAccessTokenAndSetCookie(technician,response);
         return ResponseEntity.ok(jwtResponse);
     }
 

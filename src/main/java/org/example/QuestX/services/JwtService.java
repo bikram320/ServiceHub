@@ -19,7 +19,7 @@ public class JwtService {
 
     private final JwtConfig jwtConfig;
 
-    public JwtResponse generateAndSetCookie(JwtUser jwtUser , HttpServletResponse response){
+    public JwtResponse generateAccessTokenAndSetCookie(JwtUser jwtUser , HttpServletResponse response){
         var accessToken =generateAccessToken(jwtUser);
         var refreshToken =generateRefreshToken(jwtUser);
 

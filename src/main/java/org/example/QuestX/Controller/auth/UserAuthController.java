@@ -76,7 +76,7 @@ public class UserAuthController {
         user.setIsEmailVerified(true);
         userRepository.save(user);
 
-        JwtResponse jwtResponse = jwtService.generateAndSetCookie(user,response);
+        JwtResponse jwtResponse = jwtService.generateAccessTokenAndSetCookie(user,response);
         return ResponseEntity.ok(jwtResponse);
 
     }
@@ -94,7 +94,7 @@ public class UserAuthController {
         );
         User user = userRepository.findByEmail(request.getEmail()).orElseThrow();
 
-        JwtResponse jwtResponse = jwtService.generateAndSetCookie(user,response);
+        JwtResponse jwtResponse = jwtService.generateAccessTokenAndSetCookie(user,response);
         return ResponseEntity.ok(jwtResponse);
     }
 

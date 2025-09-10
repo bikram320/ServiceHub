@@ -36,7 +36,7 @@ public class AdminAuthController {
             throw new BadCredentialsException("Invalid email or password");
         }
 
-        JwtResponse jwtResponse = jwtService.generateAndSetCookie(admin, response);
+        JwtResponse jwtResponse = jwtService.generateAccessTokenAndSetCookie(admin, response);
         return ResponseEntity.ok(jwtResponse);
     }
 
