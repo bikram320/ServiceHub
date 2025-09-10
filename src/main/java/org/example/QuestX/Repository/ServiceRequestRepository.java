@@ -14,5 +14,7 @@ public interface ServiceRequestRepository extends JpaRepository<ServiceRequest, 
     boolean existsByTechnicianAndAppointmentTimeBetween(Technician technician, LocalDateTime appointmentTime, LocalDateTime localDateTime);
 
     List<ServiceRequest> findByUserAndStatusIn(User user, List<ServiceStatus> activeStatuses);
+
+    ServiceRequest findByUserAndId(User user, Long id);
 }
 

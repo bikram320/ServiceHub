@@ -54,4 +54,12 @@ public class UserController {
         return ResponseEntity.ok(previousServiceDetails);
     }
 
+    @PostMapping("/cancel-pending-service-booking")
+    public ResponseEntity<?> cancelPendingServiceBooking(@RequestParam String userEmail ,
+                                                         @RequestParam Long requestId) {
+        userService.cancelServiceBooking(userEmail,requestId);
+        return ResponseEntity.ok("Service Booking Cancelled");
+    }
+
+
 }

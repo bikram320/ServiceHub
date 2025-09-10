@@ -11,10 +11,7 @@ import org.example.QuestX.Repository.UserRepository;
 import org.example.QuestX.dtos.GetTechnicianDataRequest;
 import org.example.QuestX.dtos.ServiceDetailsDto;
 import org.example.QuestX.dtos.ServiceRequestDto;
-import org.example.QuestX.exception.InvalidDateTimeException;
-import org.example.QuestX.exception.ServiceNotFoundException;
-import org.example.QuestX.exception.TechnicianNotFoundException;
-import org.example.QuestX.exception.UserNotFoundException;
+import org.example.QuestX.exception.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -209,7 +206,23 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
-
+    public void cancelServiceBooking(String email  , Long id){
+        User user = userRepository.findByEmail(email).orElseThrow(
+                () -> new UserNotFoundException("User Not Found")
+        );
+        var serviceRequest = serviceRequestRepository.findByUserAndId(user,id);
+        if (serviceRequest == null) {
+            throw new ServiceNotFoundException("Service Not Found");
+        }
+        if(serviceRequest.getStatus() == ServiceStatus.CANCELLED){
+            throw new StatusInvalidException("Status is already cancelled");
+        }
+        if(serviceRequest.getStatus() == ServiceStatus.COMPLETED || serviceRequest.getStatus() == ServiceStatus.IN_PROGRESS) {
+            throw new StatusInvalidException("Status cannot be cancelled Anymore");
+        }
+        serviceRequest.setStatus(ServiceStatus.CANCELLED);
+        serviceRequestRepository.save(serviceRequest);
+    }
 
 
 

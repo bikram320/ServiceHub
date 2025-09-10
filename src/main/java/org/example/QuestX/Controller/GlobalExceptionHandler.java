@@ -74,4 +74,11 @@ public class GlobalExceptionHandler {
         errors.put("message", exception.getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT).body(errors);
     }
+
+    @ExceptionHandler(StatusInvalidException.class)
+    public ResponseEntity<Map<String,String>> handleStatusInvalidException(StatusInvalidException exception) {
+        var errors = new HashMap<String, String>();
+        errors.put("message", exception.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
+    }
 }
