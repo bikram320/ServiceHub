@@ -61,5 +61,16 @@ public class UserController {
         return ResponseEntity.ok("Service Booking Cancelled");
     }
 
+    @PostMapping("/user-feedback")
+    public ResponseEntity<?> userFeedbackToTechnician(
+            @RequestParam Float rating,
+            @RequestParam long requestId,
+            @RequestParam long userId ,
+            @RequestParam String comment
+    ){
+        userService.userFeedbackToTechnician(rating , requestId, userId , comment);
+        return ResponseEntity.ok("Feedback Successfully Made");
+    }
+
 
 }

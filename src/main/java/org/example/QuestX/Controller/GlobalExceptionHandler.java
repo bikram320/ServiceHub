@@ -1,6 +1,7 @@
 package org.example.QuestX.Controller;
 
 import org.example.QuestX.exception.*;
+import org.example.QuestX.exception.IllegalAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -80,5 +81,19 @@ public class GlobalExceptionHandler {
         var errors = new HashMap<String, String>();
         errors.put("message", exception.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
+    }
+
+    @ExceptionHandler(IllegalAccessException.class)
+    public ResponseEntity<Map<String,String>> handleIllegalAccessException(IllegalAccessException exception) {
+        var errors = new HashMap<String, String>();
+        errors.put("message", exception.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
+    }
+
+    @ExceptionHandler(FeedbackAlreadyExistsException.class)
+    public ResponseEntity<Map<String,String>> handleFeedbackAlreadyExistsException(FeedbackAlreadyExistsException exception) {
+        var errors = new HashMap<String, String>();
+        errors.put("message", exception.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errors);
     }
 }

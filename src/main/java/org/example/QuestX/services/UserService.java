@@ -4,14 +4,12 @@ import jakarta.mail.MessagingException;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.example.QuestX.Model.*;
-import org.example.QuestX.Repository.ServiceRequestRepository;
-import org.example.QuestX.Repository.SkillRepository;
-import org.example.QuestX.Repository.TechnicianRepository;
-import org.example.QuestX.Repository.UserRepository;
+import org.example.QuestX.Repository.*;
 import org.example.QuestX.dtos.GetTechnicianDataRequest;
 import org.example.QuestX.dtos.ServiceDetailsDto;
 import org.example.QuestX.dtos.ServiceRequestDto;
 import org.example.QuestX.exception.*;
+import org.example.QuestX.exception.IllegalAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,6 +19,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Data
@@ -35,6 +35,7 @@ public class UserService {
     private final SkillRepository skillRepository;
     private final ServiceRequestRepository serviceRequestRepository;
     private final MailService mailService;
+    private final FeedbackRepository feedBackRepository;
 
 
     // Update profile service
@@ -223,6 +224,42 @@ public class UserService {
         }
         serviceRequest.setStatus(ServiceStatus.CANCELLED);
         serviceRequestRepository.save(serviceRequest);
+    }
+
+    public void userFeedbackToTechnician(Float rating, Long requestId , long userId , String comments){
+        ServiceRequest service = serviceRequestRepository.findById(requestId).orElseThrow(
+                () -> new ServiceNotFoundException("Service Not Found")
+        );
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new UserNotFoundException("User Not Found")
+        );
+        if(!Objects.equals(user.getId(), service.getUser().getId())){
+            throw new IllegalAccessException("you cannot give feedback for this service");
+        }
+
+        Optional<Feedback> existingFeedback = feedBackRepository.findByRequest_Id(requestId);
+        if (existingFeedback.isPresent()) {
+            throw new FeedbackAlreadyExistsException("You have already submitted feedback for this service request.");
+        }
+        Feedback feedback = new Feedback();
+        feedback.setRating(rating);
+        feedback.setRequest(service);
+        feedback.setComments(comments);
+        feedback.setCreatedAt(LocalDateTime.now());
+        feedBackRepository.save(feedback);
+
+        Technician technician = service.getTechnician();
+        List<Feedback> technicianFeedbacks = feedBackRepository.findAllByRequest_Technician_Id(technician.getId());
+
+        double avgRating = technicianFeedbacks.stream()
+                .mapToDouble(Feedback::getRating)
+                .average()
+                .orElse(rating);
+
+        technician.setRating((float)avgRating);
+        serviceRequestRepository.save(service);
+
+
     }
 
 
