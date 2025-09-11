@@ -33,7 +33,6 @@ public class TechnicianAuthController {
     private final MailService otpService;
     private final JwtService jwtService;
     private final ResetPasswordService resetPasswordService;
-    private final UserRepository userRepository;
 
     @PostMapping("/signup/technician")
     public ResponseEntity<?> technicianSignup(@RequestBody SignupRequest request ) throws MessagingException {
@@ -48,6 +47,9 @@ public class TechnicianAuthController {
             return ResponseEntity.badRequest().body("Email already exists");
         }
         technician.setEmail(request.getEmail());
+        if(!request.getPassword().equals(request.getConfirmPassword())) {
+            return ResponseEntity.badRequest().body("Passwords do not match");
+        }
         technician.setPassword(passwordConfig.passwordEncoder().encode(request.getPassword()));
         technician.setRole(Role.TECHNICIAN);
         technician.setStatus(Status.PENDING);

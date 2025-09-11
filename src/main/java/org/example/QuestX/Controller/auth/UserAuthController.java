@@ -35,7 +35,7 @@ public class UserAuthController {
     private final ResetPasswordService resetPasswordService;
 
     @PostMapping("/signup/user")
-    public ResponseEntity<?> signup(@RequestBody SignupRequest request) throws MessagingException {
+    public ResponseEntity<?> userSignup(@RequestBody SignupRequest request) throws MessagingException {
         if(userRepository.existsByEmail(request.getEmail())) {
             return ResponseEntity.badRequest().body("Email already exists");
         }
@@ -46,6 +46,9 @@ public class UserAuthController {
             return ResponseEntity.badRequest().body("Email already exists");
         }
         user.setEmail(request.getEmail());
+        if(!request.getPassword().equals(request.getConfirmPassword())) {
+            return ResponseEntity.badRequest().body("Passwords do not match");
+        }
         user.setPassword(passwordConfig.passwordEncoder().encode(request.getPassword()));
         user.setRole(Role.USER);
         user.setStatus(Status.PENDING);
