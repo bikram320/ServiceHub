@@ -144,11 +144,18 @@ public class UserService {
             throw new InvalidDateTimeException("Appointments must start at the beginning of the hour");
         }
         LocalDateTime appointmentEnd = appointmentTime.plusHours(1);
-        boolean conflict = serviceRequestRepository.existsByTechnicianAndAppointmentTimeBetween(
+        boolean technicianConflict = serviceRequestRepository.existsByTechnicianAndAppointmentTimeBetween(
                 technician, appointmentTime, appointmentEnd.minusSeconds(1)
         );
-        if (conflict) {
+        if (technicianConflict) {
             throw new InvalidDateTimeException("Technician is already booked for this time slot");
+        }
+
+        boolean userConflict = serviceRequestRepository.existsByUserAndAppointmentTimeBetween(
+                user, appointmentTime,appointmentEnd.minusSeconds(1)
+        );
+        if (userConflict) {
+            throw new InvalidDateTimeException("You already have booking for this time slot");
         }
 
         serviceRequest.setAppointmentTime(request.getAppointmentTime());
