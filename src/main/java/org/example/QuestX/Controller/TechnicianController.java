@@ -1,5 +1,6 @@
 package org.example.QuestX.Controller;
 
+import jakarta.mail.MessagingException;
 import lombok.AllArgsConstructor;
 import org.example.QuestX.Model.Technician;
 import org.example.QuestX.services.TechnicianService;
@@ -31,4 +32,12 @@ public class TechnicianController {
         technicianService.technicianProfileSetup(email,phone,address,latitude,longitude,bio,profile_image,identity_doc,valid_doc);
         return ResponseEntity.ok("Technician Profile Updated");
     }
+
+    @PostMapping("/accept-service-request")
+    public ResponseEntity<?> acceptingServiceBooking(@RequestParam long requestId) throws MessagingException {
+        technicianService.acceptingUserServiceRequest(requestId);
+        return ResponseEntity.ok("Service Booking Accepted");
+    }
+
+
 }

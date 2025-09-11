@@ -3,12 +3,14 @@ package org.example.QuestX.services;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.AllArgsConstructor;
+import org.example.QuestX.Model.ServiceStatus;
 import org.example.QuestX.dtos.VerifyOtpRequest;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
@@ -62,6 +64,21 @@ public class MailService {
                 , true);
         mailSender.send(message);
 
+    }
+
+    public void  sendMailtoUser(
+            String userEmail , String technicianName , String service,
+            LocalDateTime appointmentTime, ServiceStatus serviceStatus
+    ) throws MessagingException {
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message,true);
+        helper.setTo(userEmail);
+        helper.setSubject("Service Request Update : ");
+        helper.setText("Your Service Request for "+service+" has Been "+serviceStatus+" By "
+                +technicianName+" and Fixed for "+appointmentTime+
+                " for Further more details , contact your technician , Thank you .!\n" +
+                "\n Your regards \n QuestX");
+        mailSender.send(message);
     }
 
 }

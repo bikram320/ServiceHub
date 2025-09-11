@@ -1,8 +1,14 @@
 package org.example.QuestX.services;
 
+import jakarta.mail.MessagingException;
 import lombok.AllArgsConstructor;
+import org.example.QuestX.Model.ServiceRequest;
+import org.example.QuestX.Model.ServiceStatus;
 import org.example.QuestX.Model.Technician;
+import org.example.QuestX.Repository.ServiceRequestRepository;
 import org.example.QuestX.Repository.TechnicianRepository;
+import org.example.QuestX.exception.ServiceNotFoundException;
+import org.example.QuestX.exception.StatusInvalidException;
 import org.example.QuestX.exception.TechnicianNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,6 +23,8 @@ public class TechnicianService {
 
     private  final TechnicianRepository technicianRepository;
     private final LocationService locationService;
+    private final ServiceRequestRepository serviceRequestRepository;
+    private final MailService mailService;
 
     public void technicianProfileSetup(String email , String phone, String address, Double latitude,
                                        Double longitude, String bio, MultipartFile profileImage,
@@ -73,5 +81,24 @@ public class TechnicianService {
             technician.setIdentityPath(docPath);
         }
         technicianRepository.save(technician);
+    }
+
+    public void acceptingUserServiceRequest(long requestId) throws MessagingException {
+
+        ServiceRequest serviceRequest = serviceRequestRepository.findById(requestId).orElseThrow(
+                () -> new ServiceNotFoundException("ServiceRequest  not found")
+        );
+        if(!serviceRequest.getStatus().equals(ServiceStatus.PENDING))
+            throw new StatusInvalidException("You can't accept this ServiceRequest Anymore");
+
+        serviceRequest.setStatus(ServiceStatus.IN_PROGRESS);
+        serviceRequestRepository.save(serviceRequest);
+
+        //sending mail to user about their request status
+        mailService.sendMailtoUser(serviceRequest.getUser().getEmail(),
+                serviceRequest.getTechnician().getName(),
+                serviceRequest.getSkill().getName(),
+                serviceRequest.getAppointmentTime(),
+                ServiceStatus.ACCEPTED);
     }
 }
