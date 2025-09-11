@@ -8,6 +8,7 @@ import org.hibernate.annotations.ColumnDefault;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -71,7 +72,18 @@ public class Technician implements JwtUser{
 
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "created_at")
-    private Instant createdAt;
+    private LocalDate createdAt;
+
+    @Column(name = "profile_image_path")
+    private String profileImagePath;
+
+    @Column(name = "document_path")
+    private String validDocumentPath;
+
+    @Column(name = "identity_path")
+    private String identityPath;
+
+
 
     @OneToMany(mappedBy = "tech")
     private Set<Payment> payments = new LinkedHashSet<>();

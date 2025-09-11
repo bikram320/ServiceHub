@@ -38,7 +38,7 @@ public class UserService {
 
 
     // Update profile service
-    public void UpdateProfileSetup(
+    public void UserProfileSetup(
             String email ,String phone , String address,
             Double latitude, Double longitude,
             MultipartFile profileImage , MultipartFile validDoc
@@ -87,7 +87,7 @@ public class UserService {
 
     public List<GetTechnicianDataRequest> getTechnicianBasedOnSkill(String skill){
         Skill skillEntity = skillRepository.findByName(skill);
-        var technicians = technicianRepository.findTechniciansBySkillId(skillEntity.getId());
+        var technicians = technicianRepository.findAvailableTechniciansBySkill(skillEntity.getId());
         if (technicians.isEmpty()) {
             throw new TechnicianNotFoundException("Technician Not Found");
         }
@@ -109,7 +109,8 @@ public class UserService {
         User user = userRepository.findByEmail(request.getUserEmail()).orElseThrow(
                 () -> new UserNotFoundException("User Not Found")
         );
-        Technician technician = technicianRepository.findByEmail(request.getTechnicianEmail());
+        Technician technician =
+                technicianRepository.findByEmailAndAvailable(request.getTechnicianEmail(),Boolean.TRUE);
         if (technician == null) {
             throw new TechnicianNotFoundException("Technician Not Found");
         }
@@ -206,7 +207,7 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
-    public void cancelServiceBooking(String email  , Long id){
+    public void UserCancelServiceBooking(String email  , Long id){
         User user = userRepository.findByEmail(email).orElseThrow(
                 () -> new UserNotFoundException("User Not Found")
         );

@@ -27,7 +27,7 @@ public class UserController {
             @RequestParam(required = false) MultipartFile profile_image,
             @RequestParam(required = false) MultipartFile valid_doc
     ) throws IOException {
-        userService.UpdateProfileSetup(email , phone, address, latitude, longitude, profile_image, valid_doc);
+        userService.UserProfileSetup(email , phone, address, latitude, longitude, profile_image, valid_doc);
         return ResponseEntity.ok("Profile Updated Successfully");
     }
 
@@ -57,7 +57,7 @@ public class UserController {
     @PostMapping("/cancel-pending-service-booking")
     public ResponseEntity<?> cancelPendingServiceBooking(@RequestParam String userEmail ,
                                                          @RequestParam Long requestId) {
-        userService.cancelServiceBooking(userEmail,requestId);
+        userService.UserCancelServiceBooking(userEmail,requestId);
         return ResponseEntity.ok("Service Booking Cancelled");
     }
 

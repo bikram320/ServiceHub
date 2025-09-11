@@ -13,5 +13,10 @@ public interface TechnicianRepository extends JpaRepository<Technician, Long> {
     boolean existsByEmail(String email);
     Technician findByEmail(String email);
 
-    @Query("SELECT ts.tech FROM TechnicianSkill ts WHERE ts.skill.id = :skillId")
-    List<Technician> findTechniciansBySkillId(@Param("skillId") long skillId);}
+    @Query("SELECT t FROM Technician t " +
+            "JOIN t.technicianSkills ts " +
+            "WHERE ts.skill.id = :skillId AND t.available = true")
+    List<Technician> findAvailableTechniciansBySkill(@Param("skillId") Long skillId);
+    Technician findByEmailAndAvailable(String email, Boolean available);
+
+}

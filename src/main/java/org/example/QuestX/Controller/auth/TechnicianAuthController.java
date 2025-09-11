@@ -19,6 +19,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+
 
 @AllArgsConstructor
 @RestController
@@ -49,6 +51,7 @@ public class TechnicianAuthController {
         technician.setPassword(passwordConfig.passwordEncoder().encode(request.getPassword()));
         technician.setRole(Role.TECHNICIAN);
         technician.setStatus(Status.PENDING);
+        technician.setCreatedAt(LocalDate.now());
         technicianRepository.save(technician);
 
         otpService.sendOtpEmail(request.getEmail());
