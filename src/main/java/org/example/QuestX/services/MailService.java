@@ -74,10 +74,16 @@ public class MailService {
         MimeMessageHelper helper = new MimeMessageHelper(message,true);
         helper.setTo(userEmail);
         helper.setSubject("Service Request Update : ");
-        helper.setText("Your Service Request for "+service+" has Been "+serviceStatus+" By "
-                +technicianName+" and Fixed for "+appointmentTime+
-                " for Further more details , contact your technician , Thank you .!\n" +
-                "\n Your regards \n QuestX");
+        if(serviceStatus.equals(ServiceStatus.ACCEPTED))
+            helper.setText("Your Service Request for "+service+" has Been "+serviceStatus+" By "
+                    +technicianName+" and Fixed for "+appointmentTime+
+                    " for Further more details , contact your technician , Thank you .!\n" +
+                    "\n Your regards \n QuestX");
+        else
+            helper.setText("Your Service Request for "+service+" has Been "+serviceStatus+" By "
+                    +technicianName+
+                    "\n for Further more details , contact your technician , Thank you .!\n" +
+                    "\n Your regards \n QuestX");
         mailSender.send(message);
     }
 

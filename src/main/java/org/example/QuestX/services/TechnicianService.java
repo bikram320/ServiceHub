@@ -101,4 +101,22 @@ public class TechnicianService {
                 serviceRequest.getAppointmentTime(),
                 ServiceStatus.ACCEPTED);
     }
+
+    public void rejectingUserServiceRequest(long requestId) throws MessagingException {
+        ServiceRequest serviceRequest = serviceRequestRepository.findById(requestId).orElseThrow(
+                () -> new ServiceNotFoundException("ServiceRequest  not found")
+        );
+        if (!serviceRequest.getStatus().equals(ServiceStatus.PENDING)){
+            throw new StatusInvalidException("You can't reject this ServiceRequest Anymore");
+        }
+        serviceRequest.setStatus(ServiceStatus.REJECTED);
+        serviceRequestRepository.save(serviceRequest);
+
+        //sending mail to user about their request status
+        mailService.sendMailtoUser(serviceRequest.getUser().getEmail(),
+                serviceRequest.getTechnician().getName(),
+                serviceRequest.getSkill().getName(),
+                serviceRequest.getAppointmentTime(),
+                ServiceStatus.REJECTED);
+    }
 }

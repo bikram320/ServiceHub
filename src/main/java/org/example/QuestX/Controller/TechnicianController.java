@@ -39,5 +39,10 @@ public class TechnicianController {
         return ResponseEntity.ok("Service Booking Accepted");
     }
 
+    @PostMapping("/reject-service-request")
+    public ResponseEntity<?> rejectingServiceBooking(@RequestParam long requestId) throws MessagingException {
+        technicianService.rejectingUserServiceRequest(requestId);
+        return ResponseEntity.ok("Service Booking Rejected");
+    }
 
 }
