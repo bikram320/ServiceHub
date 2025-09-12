@@ -20,6 +20,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 
 @AllArgsConstructor
@@ -52,7 +53,7 @@ public class UserAuthController {
         user.setPassword(passwordConfig.passwordEncoder().encode(request.getPassword()));
         user.setRole(Role.USER);
         user.setStatus(Status.PENDING);
-        user.setCreatedAt(LocalDate.now());
+        user.setCreatedAt(LocalDateTime.now());
         userRepository.save(user);
 
         otpService.sendOtpEmail(request.getEmail());

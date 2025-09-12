@@ -67,7 +67,7 @@ public class User implements JwtUser {
 
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "created_at")
-    private LocalDate createdAt;
+    private LocalDateTime createdAt;
 
     @OneToMany(mappedBy = "user")
     private Set<Payment> payments = new LinkedHashSet<>();
