@@ -49,12 +49,29 @@ public class AdminService {
                 () -> new UserNotFoundException("User with email " + email + " not found")
         );
         if(user.getStatus().equals(Status.VERIFIED)) {
-            throw  new StatusInvalidException("User already verified");
+            throw new StatusInvalidException("User is already verified");
+        } else if (user.getStatus().equals(Status.REJECTED)) {
+            throw new StatusInvalidException("User is already rejected , Setup your profile with valid details ");
         }
         user.setStatus(Status.VERIFIED);
         mailService.sendMailtoUserAboutProfileVerification(email,Status.VERIFIED);
         userRepository.save(user);
 
     }
+    public void rejectUserRequest(String email) throws MessagingException {
+        User user = userRepository.findByEmail(email).orElseThrow(
+                () -> new UserNotFoundException("User with email " + email + " not found")
+        );
+        if(user.getStatus().equals(Status.VERIFIED)) {
+            throw new StatusInvalidException("User is already verified. ");
+        } else if (user.getStatus().equals(Status.REJECTED)) {
+            throw new StatusInvalidException("User is already rejected ");
+        }
+        user.setStatus(Status.REJECTED);
+        mailService.sendMailtoUserAboutProfileVerification(email,Status.REJECTED);
+        userRepository.save(user);
+
+    }
+
 
 }

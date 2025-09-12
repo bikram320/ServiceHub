@@ -83,6 +83,7 @@ public class UserService {
             validDoc.transferTo(destFile);
             user.setDocumentPath(docPath);
         }
+        user.setStatus(Status.PENDING);
         userRepository.save(user);
     }
 

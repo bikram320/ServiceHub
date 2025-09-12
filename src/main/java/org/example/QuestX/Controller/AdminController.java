@@ -34,5 +34,10 @@ public class AdminController {
         adminService.approveUserRequest(email);
         return ResponseEntity.ok("User Profile Approved");
     }
+    @PostMapping("/users-request-rejected")
+    public ResponseEntity<?> userRequestRejected(@RequestParam String email) throws MessagingException {
+        adminService.rejectUserRequest(email);
+        return ResponseEntity.ok("User Profile Rejected");
+    }
 
 }

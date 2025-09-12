@@ -100,7 +100,7 @@ public class MailService {
                     "\n Your regards \n QuestX");
         }
         else{
-            helper.setText("Your Profile has been " +status+" , SetUp profile with valid Details . Thank you !" +
+            helper.setText("Your Profile has been " +status+" , Setup your profile again with valid Details . Thank you !" +
                     "\n Your regards \n QuestX");
         }
         mailSender.send(message);
