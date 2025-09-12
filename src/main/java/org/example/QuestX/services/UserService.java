@@ -166,7 +166,7 @@ public class UserService {
 
         serviceRequestRepository.save(serviceRequest);
 
-        mailService.sendMailToTechnician(user.getName(),technician.getEmail());
+        mailService.sendMailToTechnicianAboutRequest(user.getName(),technician.getEmail());
 
     }
 

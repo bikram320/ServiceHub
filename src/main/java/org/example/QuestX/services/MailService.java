@@ -4,6 +4,7 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.AllArgsConstructor;
 import org.example.QuestX.Model.ServiceStatus;
+import org.example.QuestX.Model.Status;
 import org.example.QuestX.dtos.VerifyOtpRequest;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -53,7 +54,7 @@ public class MailService {
         return false;
     }
 
-    public void sendMailToTechnician(String userName , String technicianEmail ) throws MessagingException {
+    public void sendMailToTechnicianAboutRequest(String userName , String technicianEmail ) throws MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
         helper.setTo(technicianEmail);
@@ -66,7 +67,7 @@ public class MailService {
 
     }
 
-    public void  sendMailtoUser(
+    public void sendMailtoUserAboutRequest(
             String userEmail , String technicianName , String service,
             LocalDateTime appointmentTime, ServiceStatus serviceStatus
     ) throws MessagingException {
@@ -85,6 +86,25 @@ public class MailService {
                     "\n for Further more details , contact your technician , Thank you .!\n" +
                     "\n Your regards \n QuestX");
         mailSender.send(message);
+    }
+
+    public void sendMailtoUserAboutProfileVerification(
+            String email , Status status
+    ) throws MessagingException {
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper  = new MimeMessageHelper(message,true);
+        helper.setTo(email);
+        helper.setSubject("Profile Verification : ");
+        if(status.equals(Status.VERIFIED)){
+            helper.setText("Your Profile has been " +status+" , Now you can Request Services ." +
+                    "\n Your regards \n QuestX");
+        }
+        else{
+            helper.setText("Your Profile has been " +status+" , SetUp profile with valid Details . Thank you !" +
+                    "\n Your regards \n QuestX");
+        }
+        mailSender.send(message);
+
     }
 
 }

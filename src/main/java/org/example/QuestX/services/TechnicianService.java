@@ -95,7 +95,7 @@ public class TechnicianService {
         serviceRequestRepository.save(serviceRequest);
 
         //sending mail to user about their request status
-        mailService.sendMailtoUser(serviceRequest.getUser().getEmail(),
+        mailService.sendMailtoUserAboutRequest(serviceRequest.getUser().getEmail(),
                 serviceRequest.getTechnician().getName(),
                 serviceRequest.getSkill().getName(),
                 serviceRequest.getAppointmentTime(),
@@ -113,7 +113,7 @@ public class TechnicianService {
         serviceRequestRepository.save(serviceRequest);
 
         //sending mail to user about their request status
-        mailService.sendMailtoUser(serviceRequest.getUser().getEmail(),
+        mailService.sendMailtoUserAboutRequest(serviceRequest.getUser().getEmail(),
                 serviceRequest.getTechnician().getName(),
                 serviceRequest.getSkill().getName(),
                 serviceRequest.getAppointmentTime(),

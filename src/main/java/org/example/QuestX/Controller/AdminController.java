@@ -1,5 +1,6 @@
 package org.example.QuestX.Controller;
 
+import jakarta.mail.MessagingException;
 import lombok.AllArgsConstructor;
 import org.example.QuestX.Model.AdminAction;
 import org.example.QuestX.Model.Status;
@@ -27,9 +28,11 @@ public class AdminController {
         List<UserDataDto> userRequests = adminService.getUserRequest();
         return new ResponseEntity<>(userRequests, HttpStatus.OK);
     }
-//    @PostMapping("/users-request-approved")
-//    public ResponseEntity<?> userRequestApproved(@RequestParam String email){
-//
-//    }
+
+    @PostMapping("/users-request-approved")
+    public ResponseEntity<?> userRequestApproved(@RequestParam String email) throws MessagingException {
+        adminService.approveUserRequest(email);
+        return ResponseEntity.ok("User Profile Approved");
+    }
 
 }
