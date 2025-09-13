@@ -48,19 +48,28 @@ public class UserService {
         User user = userRepository.findByEmail(email).orElseThrow((
                 () -> new UserNotFoundException("User Not Found")
                 ));
+
         if(phone!=null){
             user.setPhone(phone);
         }
-        if (latitude != null && longitude != null) {
+
+        if (address != null && !address.isEmpty()) {
+                user.setAddress(address);
+
+            double[] coordinates = locationService.getCoordinatesFromAddress(address);
+            if (coordinates != null) {
+                user.setLatitude(BigDecimal.valueOf(coordinates[0]));
+                user.setLongitude(BigDecimal.valueOf(coordinates[1]));
+            }
+        }
+        else if (latitude != null && longitude != null) {
             user.setLatitude(BigDecimal.valueOf(latitude));
             user.setLongitude(BigDecimal.valueOf(longitude));
 
-            if (address == null || address.isEmpty()) {
-                address = locationService.getAddressByCoordinates(latitude, longitude);
+            String resolvedAddress = locationService.getAddressByCoordinates(latitude, longitude);
+            if (resolvedAddress != null && !resolvedAddress.isEmpty()) {
+                user.setAddress(resolvedAddress);
             }
-        }
-        if(address!=null && !address.isEmpty()){
-            user.setAddress(address);
         }
 
         if (profileImage != null && !profileImage.isEmpty()) {

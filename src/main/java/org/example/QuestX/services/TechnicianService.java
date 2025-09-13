@@ -38,16 +38,25 @@ public class TechnicianService {
         if(phone!=null){
             technician.setPhone(phone);
         }
-        if (latitude != null && longitude != null) {
+        if (address != null && !address.isEmpty()) {
+
+            technician.setAddress(address);
+
+            // ✅ Step 2: Generate lat & lon from address
+            double[] coordinates = locationService.getCoordinatesFromAddress(address);
+            if (coordinates != null) {
+                technician.setLatitude(BigDecimal.valueOf(coordinates[0]));
+                technician.setLongitude(BigDecimal.valueOf(coordinates[1]));
+            }
+        }
+        else if (latitude != null && longitude != null) {
             technician.setLatitude(BigDecimal.valueOf(latitude));
             technician.setLongitude(BigDecimal.valueOf(longitude));
 
-            if (address == null || address.isEmpty()) {
-                address = locationService.getAddressByCoordinates(latitude, longitude);
+            String resolvedAddress = locationService.getAddressByCoordinates(latitude, longitude);
+            if (resolvedAddress != null && !resolvedAddress.isEmpty()) {
+                technician.setAddress(resolvedAddress);
             }
-        }
-        if(address!=null && !address.isEmpty()){
-            technician.setAddress(address);
         }
 
         if(bio!=null && !bio.isEmpty()){
