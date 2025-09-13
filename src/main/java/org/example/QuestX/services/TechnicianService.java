@@ -42,7 +42,6 @@ public class TechnicianService {
 
             technician.setAddress(address);
 
-            // ✅ Step 2: Generate lat & lon from address
             double[] coordinates = locationService.getCoordinatesFromAddress(address);
             if (coordinates != null) {
                 technician.setLatitude(BigDecimal.valueOf(coordinates[0]));

@@ -49,6 +49,9 @@ public class UserAuthController {
         if(!request.getPassword().equals(request.getConfirmPassword())) {
             return ResponseEntity.badRequest().body("Passwords do not match");
         }
+        if(request.getPassword().length() < 8 || request.getPassword().length() > 32) {
+            return ResponseEntity.badRequest().body("Password must be between 8 and 32 characters");
+        }
         user.setPassword(passwordConfig.passwordEncoder().encode(request.getPassword()));
         user.setRole(Role.USER);
         user.setStatus(Status.PENDING);
