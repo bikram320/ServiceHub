@@ -8,7 +8,6 @@ import org.example.QuestX.Model.Role;
 import org.example.QuestX.Model.Status;
 import org.example.QuestX.Model.Technician;
 import org.example.QuestX.Repository.TechnicianRepository;
-import org.example.QuestX.Repository.UserRepository;
 import org.example.QuestX.config.PasswordConfig;
 import org.example.QuestX.dtos.*;
 import org.example.QuestX.services.JwtService;
@@ -19,7 +18,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 
 @AllArgsConstructor
@@ -53,7 +52,7 @@ public class TechnicianAuthController {
         technician.setPassword(passwordConfig.passwordEncoder().encode(request.getPassword()));
         technician.setRole(Role.TECHNICIAN);
         technician.setStatus(Status.PENDING);
-        technician.setCreatedAt(LocalDate.now());
+        technician.setCreatedAt(LocalDateTime.now());
         technicianRepository.save(technician);
 
         otpService.sendOtpEmail(request.getEmail());

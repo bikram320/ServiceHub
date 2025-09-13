@@ -4,6 +4,7 @@ import jakarta.mail.MessagingException;
 import lombok.AllArgsConstructor;
 import org.example.QuestX.Model.ServiceRequest;
 import org.example.QuestX.Model.ServiceStatus;
+import org.example.QuestX.Model.Status;
 import org.example.QuestX.Model.Technician;
 import org.example.QuestX.Repository.ServiceRequestRepository;
 import org.example.QuestX.Repository.TechnicianRepository;
@@ -80,6 +81,7 @@ public class TechnicianService {
             identityDoc.transferTo(destFile);
             technician.setIdentityPath(docPath);
         }
+        technician.setStatus(Status.PENDING);
         technicianRepository.save(technician);
     }
 

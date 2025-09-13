@@ -9,6 +9,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -72,7 +73,7 @@ public class Technician implements JwtUser{
 
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "created_at")
-    private LocalDate createdAt;
+    private LocalDateTime createdAt;
 
     @Column(name = "profile_image_path")
     private String profileImagePath;
@@ -82,7 +83,6 @@ public class Technician implements JwtUser{
 
     @Column(name = "identity_path")
     private String identityPath;
-
 
 
     @OneToMany(mappedBy = "tech")

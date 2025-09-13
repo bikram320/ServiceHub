@@ -7,8 +7,10 @@ import org.example.QuestX.Repository.AdminActionRepository;
 import org.example.QuestX.Repository.AdminRepository;
 import org.example.QuestX.Repository.TechnicianRepository;
 import org.example.QuestX.Repository.UserRepository;
+import org.example.QuestX.dtos.TechnicianDataDto;
 import org.example.QuestX.dtos.UserDataDto;
 import org.example.QuestX.exception.StatusInvalidException;
+import org.example.QuestX.exception.TechnicianNotFoundException;
 import org.example.QuestX.exception.UserNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -27,8 +29,10 @@ public class AdminService {
     private final AdminActionRepository adminActionRepository;
     private final AdminRepository adminRepository;
 
-    public List<UserDataDto> getUserRequest() {
-        // when users sends request their status will be pending  so lets pass pending
+
+    // Method related to Users
+    public List<UserDataDto> getUsersRequest() {
+        // when users sends request their status will be pending  so let pass pending
         return getUsersByStatus(Status.PENDING);
 
     }
@@ -111,4 +115,35 @@ public class AdminService {
         adminAction.setCreatedAt(LocalDateTime.now());
         adminActionRepository.save(adminAction);
     }
+
+    // methods related to Technician
+
+    public List<TechnicianDataDto> getTechniciansRequest(){
+        return getTechniciansByStatus(Status.PENDING);
+    }
+    public List<TechnicianDataDto> getActiveTechnicians() {
+        return getTechniciansByStatus(Status.VERIFIED);
+    }
+    public List<TechnicianDataDto> getTechniciansByStatus(Status status) {
+        List<Technician> technicians =  technicianRepository.findAllByStatus(status);
+        if(technicians.isEmpty()) {
+            throw new TechnicianNotFoundException("Technician not found");
+        }
+        return technicians.stream()
+                .map(technician->{
+                    TechnicianDataDto tech = new TechnicianDataDto();
+                    tech.setName(technician.getName());
+                    tech.setEmail(technician.getEmail());
+                    tech.setPhone(technician.getPhone());
+                    tech.setAddress(technician.getAddress());
+                    tech.setProfileImagePath(technician.getProfileImagePath());
+                    tech.setIsEmailVerified(technician.getIsEmailVerified());
+                    tech.setCreatedAt(technician.getCreatedAt());
+                    tech.setDocumentPath(technician.getValidDocumentPath());
+                    tech.setIdentityPath(technician.getIdentityPath());
+                    return tech;
+                })
+                .collect(Collectors.toList());
+    }
+
 }

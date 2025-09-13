@@ -1,7 +1,9 @@
 package org.example.QuestX.Repository;
 
 import org.example.QuestX.Model.Skill;
+import org.example.QuestX.Model.Status;
 import org.example.QuestX.Model.Technician;
+import org.example.QuestX.Model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -19,4 +21,5 @@ public interface TechnicianRepository extends JpaRepository<Technician, Long> {
     List<Technician> findAvailableTechniciansBySkill(@Param("skillId") Long skillId);
     Technician findByEmailAndAvailable(String email, Boolean available);
 
+    List<Technician> findAllByStatus(Status status);
 }
