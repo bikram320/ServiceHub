@@ -3,12 +3,12 @@ package org.example.QuestX.services;
 import jakarta.mail.MessagingException;
 import lombok.AllArgsConstructor;
 import org.example.QuestX.Model.*;
-import org.example.QuestX.Repository.AdminActionRepository;
-import org.example.QuestX.Repository.AdminRepository;
-import org.example.QuestX.Repository.TechnicianRepository;
-import org.example.QuestX.Repository.UserRepository;
+import org.example.QuestX.Repository.*;
+import org.example.QuestX.dtos.ServiceRequestDetailsDto;
+import org.example.QuestX.dtos.ServiceRequestDto;
 import org.example.QuestX.dtos.TechnicianDataDto;
 import org.example.QuestX.dtos.UserDataDto;
+import org.example.QuestX.exception.ServiceNotFoundException;
 import org.example.QuestX.exception.StatusInvalidException;
 import org.example.QuestX.exception.TechnicianNotFoundException;
 import org.example.QuestX.exception.UserNotFoundException;
@@ -27,6 +27,7 @@ public class AdminService {
     private final MailService mailService;
     private final AdminActionRepository adminActionRepository;
     private final AdminRepository adminRepository;
+    private final ServiceRequestRepository serviceRequestRepository;
 
 
     // Method related to Users
@@ -179,6 +180,33 @@ public class AdminService {
         adminAction.setDescription(description);
         adminAction.setCreatedAt(LocalDateTime.now());
         adminActionRepository.save(adminAction);
+    }
+
+    public List<ServiceRequestDetailsDto> getAllServiceRequests() {
+        List<ServiceRequest> serviceRequests = serviceRequestRepository.findAll();
+        if(serviceRequests.isEmpty()) {
+            throw new ServiceNotFoundException("There are no serviceRequests to track");
+        }
+
+        return serviceRequests.stream()
+                .map(serviceRequest ->
+                        {
+                            ServiceRequestDetailsDto serviceDetails = new ServiceRequestDetailsDto();
+                            serviceDetails.setRequestId(serviceRequest.getId());
+                            serviceDetails.setUserName(serviceRequest.getUser().getName());
+                            serviceDetails.setUserEmail(serviceRequest.getUser().getEmail());
+                            serviceDetails.setServiceName(serviceRequest.getSkill().getName());
+                            serviceDetails.setTechnicianName(serviceRequest.getTechnician().getName());
+                            serviceDetails.setTechnicianEmail(serviceRequest.getTechnician().getEmail());
+                            serviceDetails.setDescription(serviceRequest.getDescription());
+                            serviceDetails.setStatus(serviceRequest.getStatus());
+                            serviceDetails.setAppointmentTime(serviceRequest.getAppointmentTime());
+                            serviceDetails.setFeeCharge(serviceRequest.getFeeCharged());
+                            return serviceDetails;
+                        }
+                )
+                .collect(Collectors.toList());
+
     }
 
 

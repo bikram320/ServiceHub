@@ -2,6 +2,7 @@ package org.example.QuestX.Controller;
 
 import jakarta.mail.MessagingException;
 import lombok.AllArgsConstructor;
+import org.example.QuestX.dtos.ServiceRequestDetailsDto;
 import org.example.QuestX.dtos.TechnicianDataDto;
 import org.example.QuestX.dtos.UserDataDto;
 import org.example.QuestX.services.AdminService;
@@ -64,6 +65,12 @@ public class AdminController {
     public ResponseEntity<?> technicianRequestRejected(@RequestParam String email) throws MessagingException {
         adminService.rejectTechnicianRequest(email);
         return ResponseEntity.ok("Technician Request Rejected");
+    }
+
+    @GetMapping("/track-service-request")
+    public ResponseEntity<?> trackServiceRequest(){
+        List<ServiceRequestDetailsDto> serviceRequestDetails = adminService.getAllServiceRequests();
+        return new ResponseEntity<>(serviceRequestDetails, HttpStatus.OK);
     }
 
 }
