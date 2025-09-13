@@ -55,4 +55,15 @@ public class AdminController {
         return new ResponseEntity<>(activeTechnicians, HttpStatus.OK);
     }
 
+    @PostMapping("/technician-request-approved")
+    public ResponseEntity<?> technicianRequestApproved(@RequestParam String email) throws MessagingException {
+        adminService.approveTechnicianRequest(email);
+        return ResponseEntity.ok("Technician Request Approved");
+    }
+    @PostMapping("/technician-request-rejected")
+    public ResponseEntity<?> technicianRequestRejected(@RequestParam String email) throws MessagingException {
+        adminService.rejectTechnicianRequest(email);
+        return ResponseEntity.ok("Technician Request Rejected");
+    }
+
 }

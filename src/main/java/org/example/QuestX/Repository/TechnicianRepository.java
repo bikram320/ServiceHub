@@ -1,6 +1,5 @@
 package org.example.QuestX.Repository;
 
-import org.example.QuestX.Model.Skill;
 import org.example.QuestX.Model.Status;
 import org.example.QuestX.Model.Technician;
 import org.example.QuestX.Model.User;
@@ -9,7 +8,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface TechnicianRepository extends JpaRepository<Technician, Long> {
     boolean existsByEmail(String email);

@@ -88,23 +88,28 @@ public class MailService {
         mailSender.send(message);
     }
 
-    public void sendMailtoUserAboutProfileVerification(
-            String email , Status status
+    void sendMailtoUserAboutProfileVerification(
+            String email, Status status
     ) throws MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
-        MimeMessageHelper helper  = new MimeMessageHelper(message,true);
+        MimeMessageHelper helper = new MimeMessageHelper(message, true);
         helper.setTo(email);
-        helper.setSubject("Profile Verification : ");
-        if(status.equals(Status.VERIFIED)){
-            helper.setText("Your Profile has been " +status+" , Now you can Request Services ." +
-                    "\n Your regards \n QuestX");
-        }
-        else{
-            helper.setText("Your Profile has been " +status+" , Setup your profile again with valid Details . Thank you !" +
-                    "\n Your regards \n QuestX");
+        helper.setSubject("Profile Verification");
+
+        if (status.equals(Status.VERIFIED)) {
+            helper.setText(
+                    "Your profile has been " + status + ". You now have access to perform various actions!" +
+                            " Please check your profile for more details." +
+                            "\n\nRegards,\nQuestX"
+            );
+        } else {
+            helper.setText(
+                    "Your profile has been " + status + ". Please set up your profile again with valid details. Thank you!" +
+                            "\n\nRegards,\nQuestX"
+            );
         }
         mailSender.send(message);
-
     }
+
 
 }

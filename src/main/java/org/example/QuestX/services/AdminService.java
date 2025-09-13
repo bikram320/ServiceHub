@@ -14,7 +14,6 @@ import org.example.QuestX.exception.TechnicianNotFoundException;
 import org.example.QuestX.exception.UserNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -76,7 +75,7 @@ public class AdminService {
         mailService.sendMailtoUserAboutProfileVerification(email,Status.VERIFIED);
         userRepository.save(user);
 
-        recordAdminAction(Status.VERIFIED, Role.USER ,
+        recordAdminAction(Status.VERIFIED, Role.TECHNICIAN ,
                 user,"User has been Verified after Profile Review");
 
     }
@@ -93,29 +92,8 @@ public class AdminService {
         mailService.sendMailtoUserAboutProfileVerification(email,Status.REJECTED);
         userRepository.save(user);
         recordAdminAction(Status.REJECTED, Role.USER ,
-                        user,"User has been Rejected after Profile Review");
+                user,"User has been Rejected after Profile Review");
     }
-    public void recordAdminAction
-            (Status actionType, Role target,
-             JwtUser jwtUser , String description
-            ){
-        //Store the Action that has been Performed by Admin
-        AdminAction adminAction = new AdminAction();
-
-        // let Retrieve admin first (id=1 , cause admin is only one)
-        Admin admin = adminRepository.findById((long)1).orElseThrow(
-                ()-> new UserNotFoundException("Admin not found")
-        );
-
-        adminAction.setAdmin(admin);
-        adminAction.setActionType(actionType);
-        adminAction.setTargetType(target);
-        adminAction.setTargetId(jwtUser.getId());
-        adminAction.setDescription(description);
-        adminAction.setCreatedAt(LocalDateTime.now());
-        adminActionRepository.save(adminAction);
-    }
-
     // methods related to Technician
 
     public List<TechnicianDataDto> getTechniciansRequest(){
@@ -145,5 +123,65 @@ public class AdminService {
                 })
                 .collect(Collectors.toList());
     }
+
+    public void approveTechnicianRequest(String email) throws MessagingException {
+        Technician technician = technicianRepository.findByEmail(email);
+        if (technician == null) {
+            throw new TechnicianNotFoundException("Technician not found");
+        }
+        if(technician.getStatus().equals(Status.VERIFIED)) {
+            throw new StatusInvalidException("Technician is already verified");
+        } else if (technician.getStatus().equals(Status.REJECTED)) {
+            throw new StatusInvalidException("Technician is already rejected , Setup your profile with valid details ");
+        }
+        technician.setStatus(Status.VERIFIED);
+        mailService.sendMailtoUserAboutProfileVerification(email,Status.VERIFIED);
+        technicianRepository.save(technician);
+
+        recordAdminAction(Status.VERIFIED, Role.USER ,
+                technician,"Technician has been Verified after Profile Review");
+
+    }
+
+    public void rejectTechnicianRequest(String email) throws MessagingException {
+        Technician technician = technicianRepository.findByEmail(email);
+        if (technician==null) {
+            throw new TechnicianNotFoundException("Technician not found");
+        }
+        if(technician.getStatus().equals(Status.VERIFIED)) {
+            throw new StatusInvalidException("Technician is already verified. ");
+        } else if (technician.getStatus().equals(Status.REJECTED)) {
+            throw new StatusInvalidException("Technician is already rejected ");
+        }
+        technician.setStatus(Status.REJECTED);
+        mailService.sendMailtoUserAboutProfileVerification(email,Status.REJECTED);
+        technicianRepository.save(technician);
+        recordAdminAction(Status.REJECTED, Role.TECHNICIAN ,
+                technician,"Technician has been Rejected after Profile Review");
+    }
+
+    public void recordAdminAction
+            (Status actionType, Role target,
+             JwtUser jwtUser , String description
+            ){
+        //Store the Action that has been Performed by Admin
+        AdminAction adminAction = new AdminAction();
+
+        // let Retrieve admin first (id=1 , cause admin is only one)
+        Admin admin = adminRepository.findById((long)1).orElseThrow(
+                ()-> new UserNotFoundException("Admin not found")
+        );
+
+        adminAction.setAdmin(admin);
+        adminAction.setActionType(actionType);
+        adminAction.setTargetType(target);
+        adminAction.setTargetId(jwtUser.getId());
+        adminAction.setDescription(description);
+        adminAction.setCreatedAt(LocalDateTime.now());
+        adminActionRepository.save(adminAction);
+    }
+
+
+
 
 }
