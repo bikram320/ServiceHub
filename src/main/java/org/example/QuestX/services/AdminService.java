@@ -23,7 +23,17 @@ public class AdminService {
     private final MailService mailService;
 
     public List<UserDataDto> getUserRequest() {
-        List<User> user =  userRepository.findAllByStatus(Status.PENDING);
+        // when users sends request their status will be pending  so lets pass pending
+        return getUsersByStatus(Status.PENDING);
+
+    }
+    public List<UserDataDto> getActiveUsers() {
+        // active users have status Verified so lets pass Verified as status
+        return getUsersByStatus(Status.VERIFIED);
+    }
+
+    public List<UserDataDto> getUsersByStatus(Status status) {
+        List<User> user =  userRepository.findAllByStatus(status);
         if (user.isEmpty()) {
             throw new UserNotFoundException("User not found");
         }
@@ -72,6 +82,4 @@ public class AdminService {
         userRepository.save(user);
 
     }
-
-
 }

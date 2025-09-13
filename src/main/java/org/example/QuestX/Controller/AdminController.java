@@ -2,12 +2,6 @@ package org.example.QuestX.Controller;
 
 import jakarta.mail.MessagingException;
 import lombok.AllArgsConstructor;
-import org.example.QuestX.Model.AdminAction;
-import org.example.QuestX.Model.Status;
-import org.example.QuestX.Model.User;
-import org.example.QuestX.Repository.AdminActionRepository;
-import org.example.QuestX.Repository.TechnicianRepository;
-import org.example.QuestX.Repository.UserRepository;
 import org.example.QuestX.dtos.UserDataDto;
 import org.example.QuestX.services.AdminService;
 import org.springframework.http.HttpStatus;
@@ -27,6 +21,12 @@ public class AdminController {
     public  ResponseEntity<?> userRequest(){
         List<UserDataDto> userRequests = adminService.getUserRequest();
         return new ResponseEntity<>(userRequests, HttpStatus.OK);
+    }
+
+    @GetMapping("/get-active-users")
+    public ResponseEntity<?> getActiveUsers() {
+        List<UserDataDto> activeUsers = adminService.getActiveUsers();
+        return new ResponseEntity<>(activeUsers, HttpStatus.OK);
     }
 
     @PostMapping("/users-request-approved")
