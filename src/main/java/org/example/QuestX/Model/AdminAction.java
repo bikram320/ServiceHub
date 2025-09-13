@@ -6,6 +6,8 @@ import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -21,12 +23,13 @@ public class AdminAction {
     @JoinColumn(name = "admin_id", nullable = false)
     private Admin admin;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "action_type", nullable = false, length = 100)
-    private String actionType;
+    private Status actionType;
 
-    @Lob
+    @Enumerated(EnumType.STRING)
     @Column(name = "target_type")
-    private String targetType;
+    private Role targetType;
 
     @Column(name = "target_id")
     private Long targetId;
@@ -37,6 +40,6 @@ public class AdminAction {
 
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "created_at")
-    private Instant createdAt;
+    private LocalDateTime createdAt;
 
 }

@@ -2,8 +2,9 @@ package org.example.QuestX.services;
 
 import jakarta.mail.MessagingException;
 import lombok.AllArgsConstructor;
-import org.example.QuestX.Model.Status;
-import org.example.QuestX.Model.User;
+import org.example.QuestX.Model.*;
+import org.example.QuestX.Repository.AdminActionRepository;
+import org.example.QuestX.Repository.AdminRepository;
 import org.example.QuestX.Repository.TechnicianRepository;
 import org.example.QuestX.Repository.UserRepository;
 import org.example.QuestX.dtos.UserDataDto;
@@ -11,6 +12,8 @@ import org.example.QuestX.exception.StatusInvalidException;
 import org.example.QuestX.exception.UserNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,6 +24,8 @@ public class AdminService {
     private final UserRepository userRepository;
     private final TechnicianRepository technicianRepository;
     private final MailService mailService;
+    private final AdminActionRepository adminActionRepository;
+    private final AdminRepository adminRepository;
 
     public List<UserDataDto> getUserRequest() {
         // when users sends request their status will be pending  so lets pass pending
@@ -67,6 +72,9 @@ public class AdminService {
         mailService.sendMailtoUserAboutProfileVerification(email,Status.VERIFIED);
         userRepository.save(user);
 
+        recordAdminAction(Status.VERIFIED, Role.USER ,
+                user,"User has been Verified after Profile Review");
+
     }
     public void rejectUserRequest(String email) throws MessagingException {
         User user = userRepository.findByEmail(email).orElseThrow(
@@ -80,6 +88,27 @@ public class AdminService {
         user.setStatus(Status.REJECTED);
         mailService.sendMailtoUserAboutProfileVerification(email,Status.REJECTED);
         userRepository.save(user);
+        recordAdminAction(Status.REJECTED, Role.USER ,
+                        user,"User has been Rejected after Profile Review");
+    }
+    public void recordAdminAction
+            (Status actionType, Role target,
+             JwtUser jwtUser , String description
+            ){
+        //Store the Action that has been Performed by Admin
+        AdminAction adminAction = new AdminAction();
 
+        // let Retrieve admin first (id=1 , cause admin is only one)
+        Admin admin = adminRepository.findById((long)1).orElseThrow(
+                ()-> new UserNotFoundException("Admin not found")
+        );
+
+        adminAction.setAdmin(admin);
+        adminAction.setActionType(actionType);
+        adminAction.setTargetType(target);
+        adminAction.setTargetId(jwtUser.getId());
+        adminAction.setDescription(description);
+        adminAction.setCreatedAt(LocalDateTime.now());
+        adminActionRepository.save(adminAction);
     }
 }
