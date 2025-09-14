@@ -113,13 +113,15 @@ public class UserService {
                     return dto;
                 })
                 .toList();
-
     }
 
     public void bookTechnicianForService(ServiceRequestDto request) throws MessagingException {
         User user = userRepository.findByEmail(request.getUserEmail()).orElseThrow(
                 () -> new UserNotFoundException("User Not Found")
         );
+        if(!user.getStatus().equals(Status.VERIFIED)){
+            throw new StatusInvalidException("You need to be  verified");
+        }
         Technician technician =
                 technicianRepository.findByEmailAndAvailable(request.getTechnicianEmail(),Boolean.TRUE);
         if (technician == null) {
@@ -170,7 +172,7 @@ public class UserService {
 
         serviceRequest.setAppointmentTime(request.getAppointmentTime());
         serviceRequest.setDescription(request.getDescription());
-        serviceRequest.setFeeCharged(request.getFee_charge());
+        serviceRequest.setFeeCharged(request.getFeeCharge());
         serviceRequest.setStatus(ServiceStatus.PENDING);
         serviceRequest.setCreatedAt(LocalDateTime.now());
 

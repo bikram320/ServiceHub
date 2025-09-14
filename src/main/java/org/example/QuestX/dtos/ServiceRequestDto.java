@@ -13,5 +13,5 @@ public class ServiceRequestDto {
     String serviceName;
     String description;
     LocalDateTime appointmentTime;
-    BigDecimal fee_charge;
+    BigDecimal feeCharge;
 }
