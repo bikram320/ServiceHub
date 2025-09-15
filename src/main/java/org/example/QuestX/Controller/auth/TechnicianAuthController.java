@@ -23,7 +23,7 @@ import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @RestController
-@RequestMapping("auth")
+@RequestMapping("/auth")
 public class TechnicianAuthController {
 
     private final AuthenticationManager authenticationManager;

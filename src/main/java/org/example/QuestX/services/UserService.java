@@ -6,7 +6,7 @@ import lombok.Data;
 import org.example.QuestX.Model.*;
 import org.example.QuestX.Repository.*;
 import org.example.QuestX.dtos.GetTechnicianDataRequest;
-import org.example.QuestX.dtos.ServiceDetailsDto;
+import org.example.QuestX.dtos.ServiceAndTechnicianDetailsDto;
 import org.example.QuestX.dtos.ServiceRequestDto;
 import org.example.QuestX.exception.*;
 import org.example.QuestX.exception.IllegalAccessException;
@@ -182,7 +182,7 @@ public class UserService {
 
     }
 
-    public List<ServiceDetailsDto> getCurrentServiceBooking(String email ){
+    public List<ServiceAndTechnicianDetailsDto> getCurrentServiceBooking(String email ){
         User user = userRepository.findByEmail(email).orElseThrow(
                 () -> new UserNotFoundException("User Not Found")
         );
@@ -193,7 +193,7 @@ public class UserService {
         return getServiceBooking(user, Statuses);
     }
 
-    public List<ServiceDetailsDto> getPreviousServiceBooking(String email ){
+    public List<ServiceAndTechnicianDetailsDto> getPreviousServiceBooking(String email ){
         User user = userRepository.findByEmail(email).orElseThrow(
                 () -> new UserNotFoundException("User Not Found")
         );
@@ -204,7 +204,7 @@ public class UserService {
         return getServiceBooking(user, Statuses);
     }
 
-    public List<ServiceDetailsDto> getServiceBooking(User user , List<ServiceStatus> Statuses){
+    public List<ServiceAndTechnicianDetailsDto> getServiceBooking(User user , List<ServiceStatus> Statuses){
 
         List<ServiceRequest> serviceRequests =
                 serviceRequestRepository.findByUserAndStatusIn(user, Statuses);
@@ -214,7 +214,7 @@ public class UserService {
         return serviceRequests.stream()
                 .map( serviceRequest ->
                 {
-                    ServiceDetailsDto service = new ServiceDetailsDto();
+                    ServiceAndTechnicianDetailsDto service = new ServiceAndTechnicianDetailsDto();
                     service.setTechnicianName(serviceRequest.getTechnician().getName());
                     service.setTechnicianAddress(serviceRequest.getTechnician().getAddress());
                     service.setServiceName(serviceRequest.getSkill().getName());

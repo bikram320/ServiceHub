@@ -2,12 +2,11 @@ package org.example.QuestX.services;
 
 import jakarta.mail.MessagingException;
 import lombok.AllArgsConstructor;
-import org.example.QuestX.Model.ServiceRequest;
-import org.example.QuestX.Model.ServiceStatus;
-import org.example.QuestX.Model.Status;
-import org.example.QuestX.Model.Technician;
+import org.example.QuestX.Model.*;
 import org.example.QuestX.Repository.ServiceRequestRepository;
 import org.example.QuestX.Repository.TechnicianRepository;
+import org.example.QuestX.dtos.ServiceAndTechnicianDetailsDto;
+import org.example.QuestX.dtos.ServiceAndUserDetailsDto;
 import org.example.QuestX.exception.ServiceNotFoundException;
 import org.example.QuestX.exception.StatusInvalidException;
 import org.example.QuestX.exception.TechnicianNotFoundException;
@@ -17,6 +16,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Service
@@ -128,5 +130,51 @@ public class TechnicianService {
                 serviceRequest.getSkill().getName(),
                 serviceRequest.getAppointmentTime(),
                 ServiceStatus.REJECTED);
+    }
+
+    public List<ServiceAndUserDetailsDto> getCurrentRequest(String email){
+        var technician = technicianRepository.findByEmail(email);
+        if(technician == null){
+            throw new TechnicianNotFoundException("Technician not found");
+        }
+        List<ServiceStatus> Statuses = Arrays.asList(
+                ServiceStatus.PENDING,
+                ServiceStatus.IN_PROGRESS
+        );
+        return getServiceBooking(technician, Statuses);
+    }
+    public List<ServiceAndUserDetailsDto> getPreviousRequest(String email){
+        var technician = technicianRepository.findByEmail(email);
+        if(technician == null){
+            throw new TechnicianNotFoundException("Technician not found");
+        }
+        List<ServiceStatus> Statuses = Arrays.asList(
+                ServiceStatus.COMPLETED,
+                ServiceStatus.CANCELLED
+        );
+        return getServiceBooking(technician , Statuses);
+    }
+    public List<ServiceAndUserDetailsDto> getServiceBooking(Technician technician , List<ServiceStatus> Statuses){
+
+        List<ServiceRequest> serviceRequests =
+                serviceRequestRepository.findByTechnicianAndStatusIn(technician, Statuses);
+        if (serviceRequests.isEmpty()) {
+            throw new ServiceNotFoundException("Service Not Found");
+        }
+        return serviceRequests.stream()
+                .map( serviceRequest ->
+                {
+                    ServiceAndUserDetailsDto service = new ServiceAndUserDetailsDto();
+                    service.setUsername(serviceRequest.getUser().getName());
+                    service.setUserAddress(serviceRequest.getUser().getAddress());
+                    service.setUserPhone(serviceRequest.getUser().getPhone());
+                    service.setServiceName(serviceRequest.getSkill().getName());
+                    service.setUserEmail(serviceRequest.getUser().getEmail());
+                    service.setAppointmentTime(serviceRequest.getAppointmentTime());
+                    service.setFeeCharge(serviceRequest.getFeeCharged());
+                    service.setStatus(serviceRequest.getStatus());
+                    return service;
+                })
+                .collect(Collectors.toList());
     }
 }

@@ -7,6 +7,7 @@ import org.example.QuestX.Model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 public interface ServiceRequestRepository extends JpaRepository<ServiceRequest, Long> {
@@ -18,5 +19,7 @@ public interface ServiceRequestRepository extends JpaRepository<ServiceRequest, 
     ServiceRequest findByUserAndId(User user, Long id);
 
     boolean existsByUserAndAppointmentTimeBetween(User user, LocalDateTime appointmentTimeAfter, LocalDateTime appointmentTimeBefore);
+
+    List<ServiceRequest> findByTechnicianAndStatusIn(Technician technician, Collection<ServiceStatus> statuses);
 }
 
