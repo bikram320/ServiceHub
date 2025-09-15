@@ -7,6 +7,7 @@ import org.hibernate.annotations.ColumnDefault;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -36,16 +37,18 @@ public class Payment {
     @Column(name = "transaction_id", length = 100)
     private String transactionId;
 
-    @ColumnDefault("'PENDING'")
-    @Lob
+    @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    private String status;
+    private PaymentStatus status;
 
     @Column(name = "paid_at")
-    private Instant paidAt;
+    private LocalDateTime paidAt;
 
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "created_at")
-    private Instant createdAt;
+    private LocalDateTime createdAt;
+
+    @Column(name = "released_at")
+    private LocalDateTime releasedAt;
 
 }
