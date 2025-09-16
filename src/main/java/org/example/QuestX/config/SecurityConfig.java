@@ -2,7 +2,6 @@ package org.example.QuestX.config;
 
 import lombok.AllArgsConstructor;
 import org.example.QuestX.Model.Role;
-import org.example.QuestX.Repository.UserRepository;
 import org.example.QuestX.filters.JwtAuthenticationFilter;
 import org.example.QuestX.services.UserDetailsService.AdminDetailsService;
 import org.example.QuestX.services.UserDetailsService.TechnicianDetailsService;
@@ -83,14 +82,17 @@ public class SecurityConfig {
                         //  Public endpoints
                         .requestMatchers(HttpMethod.POST, "/auth/login/**", "/auth/signup/**").permitAll()
                         .requestMatchers("/Home/**").permitAll()
+                        .requestMatchers("/payments/esewa/success", "/payments/esewa/failure").permitAll()
 
                         // User endpoints
+                        .requestMatchers("/payments/initiate").hasRole(Role.USER.name())
                         .requestMatchers("/users/**").hasRole(Role.USER.name())
 
                         // Technician endpoints
                         .requestMatchers("/technicians/**").hasRole(Role.TECHNICIAN.name())
 
                         // Admin endpoints
+                        .requestMatchers("/payments/release/**").hasRole(Role.ADMIN.name())
                         .requestMatchers("/admin/**").hasRole(Role.ADMIN.name())
 
                         // Everything else

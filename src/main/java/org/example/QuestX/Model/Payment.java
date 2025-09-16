@@ -37,6 +37,9 @@ public class Payment {
     @Column(name = "transaction_id", length = 100)
     private String transactionId;
 
+    @Column(name = "esewa_rid", length = 100)
+    private String esewaRid;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private PaymentStatus status;

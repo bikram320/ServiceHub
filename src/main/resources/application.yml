@@ -26,3 +26,11 @@ spring:
     redis:
       host: localhost
       port: 6379
+
+esewa:
+  merchantId: EPAYTEST
+  secretKey: "8gBm/:&EnhH.1/q"
+  successUrl: "http://localhost:8080/payments/esewa/success"
+  failureUrl: "http://localhost:8080/payments/esewa/failure"
+  paymentUrl: "https://uat.esewa.com.np/epay/main:"
+  verificationUrl: "https://uat.esewa.com.np/epay/transrec"

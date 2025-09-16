@@ -87,6 +87,9 @@ public class Technician implements JwtUser{
     @Column(name = "identity_path")
     private String identityPath;
 
+    @Column(name = "earned_amount")
+    private BigDecimal earnedAmount;
+
 
     @OneToMany(mappedBy = "tech")
     private Set<Payment> payments = new LinkedHashSet<>();
