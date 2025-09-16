@@ -80,7 +80,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(c -> c
                         //  Public endpoints
-                        .requestMatchers(HttpMethod.POST, "/auth/login/**", "/auth/signup/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/auth/login/**", "/auth/signup/**" , "/auth/logout").permitAll()
                         .requestMatchers("/Home/**").permitAll()
                         .requestMatchers("/payments/esewa/success", "/payments/esewa/failure").permitAll()
 

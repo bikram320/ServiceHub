@@ -30,6 +30,13 @@ public class JwtService {
         cookie.setMaxAge(jwtConfig.getRefreshTokenExpiration());
         response.addCookie(cookie);
 
+        Cookie accessCookie = new Cookie("Access", accessToken.toString());
+        accessCookie.setHttpOnly(true);
+        accessCookie.setSecure(true);
+        accessCookie.setPath("/");
+        accessCookie.setMaxAge(jwtConfig.getAccessTokenExpiration());
+        response.addCookie(accessCookie);
+
         return  new JwtResponse(accessToken.toString());
     }
 
@@ -71,6 +78,11 @@ public class JwtService {
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
+    }
+
+    public long getExpirationFromToken(String token) {
+        var claims = getClaims(token);
+        return claims.getExpiration().getTime();
     }
 
 }

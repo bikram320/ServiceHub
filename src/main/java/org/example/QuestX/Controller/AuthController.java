@@ -1,8 +1,11 @@
 package org.example.QuestX.Controller;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import org.example.QuestX.exception.TechnicianNotFoundException;
 import org.example.QuestX.exception.UserNotFoundException;
+import org.example.QuestX.services.TokenBlackListService;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -36,6 +39,7 @@ public class AuthController {
     private final MailService otpService;
     private final JwtService jwtService;
     private final ResetPasswordService resetPasswordService;
+    private final TokenBlackListService tokenBlackListService;
 
     // login
     @PostMapping("/login/admin")
@@ -209,5 +213,42 @@ public class AuthController {
 
         resetPasswordService.removeResetToken(request.getEmail());
         return ResponseEntity.ok("Password has been Reset Successfully");
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(
+            @CookieValue(name = "Access", required = false) String accessToken,
+            @RequestHeader(value = "Authorization", required = false) String authHeader,
+            HttpServletResponse response
+    ) {
+
+        // Use token from header if present
+        String token = accessToken;
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            token = authHeader.substring(7);
+        }
+
+        // Blacklist the token
+        if (token != null) {
+            long expiration = jwtService.getExpirationFromToken(token);
+            tokenBlackListService.blacklistToken(token, expiration);
+        }
+
+        // Clear cookies
+        Cookie refreshCookie = new Cookie("Refresh", null);
+        refreshCookie.setHttpOnly(true);
+        refreshCookie.setSecure(true);
+        refreshCookie.setPath("/");
+        refreshCookie.setMaxAge(0);
+        response.addCookie(refreshCookie);
+
+        Cookie accessCookie = new Cookie("Access", null);
+        accessCookie.setHttpOnly(true);
+        accessCookie.setSecure(true);
+        accessCookie.setPath("/");
+        accessCookie.setMaxAge(0);
+        response.addCookie(accessCookie);
+
+        return ResponseEntity.ok("Logged out successfully");
     }
 }
