@@ -3,8 +3,10 @@ package org.example.QuestX.services;
 import jakarta.mail.MessagingException;
 import lombok.AllArgsConstructor;
 import org.example.QuestX.Model.*;
+import org.example.QuestX.Repository.PaymentRepository;
 import org.example.QuestX.Repository.ServiceRequestRepository;
 import org.example.QuestX.Repository.TechnicianRepository;
+import org.example.QuestX.dtos.PaymentDetailsDto;
 import org.example.QuestX.dtos.ServiceAndTechnicianDetailsDto;
 import org.example.QuestX.dtos.ServiceAndUserDetailsDto;
 import org.example.QuestX.exception.ServiceNotFoundException;
@@ -28,6 +30,7 @@ public class TechnicianService {
     private final LocationService locationService;
     private final ServiceRequestRepository serviceRequestRepository;
     private final MailService mailService;
+    private final PaymentRepository paymentRepository;
 
     public void technicianProfileSetup(String email , String phone, String address, Double latitude,
                                        Double longitude, String bio, MultipartFile profileImage,
@@ -175,6 +178,34 @@ public class TechnicianService {
                     service.setStatus(serviceRequest.getStatus());
                     return service;
                 })
+                .collect(Collectors.toList());
+    }
+
+    public List<PaymentDetailsDto> getPendingPayments(String email){
+       return getPaymentsByStatus(email, PaymentStatus.HOLD);
+    }
+    public List<PaymentDetailsDto> getReceivedPayments(String email){
+        return getPaymentsByStatus(email , PaymentStatus.RELEASED );
+    }
+    public List<PaymentDetailsDto> getPaymentsByStatus(String email , PaymentStatus status){
+        List<ServiceRequest> serviceRequests = serviceRequestRepository.
+                getServiceRequestByTechnicianEmailAndPayment_Status(email,status);
+        if(serviceRequests == null){
+            throw new ServiceNotFoundException("ServiceRequest  not found");
+        }
+
+        return serviceRequests.stream()
+                .map( serviceRequest ->{
+                            PaymentDetailsDto paymentDetails = new PaymentDetailsDto();
+                            paymentDetails.setUserId(serviceRequest.getUser().getId());
+                            paymentDetails.setUserName(serviceRequest.getUser().getName());
+                            paymentDetails.setServiceName(serviceRequest.getSkill().getName());
+                            paymentDetails.setServiceDate(serviceRequest.getAppointmentTime());
+                            paymentDetails.setAmount(serviceRequest.getFeeCharged());
+                            paymentDetails.setStatus(serviceRequest.getPayment().getStatus());
+                            return paymentDetails;
+                        }
+                )
                 .collect(Collectors.toList());
     }
 }

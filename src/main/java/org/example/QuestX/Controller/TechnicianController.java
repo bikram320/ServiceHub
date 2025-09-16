@@ -3,6 +3,7 @@ package org.example.QuestX.Controller;
 import jakarta.mail.MessagingException;
 import lombok.AllArgsConstructor;
 import org.example.QuestX.Model.Technician;
+import org.example.QuestX.dtos.PaymentDetailsDto;
 import org.example.QuestX.dtos.ServiceAndUserDetailsDto;
 import org.example.QuestX.services.TechnicianService;
 import org.springframework.http.ResponseEntity;
@@ -55,6 +56,18 @@ public class TechnicianController {
     public ResponseEntity<?> rejectingServiceBooking(@RequestParam long requestId) throws MessagingException {
         technicianService.rejectingUserServiceRequest(requestId);
         return ResponseEntity.ok("Service Booking Rejected");
+    }
+
+    @GetMapping("/pending-payments")
+    public ResponseEntity<?> getPendingPayment(@RequestParam String email) {
+        List<PaymentDetailsDto> paymentDetails = technicianService.getPendingPayments(email);
+        return ResponseEntity.ok(paymentDetails);
+    }
+
+    @GetMapping("/received-payments")
+    public ResponseEntity<?> getReceivedPayment(@RequestParam String email) {
+        List<PaymentDetailsDto> paymentDetails = technicianService.getReceivedPayments(email);
+        return ResponseEntity.ok(paymentDetails);
     }
 
 }

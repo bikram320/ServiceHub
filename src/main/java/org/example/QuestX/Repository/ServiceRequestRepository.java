@@ -1,9 +1,6 @@
 package org.example.QuestX.Repository;
 
-import org.example.QuestX.Model.ServiceRequest;
-import org.example.QuestX.Model.ServiceStatus;
-import org.example.QuestX.Model.Technician;
-import org.example.QuestX.Model.User;
+import org.example.QuestX.Model.*;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDateTime;
@@ -21,5 +18,9 @@ public interface ServiceRequestRepository extends JpaRepository<ServiceRequest, 
     boolean existsByUserAndAppointmentTimeBetween(User user, LocalDateTime appointmentTimeAfter, LocalDateTime appointmentTimeBefore);
 
     List<ServiceRequest> findByTechnicianAndStatusIn(Technician technician, Collection<ServiceStatus> statuses);
+
+    List<ServiceRequest> getServiceRequestByTechnicianEmail(String technicianEmail);
+
+    List<ServiceRequest> getServiceRequestByTechnicianEmailAndPayment_Status(String technicianEmail, PaymentStatus paymentStatus);
 }
 
