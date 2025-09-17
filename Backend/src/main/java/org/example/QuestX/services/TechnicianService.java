@@ -70,7 +70,7 @@ public class TechnicianService {
         if (profileImage != null && !profileImage.isEmpty()) {
 
             String profilePath = "upload/technician/profile-image/" + profileImage.getOriginalFilename();
-            File destFile = new File(System.getProperty("user.dir") + "/ServiceHub/" + profilePath);
+            File destFile = new File(System.getProperty("user.dir") + "/QuestXDataFolder/" + profilePath);
 
             // Create directories if not exists
             destFile.getParentFile().mkdirs();
@@ -82,14 +82,14 @@ public class TechnicianService {
 
         if (validDoc != null && !validDoc.isEmpty()) {
             String docPath = "upload/technician/documents/" + validDoc.getOriginalFilename();
-            File destFile = new File(System.getProperty("user.dir") + "/ServiceHub/" + docPath);
+            File destFile = new File(System.getProperty("user.dir") + "/QuestXDataFolder/" + docPath);
             destFile.getParentFile().mkdirs();
             validDoc.transferTo(destFile);
             technician.setValidDocumentPath(docPath);
         }
         if (identityDoc != null && !identityDoc.isEmpty()) {
             String docPath = "upload/technician/identity-Proof/" + identityDoc.getOriginalFilename();
-            File destFile = new File(System.getProperty("user.dir") + "/ServiceHub/" + docPath);
+            File destFile = new File(System.getProperty("user.dir") + "/QuestXDataFolder/" + docPath);
             destFile.getParentFile().mkdirs();
             identityDoc.transferTo(destFile);
             technician.setIdentityPath(docPath);

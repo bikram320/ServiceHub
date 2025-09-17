@@ -10,7 +10,7 @@ spring:
     show-sql: true
 
   jwt:
-    secret: ${JWT_SECRET}
+    secret: "q5Fz8xvQ2K+3oHf9pG6RtXJk0Nw+Yh2bUu1d5LZ4aP8sVfM7yBqD9kLhS3mCjTnE6R8wXyQ0vP2aJrL6bFzUw=="
     accessTokenExpiration: 900 #15min
     refreshTokenExpiration: 604800 #7days
 

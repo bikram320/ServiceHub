@@ -75,7 +75,7 @@ public class UserService {
         if (profileImage != null && !profileImage.isEmpty()) {
 
             String profilePath = "upload/users/profile-image/" + profileImage.getOriginalFilename();
-            File destFile = new File(System.getProperty("user.dir") + "/ServiceHub/" + profilePath);
+            File destFile = new File(System.getProperty("user.dir") + "/QuestXDataFolder/" + profilePath);
 
             // Create directories if not exists
             destFile.getParentFile().mkdirs();
@@ -87,7 +87,7 @@ public class UserService {
 
         if (validDoc != null && !validDoc.isEmpty()) {
             String docPath = "upload/users/documents/" + validDoc.getOriginalFilename();
-            File destFile = new File(System.getProperty("user.dir") + "/ServiceHub/" + docPath);
+            File destFile = new File(System.getProperty("user.dir") + "/QuestXDataFolder/" + docPath);
             destFile.getParentFile().mkdirs();
             validDoc.transferTo(destFile);
             user.setDocumentPath(docPath);
