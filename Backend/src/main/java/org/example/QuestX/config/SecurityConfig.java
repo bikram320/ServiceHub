@@ -21,6 +21,9 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
 
@@ -41,6 +44,7 @@ public class SecurityConfig {
         provider.setUserDetailsService(userDetailsService);
         return provider;
     }
+
     @Bean
     public AuthenticationProvider technicianAuthenticationProvider(TechnicianDetailsService technicianDetailsService) {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
@@ -77,10 +81,12 @@ public class SecurityConfig {
         http
                 .sessionManagement(c ->
                         c.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .cors()
+                .and()
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(c -> c
                         //  Public endpoints
-                        .requestMatchers(HttpMethod.POST, "/auth/login/**", "/auth/signup/**" , "/auth/logout").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/auth/login/**", "/auth/signup/**", "/auth/logout").permitAll()
                         .requestMatchers("/Home/**").permitAll()
                         .requestMatchers("/payments/esewa/success", "/payments/esewa/failure").permitAll()
 
@@ -109,5 +115,23 @@ public class SecurityConfig {
 
         return http.build();
     }
+
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(List.of(
+                "http://localhost:5175",
+                "http://localhost:5173" // add this port
+        ));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+
 
 }

@@ -26,13 +26,13 @@ public class JwtService {
         var cookie = new Cookie("Refresh", refreshToken.toString());
         cookie.setPath("/");
         cookie.setHttpOnly(true);
-        cookie.setSecure(true);
+        cookie.setSecure(false);
         cookie.setMaxAge(jwtConfig.getRefreshTokenExpiration());
         response.addCookie(cookie);
 
         Cookie accessCookie = new Cookie("Access", accessToken.toString());
         accessCookie.setHttpOnly(true);
-        accessCookie.setSecure(true);
+        accessCookie.setSecure(false);
         accessCookie.setPath("/");
         accessCookie.setMaxAge(jwtConfig.getAccessTokenExpiration());
         response.addCookie(accessCookie);
