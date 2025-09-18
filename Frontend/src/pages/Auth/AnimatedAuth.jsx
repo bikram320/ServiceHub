@@ -1,4 +1,4 @@
-// AnimatedAuth.jsx
+
 import React, { useState } from 'react';
 import { User, Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import styles from '../../styles/AnimatedAuth.module.css';

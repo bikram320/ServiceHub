@@ -27,11 +27,12 @@ import Footer from "../Components/layout/Footer.jsx";
 import AnimatedAuth from "./Auth/AnimatedAuth.jsx";
 import RatingsAndReviews from "./Technician/RatingReviews.jsx";
 import ForgotPassword from "./Auth/ForgotPassword.jsx";
+import TechnicianLandingPage from "./questX/TechnicianLandingPage.jsx";
 
 const Test = () => {
     return (
         <div>
-            <UserDashboard/>
+            <TechnicianLayout />
         </div>
     );
 };

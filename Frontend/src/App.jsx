@@ -9,6 +9,7 @@ import Login from './pages/Auth/login.jsx';
 import Test from "./pages/Test.jsx";
 import LandingPage from "./pages/questX/LandingPage.jsx";
 import AuthContainer from "./Components/layout/AuthContainer.jsx";
+import TechnicianLandingPage from "./pages/questX/TechnicianLandingPage.jsx";
 
 function App() {
     return (
@@ -17,9 +18,10 @@ function App() {
                <Route path="/" element={<LandingPage />} />
                <Route path="/UserLayout/*" element={<UserLayout />} />
                <Route path="/LoginSignup/*" element={<AnimatedAuth />} />
+               <Route path="/TechnicianLandingPage/*" element={<TechnicianLandingPage />} />
            </Routes>
        </Router>
-        // <Test />
+         //<Test />
 
 
 );
