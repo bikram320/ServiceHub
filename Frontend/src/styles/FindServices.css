@@ -1,0 +1,455 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: #f8f9fa;
+    min-height: 100vh;
+}
+
+.page-container {
+    min-height: 100vh;
+    background-color: #f8f9fa;
+}
+
+/* Header Styles */
+.header {
+    background-color: white;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.logo-icon {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #a3e635, #65a30d);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+}
+
+.logo-text {
+    color: #65a30d;
+}
+
+.header-buttons {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.btn-signin {
+    background-color: #a3e635;
+    color: #1f2937;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 25px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.95rem;
+}
+
+.btn-signin:hover {
+    background-color: #84cc16;
+    transform: translateY(-1px);
+}
+
+.btn-technician {
+    background-color: transparent;
+    color: #65a30d;
+    padding: 0.75rem 1.5rem;
+    border: 2px solid #65a30d;
+    border-radius: 25px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.95rem;
+}
+
+.btn-technician:hover {
+    background-color: #65a30d;
+    color: white;
+    transform: translateY(-1px);
+}
+
+/* Main Container */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 4rem 2rem 2rem;
+}
+
+/* Hero Content */
+.hero-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+    min-height: 70vh;
+}
+
+.left-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.main-title {
+    font-size: 3rem;
+    font-weight: bold;
+    color: #1f2937;
+    line-height: 1.1;
+    margin-bottom: 1rem;
+}
+
+/* Service Buttons Grid */
+.services-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+    max-width: 600px;
+}
+
+.service-btn {
+    background-color: #76af8c;
+    color: white;
+    padding: 0.875rem 1.25rem;
+    border: none;
+    border-radius: 25px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+    white-space: nowrap;
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.service-btn:hover {
+    background-color: #86efac;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.service-btn:active {
+    transform: translateY(0);
+}
+
+/* Search Container */
+.search-container {
+    position: relative;
+    max-width: 600px;
+    width: 100%;
+}
+
+.search-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.search-input-container {
+    position: relative;
+    width: 100%;
+}
+
+.search-bar {
+    width: 100%;
+    background-color: #76af8c;
+    border: none;
+    border-radius: 25px;
+    padding: 1.25rem 4rem 1.25rem 2rem;
+    font-size: 1.1rem;
+    color: white;
+    outline: none;
+    transition: all 0.2s;
+}
+
+.search-bar::placeholder {
+    color: white;
+}
+
+.search-bar:focus {
+    box-shadow: 0 0 0 3px rgba(163, 230, 53, 0.3);
+}
+
+.search-input-container.focused {
+    box-shadow: 0 0 0 3px rgba(163, 230, 53, 0.3);
+    border-radius: 25px;
+}
+
+.search-icon-wrapper {
+    position: absolute;
+    right: 1.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+}
+
+.search-icon-wrapper:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.search-icon {
+    width: 24px;
+    height: 24px;
+    color: #1f2937;
+}
+
+.clear-btn {
+    position: absolute;
+    right: 3.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+}
+
+.clear-btn:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Suggestions Dropdown */
+.suggestions {
+    position: absolute;
+    top: calc(100% + 0.25rem);
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    max-height: 300px;
+    overflow-y: auto;
+    z-index: 1000;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.suggestion-header {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.75rem 1rem 0.5rem;
+    color: #6b7280;
+    background: #f9fafb;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.suggestion-item {
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    transition: background-color 0.15s;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.suggestion-item:last-child {
+    border-bottom: none;
+}
+
+.suggestion-item:hover,
+.suggestion-item.selected {
+    background: #f3f4f6;
+}
+
+.suggestion-item.recent-item {
+    color: #6b7280;
+}
+
+.recent-icon,
+.suggestion-icon {
+    flex-shrink: 0;
+    color: #9ca3af;
+}
+
+.suggestion-text {
+    flex: 1;
+    color: #1f2937;
+}
+
+.highlight {
+    background-color: #fef3c7;
+    font-weight: 600;
+}
+
+.remove-recent {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.5;
+    transition: all 0.15s;
+}
+
+.remove-recent:hover {
+    opacity: 1;
+    background-color: #fee2e2;
+    color: #dc2626;
+}
+
+.suggestion-divider {
+    height: 1px;
+    background-color: #e5e7eb;
+    margin: 0.5rem 0;
+}
+
+.no-results {
+    padding: 1rem;
+    text-align: center;
+    color: #6b7280;
+    font-style: italic;
+}
+
+/* Right Side Content */
+.right-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.image-container {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.hero-image {
+    width: auto;
+    height: 40rem !important;
+    object-fit: contain;
+    border-radius: 20px;
+}
+
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 968px) {
+    .hero-content {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+        text-align: center;
+    }
+
+    .main-title {
+        font-size: 2.5rem;
+    }
+
+    .services-grid {
+        grid-template-columns: repeat(3, 1fr);
+        justify-content: center;
+        margin: 0 auto 2rem;
+    }
+
+    .left-content {
+        align-items: center;
+    }
+}
+
+@media (max-width: 768px) {
+    .header {
+        padding: 1rem;
+    }
+
+    .container {
+        padding: 2rem 1rem;
+    }
+
+    .main-title {
+        font-size: 2rem;
+    }
+
+    .services-grid {
+        grid-template-columns: repeat(2, 1fr);
+        max-width: 400px;
+    }
+
+    .header-buttons {
+        gap: 0.5rem;
+    }
+
+    .btn-signin,
+    .btn-technician {
+        padding: 0.5rem 1rem;
+        font-size: 0.85rem;
+    }
+
+    .search-bar {
+        padding: 1rem 3.5rem 1rem 1.5rem;
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .services-grid {
+        grid-template-columns: 1fr;
+        max-width: 300px;
+    }
+
+    .service-btn {
+        padding: 0.75rem 1rem;
+    }
+
+    .main-title {
+        font-size: 1.75rem;
+    }
+
+    .header-buttons {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .btn-signin,
+    .btn-technician {
+        width: 100%;
+        min-width: 120px;
+    }
+}
