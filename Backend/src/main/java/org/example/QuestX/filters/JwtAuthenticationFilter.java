@@ -2,6 +2,7 @@ package org.example.QuestX.filters;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
@@ -25,12 +26,26 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     public void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        var authHeader = request.getHeader("Authorization");
+        String authHeader = request.getHeader("Authorization");
+
+        // Check cookies if header is missing
+        if ((authHeader == null || !authHeader.startsWith("Bearer ")) && request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if (cookie.getName().equals("Access")) {
+                    authHeader = "Bearer " + cookie.getValue();
+                    break;
+                }
+            }
+        }
+
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
-        var token = authHeader.replace("Bearer ", "");
+
+        String token = authHeader.replace("Bearer ", "");
+
+
         if (tokenBlackListService.isBlacklisted(token)) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write("Token is Expired. Unauthorized.");

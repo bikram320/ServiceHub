@@ -106,6 +106,7 @@ public class UserService {
         return technicians.stream()
                 .map(tech -> {
                     GetTechnicianDataRequest dto = new GetTechnicianDataRequest();
+                    dto.setImageFile(tech.getProfileImagePath());
                     dto.setTechnicianName(tech.getName());
                     dto.setTechnicianAddress(tech.getAddress());
                     dto.setTechnicianPhone(tech.getPhone());

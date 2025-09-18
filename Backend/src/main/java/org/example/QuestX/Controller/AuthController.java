@@ -5,7 +5,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import org.example.QuestX.exception.TechnicianNotFoundException;
 import org.example.QuestX.exception.UserNotFoundException;
-import org.example.QuestX.services.TokenBlackListService;
+import org.example.QuestX.services.*;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,9 +18,6 @@ import org.example.QuestX.Repository.TechnicianRepository;
 import org.example.QuestX.Repository.UserRepository;
 import org.example.QuestX.config.PasswordConfig;
 import org.example.QuestX.dtos.*;
-import org.example.QuestX.services.JwtService;
-import org.example.QuestX.services.MailService;
-import org.example.QuestX.services.ResetPasswordService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -250,5 +248,37 @@ public class AuthController {
         response.addCookie(accessCookie);
 
         return ResponseEntity.ok("Logged out successfully");
+    }
+
+    //refresh token
+
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refreshToken(HttpServletRequest request, HttpServletResponse response) {
+        String refreshToken = null;
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if (cookie.getName().equals("Refresh")) {
+                    refreshToken = cookie.getValue();
+                    break;
+                }
+            }
+        }
+
+        if (refreshToken == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Refresh token missing");
+        }
+
+        Jwt refreshJwt = jwtService.parseToken(refreshToken);
+        if (refreshJwt == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid refresh token");
+        }
+
+        Long userId = refreshJwt.getUserId();
+        var user = userRepository.findById(userId).orElseThrow(
+                () -> new UserNotFoundException("User not found")
+        );
+        var jwtResponse = jwtService.generateAccessTokenAndSetCookie(user, response);
+
+        return ResponseEntity.ok(jwtResponse);
     }
 }
