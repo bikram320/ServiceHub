@@ -1,96 +1,115 @@
 import React from 'react';
-import {Facebook, Instagram, Twitter} from "lucide-react";
+import { Facebook, Instagram, Twitter } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import "../../styles/Footer.css";
-import {useNavigate} from "react-router-dom";
 
 const Footer = () => {
     const navigate = useNavigate();
+
     return (
         <footer className="footer">
-            {/*Main content*/}
-            <div className="footer-content">
+            {/* Main Footer Content */}
+            <div className="footer-main">
                 <div className="footer-container">
 
-                    {/*Company section*/}
+                    {/* Company Links */}
                     <div className="footer-section">
-                        <h3 className="footer-heading">
-                            Company
-                        </h3>
-                        <ul className="footer-links">
-                            <li><a href="#" className="footer-link" onClick={() => navigate("/AboutUs")}>About Us</a></li>
-                            <li><a href="#" className="footer-link" onClick={() => navigate("/HelpSupport")}>Help & Support</a></li>
-                            <li><a href="#" className="footer-link">Careers</a></li>
-                            <li><a href="#" className="footer-link" onClick={() => navigate("/TermsOfServices")}>Terms of Services</a></li>
-                            <li><a href="#" className="footer-link" onClick={() => navigate("/PrivacyPolicy")}>Privacy Policy</a></li>
-                            <li><a href="#" className="footer-link">Partnerships</a></li>
+                        <h3 className="footer-title">Company</h3>
+                        <ul className="footer-nav">
+                            <li>
+                                <button
+                                    onClick={() => navigate("/about-us")}
+                                    className="footer-link"
+                                >
+                                    About Us
+                                </button>
+                            </li>
+                            <li>
+                                <button
+                                    onClick={() => navigate("/help-support")}
+                                    className="footer-link"
+                                >
+                                    Help & Support
+                                </button>
+                            </li>
                         </ul>
                     </div>
 
-
-                    {/*Solutions Section */}
+                    {/* Legal Links */}
                     <div className="footer-section">
-                        <h3 className="footer-heading">Solutions</h3>
-                        <ul className="footer-links">
-                            <li><a href="#" className="footer-link">serviceHub Pro</a></li>
-                            <li><a href="#" className="footer-link">Contact Sales</a></li>
+                        <h3 className="footer-title">Legal</h3>
+                        <ul className="footer-nav">
+                            <li>
+                                <button
+                                    onClick={() => navigate("/privacy-policy")}
+                                    className="footer-link"
+                                >
+                                    Privacy Policy
+                                </button>
+                            </li>
+                            <li>
+                                <button
+                                    onClick={() => navigate("/terms-of-service")}
+                                    className="footer-link"
+                                >
+                                    Terms of Service
+                                </button>
+                            </li>
                         </ul>
                     </div>
 
-                    {/* For Seller Section */}
+                    {/* Social Media */}
                     <div className="footer-section">
-                        <h3 className="footer-heading">For seller</h3>
-                        <ul className="footer-links">
-                            <li><a href="#" className="footer-link">Become a provider</a></li>
-                            <li><a href="#" className="footer-link">Become an Agency</a></li>
-                            <li><a href="#" className="footer-link">Community Hub</a></li>
-                        </ul>
-                    </div>
-
-                    {/* Header Name Section */}
-                    <div className="footer-section">
-                        <h3 className="footer-heading-large">Header Name</h3>
-                        <ul className="footer-links">
-                            <li><a href="#" className="footer-link">link 1</a></li>
-                            <li><a href="#" className="footer-link">link 2</a></li>
-                            <li><a href="#" className="footer-link">link 3</a></li>
-                        </ul>
+                        <h3 className="footer-title">Follow Us</h3>
+                        <div className="social-links">
+                            <a
+                                href="https://facebook.com"
+                                className="social-link"
+                                aria-label="Facebook"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                <Facebook size={20} />
+                            </a>
+                            <a
+                                href="https://instagram.com"
+                                className="social-link"
+                                aria-label="Instagram"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                <Instagram size={20} />
+                            </a>
+                            <a
+                                href="https://twitter.com"
+                                className="social-link"
+                                aria-label="Twitter"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                <Twitter size={20} />
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            {/* Bottom Section */}
+            {/* Bottom Bar */}
             <div className="footer-bottom">
-                <div className="footer-bottom-container">
-                    {/* Logo and Copyright */}
+                <div className="footer-bottom-content">
                     <div className="footer-brand">
-                        <div className="footer-logo">
-                            <div className="logo-icon">
-                                <span className="logo-text2">Q</span>
-                            </div>
-                            <span className="brand-name">QuestX</span>
-                            <span className="copyright">2025 | All Rights Reserved.</span>
+                        <div className="logo">
+                            <span className="logo-icon">Q</span>
                         </div>
+                        <span className="brand-text">QuestX</span>
                     </div>
-
-                    {/* Social Media */}
-                    <div className="footer-social">
-                        <span className="follow-text">Follow Us:</span>
-                        <div className="social-links">
-                            <a href="#" className="social-link" aria-label="Facebook">
-                                <Facebook size={24} />
-                            </a>
-                            <a href="#" className="social-link" aria-label="Instagram">
-                                <Instagram size={24} />
-                            </a>
-                            <a href="#" className="social-link" aria-label="Twitter">
-                                <Twitter size={24} />
-                            </a>
-                        </div>
+                    <div className="copyright">
+                        © 2025 QuestX. All Rights Reserved.
                     </div>
                 </div>
             </div>
         </footer>
-    )
-}
+    );
+};
 
 export default Footer;

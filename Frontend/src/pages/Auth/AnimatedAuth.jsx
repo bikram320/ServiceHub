@@ -4,7 +4,7 @@ import styles from '../../styles/AnimatedAuth.module.css';
 import { useNavigate } from "react-router-dom";
 import OTPVerificationModal from '../../Components/layout/OTPVerificationModal';
 
-const API_BASE = "http://localhost:5000";
+const API_BASE = "http://localhost:8080";
 const AnimatedAuth = () => {
     const [isLogin, setIsLogin] = useState(true);
     const [showPassword, setShowPassword] = useState(false);
@@ -54,12 +54,16 @@ const AnimatedAuth = () => {
         try {
             // role deteremination to be added
             const role = 'user'; // 'admin', 'user', 'technician' depending on your login logic
-            const response = await fetch(`${API_BASE}/auth/login/${role}`, {
+            const response =await fetch(`${API_BASE}/auth/signup/user`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                },
                 body: JSON.stringify({
-                    email: loginData.email,
-                    password: loginData.password
+                    name: signupData.fullName,
+                    email: signupData.email,
+                    password: signupData.password,
+                    confirmPassword: signupData.confirmPassword
                 })
             });
 

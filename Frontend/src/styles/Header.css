@@ -17,6 +17,7 @@
     display: flex;
     align-items: center;
     gap: 10px;
+    cursor: pointer;
 }
 
 .logo-icon1 {
@@ -30,12 +31,14 @@
     color: white;
     font-weight: bold;
     font-size: 18px;
+    cursor: pointer;
 }
 
 .logo-text1 {
     font-size: 24px;
     font-weight: 300;
     color: #76af8c !important;
+    cursor: pointer;
 }
 
 .nav {
@@ -56,6 +59,7 @@
 
 .header .btn-primary1:hover {
     background-color: #22c55e;
+    cursor: pointer;
 }
 
 .header .btn-secondary1 {
