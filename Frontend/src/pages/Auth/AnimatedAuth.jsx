@@ -68,8 +68,16 @@ const AnimatedAuth = () => {
             if (response.ok) {
                 const data = await response.json();
                 console.log('Login success:', data);
-                navigate("/UserLayout"); // or navigate according to role
-            } else {
+
+                const userRole = role || signupData.role; // ensure you have role defined
+
+                if (userRole === 'user') {
+                    navigate("/UserLayout");
+                } else if (userRole === 'technician') {
+                    navigate("/TechnicianLayout");
+                } else {
+                    console.error('Unknown role:', userRole);
+                }            } else {
                 const errorData = await response.json();
                 alert(errorData.message || 'Login failed');
             }
@@ -135,7 +143,16 @@ const AnimatedAuth = () => {
                 const data = await response.json();
                 console.log('OTP verified:', data);
                 setShowOTPModal(false);
-                navigate("/UserLayout");
+
+                const userRole = role || signupData.role; // ensure you have role defined
+
+                if (userRole === 'user') {
+                    navigate("/UserLayout");
+                } else if (userRole === 'technician') {
+                    navigate("/TechnicianLayout");
+                } else {
+                    console.error('Unknown role:', userRole);
+                }
             } else {
                 const errorData = await response.json();
                 alert(errorData.message || 'Invalid OTP');

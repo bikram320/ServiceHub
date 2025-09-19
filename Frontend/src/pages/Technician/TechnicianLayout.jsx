@@ -4,6 +4,7 @@ import TechnicianDashboard from './TechnicianDashboard';
 import TechnicianProfileForm from '../Auth/TechnicianProfileForm';
 import ServiceRequests from './ServiceRequests';
 import JobHistory from './JobHistory';
+import {useNavigate} from "react-router-dom";
 
 const TechnicianLayout = () => {
     const [activeTab, setActiveTab] = useState('dashboard');
@@ -23,6 +24,7 @@ const TechnicianLayout = () => {
         preferredLanguage: 'English',
         timezone: 'Asia/Kathmandu (UTC+05:45)'
     });
+    const navigate = useNavigate();
 
     const handleTabChange = (tabId) => {
         setActiveTab(tabId);
@@ -34,10 +36,25 @@ const TechnicianLayout = () => {
         console.log('Technician profile updated:', updatedProfile);
     };
 
-    const handleLogout = () => {
-        // Clear technician session and redirect to login
-        console.log('Technician logged out');
-        // To redirect to login page or clear authentication tokens
+    const handleLogout = async () => {
+        try {
+            const response = await fetch("http://localhost:8080/auth/logout", {
+                method: "POST",
+                credentials: "include", // important to send cookies
+            });
+
+            if (response.ok) {
+                console.log("User logged out successfully");
+                // Cookies are cleared by the backend, so no need to clear localStorage
+                navigate("/"); // redirect to homepage or login
+            } else {
+                console.error("Logout failed:", await response.text());
+                alert("Failed to logout. Please try again.");
+            }
+        } catch (error) {
+            console.error("Error during logout:", error);
+            alert("Something went wrong while logging out.");
+        }
     };
 
     const renderActiveComponent = () => {

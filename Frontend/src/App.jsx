@@ -13,6 +13,7 @@ import PrivacyPolicy from "./pages/questX/PrivacyPolicy.jsx";
 import TermsOfServices from "./pages/questX/TermsOfServices.jsx";
 import HelpSupport from "./pages/questX/HelpSupprt.jsx";
 import ForgotPassword from "./pages/Auth/ForgotPassword.jsx";
+import TechnicianLayout from "./pages/Technician/TechnicianLayout.jsx";
 
 function App() {
     return (
@@ -27,7 +28,7 @@ function App() {
                <Route path="/PrivacyPolicy/*" element={<PrivacyPolicy />} />
                <Route path="/TermsOfServices" element={<TermsOfServices />} />
                <Route path="/HelpSupport/*" element={<HelpSupport />} />
-
+               <Route path="/TechnicianLayout/*" element={<TechnicianLayout />} />
            </Routes>
        </Router>
         //<Test />

@@ -142,7 +142,7 @@ function TechnicianLandingPage() {
                         </p>
 
                         <div className={styles["hero-buttons"]}>
-                            <button className={styles["btn-primary"]} onClick={() => navigate("/LoginSignup")}>APPLY NOW</button>
+                            <button className={styles["btn-primary"]} onClick={() => navigate("/LoginSignup" , { state: { role: "technician" } })}>APPLY NOW</button>
                             <button className={styles["btn-secondary"]}>LEARN MORE</button>
                         </div>
                     </div>
