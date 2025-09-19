@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Star, User, Calendar, CheckCircle } from "lucide-react";
 import "../../styles/RatingReviews.css";
 
-function TechnicianProfile({ technicianId, user }) {
+function RatingReviews({ technicianId, user }) {
     const [reviews, setReviews] = useState([]);
     const [rating, setRating] = useState(0);
     const [reviewText, setReviewText] = useState("");
@@ -260,6 +260,6 @@ function TechnicianProfile({ technicianId, user }) {
             )}
         </div>
     );
-}
+};
 
-export default TechnicianProfile;
+export default RatingReviews;

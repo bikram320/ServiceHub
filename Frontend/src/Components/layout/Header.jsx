@@ -24,7 +24,7 @@ const Header = () => {
                 {/* Become a technician */}
                 <button
                     className="btn-secondary1"
-                    onClick={() => navigate("/LoginSignup", { state: { role: "technician" } })}
+                    onClick={() => navigate("/TechnicianLandingPage")}
                 >
                     Become a Technician
                 </button>

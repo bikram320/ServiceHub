@@ -23,13 +23,13 @@ import UserLayout from "./User/UserLayout.jsx";
 import TechnicianLayout from "./Technician/TechnicianLayout.jsx";
 import Footer from "../Components/layout/Footer.jsx";
 import AnimatedAuth from "./Auth/AnimatedAuth.jsx";
-import RatingsAndReviews from "./Technician/RatingReviews.jsx";
+import RatingReviews from "./Technician/RatingReviews.jsx";
 import ForgotPassword from "./Auth/ForgotPassword.jsx";
 
 const Test = () => {
     return (
         <div>
-            <TechnicianLayout />
+            <RatingReviews />
         </div>
     );
 };

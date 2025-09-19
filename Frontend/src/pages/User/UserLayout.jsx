@@ -36,20 +36,13 @@ const UserLayout = () => {
         try {
             const response = await fetch("http://localhost:8080/auth/logout", {
                 method: "POST",
-                credentials: "include", // important to send cookies (Access + Refresh)
-                headers: {
-                    "Content-Type": "application/json",
-                },
+                credentials: "include", // important to send cookies
             });
 
             if (response.ok) {
                 console.log("User logged out successfully");
-
-                localStorage.removeItem("user");
-                sessionStorage.clear();
-
-                // Redirect to homepage
-                navigate("/");
+                // Cookies are cleared by the backend, so no need to clear localStorage
+                navigate("/"); // redirect to homepage or login
             } else {
                 console.error("Logout failed:", await response.text());
                 alert("Failed to logout. Please try again.");
