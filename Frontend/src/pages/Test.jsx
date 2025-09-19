@@ -31,7 +31,7 @@ import ForgotPassword from "./Auth/ForgotPassword.jsx";
 const Test = () => {
     return (
         <div>
-            <LandingPage/>
+            <UserDashboard/>
         </div>
     );
 };

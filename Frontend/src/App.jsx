@@ -13,13 +13,13 @@ import AuthContainer from "./Components/layout/AuthContainer.jsx";
 function App() {
     return (
        <Router>
-            <Routes>
-                <Route path="/" element={<LandingPage />} />
-                    <Route path="/UserLayout/*" element={<UserLayout />} />
-              <Route path="/LoginSignup/*" element={<AnimatedAuth />} />
+           <Routes>
+               <Route path="/" element={<LandingPage />} />
+               <Route path="/UserLayout/*" element={<UserLayout />} />
+               <Route path="/LoginSignup/*" element={<AnimatedAuth />} />
            </Routes>
-        </Router>
-         // < Test/>
+       </Router>
+        // <Test />
 
 
 );
