@@ -3,6 +3,7 @@ package org.example.QuestX.Controller;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
+import org.example.QuestX.Repository.PendingSignupRepository;
 import org.example.QuestX.exception.TechnicianNotFoundException;
 import org.example.QuestX.exception.UserNotFoundException;
 import org.example.QuestX.services.*;
@@ -38,6 +39,8 @@ public class AuthController {
     private final JwtService jwtService;
     private final ResetPasswordService resetPasswordService;
     private final TokenBlackListService tokenBlackListService;
+    private final PendingSignupRepository pendingSignupRepository;
+    private final SignupService signupService;
 
     // login
     @PostMapping("/login/admin")
@@ -80,91 +83,55 @@ public class AuthController {
         return ResponseEntity.ok(jwtService.generateAccessTokenAndSetCookie((JwtUser) entity, response));
     }
 
-    // SignUp
     @PostMapping("/signup/user")
     public ResponseEntity<?> signupUser(@RequestBody SignupRequest request) throws MessagingException {
-        return signup(request, userRepository, Role.USER);
+        return initiateSignup(request, Role.USER);
     }
 
     @PostMapping("/signup/technician")
     public ResponseEntity<?> signupTechnician(@RequestBody SignupRequest request) throws MessagingException {
-        return signup(request, technicianRepository, Role.TECHNICIAN);
+        return initiateSignup(request, Role.TECHNICIAN);
     }
 
-    private ResponseEntity<?> signup(SignupRequest request, Object repo, Role role) throws MessagingException {
-        if (emailExists(request.getEmail(), repo)) {
+    private ResponseEntity<?> initiateSignup(SignupRequest request, Role role) throws MessagingException {
+        // 1️ Check if email already exists in users or technicians
+        if (userRepository.existsByEmail(request.getEmail()) || technicianRepository.existsByEmail(request.getEmail())) {
             return ResponseEntity.badRequest().body("Email already exists");
         }
-        if (!request.getPassword().equals(request.getConfirmPassword())){
+        if (!request.getPassword().equals(request.getConfirmPassword())) {
             return ResponseEntity.badRequest().body("Passwords do not match");
         }
-        if (request.getPassword().length() < 8 || request.getPassword().length() > 32)
+        if (request.getPassword().length() < 8 || request.getPassword().length() > 32) {
             return ResponseEntity.badRequest().body("Password must be 8-32 characters");
-
-        Object entity = role == Role.USER ? new User() : new Technician();
-
-        if (entity instanceof User u) {
-            u.setName(request.getName());
-            u.setEmail(request.getEmail());
-            u.setPassword(passwordConfig.passwordEncoder().encode(request.getPassword()));
-            u.setRole(role);
-            u.setStatus(Status.PENDING);
-            u.setCreatedAt(LocalDateTime.now());
-            userRepository.save(u);
-        } else {
-            Technician t = (Technician) entity;
-            t.setName(request.getName());
-            t.setEmail(request.getEmail());
-            t.setPassword(passwordConfig.passwordEncoder().encode(request.getPassword()));
-            t.setRole(role);
-            t.setStatus(Status.PENDING);
-            t.setCreatedAt(LocalDateTime.now());
-            technicianRepository.save(t);
         }
 
+        //  Remove any previous pending signup with the same email (cleanup)
+        pendingSignupRepository.deleteByEmail(request.getEmail());
+
+        // Store pending signup in DB
+        PendingSignup pending = new PendingSignup();
+        pending.setName(request.getName());
+        pending.setEmail(request.getEmail());
+        pending.setPassword(passwordConfig.passwordEncoder().encode(request.getPassword())); // encode before saving
+        pending.setRole(role);
+        pending.setCreatedAt(LocalDateTime.now());
+        pendingSignupRepository.save(pending);
+
+        // ️Send OTP
         otpService.sendOtpEmail(request.getEmail());
-        return ResponseEntity.ok("OTP has been sent to your email");
+
+        return ResponseEntity.ok("OTP sent. Please verify to complete signup.");
     }
 
-    private boolean emailExists(String email, Object repo) {
-        if (repo instanceof UserRepository ur){
-            return ur.existsByEmail(email);
-        }
-        if (repo instanceof TechnicianRepository tr) {
-            return tr.existsByEmail(email);
-        }
-        return false;
-    }
-
-    // Verify OTP
+    // --- Verify OTP & Create User/Technician ---
     @PostMapping("/signup/user/verify-otp")
     public ResponseEntity<?> verifyOtpUser(@RequestBody VerifyOtpRequest request, HttpServletResponse response) {
-        return verifyOtp(request, userRepository, response);
+        return signupService.verifyOtpAndSave(request, Role.USER, response);
     }
 
-    @PostMapping("/signup/technician/verify-otp")
+    @PostMapping("signup/technician/verify-otp")
     public ResponseEntity<?> verifyOtpTechnician(@RequestBody VerifyOtpRequest request, HttpServletResponse response) {
-        return verifyOtp(request, technicianRepository, response);
-    }
-
-    private  ResponseEntity<?> verifyOtp(VerifyOtpRequest request, Object repo, HttpServletResponse response) {
-        boolean verified = otpService.verifyOtp(request);
-        if (!verified) {
-            return ResponseEntity.badRequest().body("OTP verification failed");
-        }
-
-        if (repo instanceof UserRepository ur) {
-            var user = ur.findByEmail(request.getEmail()).orElseThrow();
-            user.setIsEmailVerified(true);
-            ur.save(user);
-            return ResponseEntity.ok(jwtService.generateAccessTokenAndSetCookie(user, response));
-        } else if (repo instanceof TechnicianRepository tr) {
-            var tech = tr.findByEmail(request.getEmail());
-            tech.setIsEmailVerified(true);
-            tr.save(tech);
-            return ResponseEntity.ok(jwtService.generateAccessTokenAndSetCookie(tech, response));
-        }
-        return ResponseEntity.badRequest().body("Unknown repository");
+        return signupService.verifyOtpAndSave(request, Role.TECHNICIAN, response);
     }
 
     @PostMapping({"/signup/user/resend-otp",
