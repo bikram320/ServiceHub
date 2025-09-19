@@ -1,23 +1,22 @@
 import React, { useState } from 'react';
 import {
     Mail,
-    Phone,
     ArrowLeft,
     CheckCircle,
     AlertCircle,
     Loader2,
     Eye,
-    EyeOff,
-    Shield
+    EyeOff
 } from 'lucide-react';
-import "../../styles/ForgotPassword.css";
+import { useNavigate } from "react-router-dom";
+import styles from '../../styles/ForgotPassword.module.css';
 
 const ForgotPassword = ({ onBackToLogin, onPasswordReset }) => {
+    const navigate = useNavigate();
     const [step, setStep] = useState('identify'); // 'identify', 'verify', 'reset', 'success'
-    const [method, setMethod] = useState('email'); // 'email' or 'phone'
+    const [method, setMethod] = useState('email'); // 'email'
     const [formData, setFormData] = useState({
         email: '',
-        phone: '',
         verificationCode: '',
         newPassword: '',
         confirmPassword: ''
@@ -41,17 +40,11 @@ const ForgotPassword = ({ onBackToLogin, onPasswordReset }) => {
         return emailRegex.test(email);
     };
 
-    const validatePhone = (phone) => {
-        const phoneRegex = /^\+?977[0-9]{10}$|^[0-9]{10}$/;
-        return phoneRegex.test(phone);
-    };
-
     const handleIdentifyUser = async () => {
         setIsLoading(true);
         setError('');
 
         try {
-            // Validate input
             if (method === 'email') {
                 if (!formData.email) {
                     throw new Error('Email address is required');
@@ -59,21 +52,10 @@ const ForgotPassword = ({ onBackToLogin, onPasswordReset }) => {
                 if (!validateEmail(formData.email)) {
                     throw new Error('Please enter a valid email address');
                 }
-            } else {
-                if (!formData.phone) {
-                    throw new Error('Phone number is required');
-                }
-                if (!validatePhone(formData.phone)) {
-                    throw new Error('Please enter a valid phone number');
-                }
             }
 
-            // Simulate API call to send verification code
             await new Promise(resolve => setTimeout(resolve, 2000));
-
-            // For demo purposes, we'll assume the user exists
-            // In real implementation, you'd call your API here
-            console.log('Sending verification code to:', method === 'email' ? formData.email : formData.phone);
+            console.log('Sending verification code to:', formData.email);
 
             setStep('verify');
             startResendTimer();
@@ -96,10 +78,8 @@ const ForgotPassword = ({ onBackToLogin, onPasswordReset }) => {
                 throw new Error('Verification code must be 6 digits');
             }
 
-            // use API call to verify code
             await new Promise(resolve => setTimeout(resolve, 1500));
 
-            // for now accepts any 6-digit code except 000000
             if (formData.verificationCode === '000000') {
                 throw new Error('Invalid verification code. Please try again.');
             }
@@ -130,7 +110,6 @@ const ForgotPassword = ({ onBackToLogin, onPasswordReset }) => {
                 throw new Error('Passwords do not match');
             }
 
-            // Validate password strength
             const hasUpperCase = /[A-Z]/.test(formData.newPassword);
             const hasLowerCase = /[a-z]/.test(formData.newPassword);
             const hasNumbers = /\d/.test(formData.newPassword);
@@ -140,12 +119,10 @@ const ForgotPassword = ({ onBackToLogin, onPasswordReset }) => {
                 throw new Error('Password must contain at least one uppercase letter, lowercase letter, number, and special character');
             }
 
-            // Simulate API call to reset password
             await new Promise(resolve => setTimeout(resolve, 2000));
 
             setStep('success');
 
-            // Call the parent callback if provided
             if (onPasswordReset) {
                 onPasswordReset({
                     method,
@@ -166,10 +143,8 @@ const ForgotPassword = ({ onBackToLogin, onPasswordReset }) => {
         setError('');
 
         try {
-            // Simulate API call to resend code
             await new Promise(resolve => setTimeout(resolve, 1000));
-
-            console.log('Resending verification code to:', method === 'email' ? formData.email : formData.phone);
+            console.log('Resending verification code to:', formData.email);
             startResendTimer();
         } catch (err) {
             setError('Failed to resend code. Please try again.');
@@ -198,68 +173,40 @@ const ForgotPassword = ({ onBackToLogin, onPasswordReset }) => {
     };
 
     const renderIdentifyStep = () => (
-        <div className="forgot-password-form">
-            <div className="form-header">
-                <h2 className="form-title">Reset Your Password</h2>
-                <p className="form-subtitle">
-                    Enter your email address or phone number and we'll send you a verification code.
+        <div className={styles["forgot-password-form"]}>
+            <div className={styles["form-header"]}>
+                <h2 className={styles["form-title"]}>Reset Your Password</h2>
+                <p className={styles["form-subtitle"]}>
+                    Enter your email address and we'll send you a verification code.
                 </p>
             </div>
 
-            <div className="method-selector">
-                <div className="method-options">
-                    <button
-                        type="button"
-                        className={`method-btn ${method === 'email' ? 'active' : ''}`}
-                        onClick={() => setMethod('email')}
-                    >
+            <div className={styles["method-selector"]}>
+                <div className={styles["method-options"]}>
+                    <button type="button" className={styles["method-btn"]}>
                         <Mail size={20} />
                         Email
-                    </button>
-                    <button
-                        type="button"
-                        className={`method-btn ${method === 'phone' ? 'active' : ''}`}
-                        onClick={() => setMethod('phone')}
-                    >
-                        <Phone size={20} />
-                        Phone
                     </button>
                 </div>
             </div>
 
-            <div className="reset-form">
-                {method === 'email' ? (
-                    <div className="form-group">
-                        <label htmlFor="email" className="form-label">Email Address</label>
-                        <input
-                            type="email"
-                            id="email"
-                            className="form-input"
-                            value={formData.email}
-                            onChange={(e) => handleInputChange('email', e.target.value)}
-                            onKeyPress={(e) => handleKeyPress(e, handleIdentifyUser)}
-                            placeholder="Enter your email address"
-                            disabled={isLoading}
-                        />
-                    </div>
-                ) : (
-                    <div className="form-group">
-                        <label htmlFor="phone" className="form-label">Phone Number</label>
-                        <input
-                            type="tel"
-                            id="phone"
-                            className="form-input"
-                            value={formData.phone}
-                            onChange={(e) => handleInputChange('phone', e.target.value)}
-                            onKeyPress={(e) => handleKeyPress(e, handleIdentifyUser)}
-                            placeholder="Enter your phone number"
-                            disabled={isLoading}
-                        />
-                    </div>
-                )}
+            <div className={styles["reset-form"]}>
+                <div className={styles["form-group"]}>
+                    <label htmlFor="email" className={styles["form-label"]}>Email Address</label>
+                    <input
+                        type="email"
+                        id="email"
+                        className={styles["form-input"]}
+                        value={formData.email}
+                        onChange={(e) => handleInputChange('email', e.target.value)}
+                        onKeyPress={(e) => handleKeyPress(e, handleIdentifyUser)}
+                        placeholder="Enter your email address"
+                        disabled={isLoading}
+                    />
+                </div>
 
                 {error && (
-                    <div className="error-message">
+                    <div className={styles["error-message"]}>
                         <AlertCircle size={16} />
                         <span>{error}</span>
                     </div>
@@ -267,13 +214,13 @@ const ForgotPassword = ({ onBackToLogin, onPasswordReset }) => {
 
                 <button
                     type="button"
-                    className="submit-btn"
+                    className={styles["submit-btn"]}
                     onClick={handleIdentifyUser}
                     disabled={isLoading}
                 >
                     {isLoading ? (
                         <>
-                            <Loader2 size={16} className="spinning" />
+                            <Loader2 size={16} className={styles["spinning"]} />
                             Sending...
                         </>
                     ) : (
@@ -285,22 +232,21 @@ const ForgotPassword = ({ onBackToLogin, onPasswordReset }) => {
     );
 
     const renderVerifyStep = () => (
-        <div className="forgot-password-form">
-            <div className="form-header">
-                <h2 className="form-title">Verify Your Identity</h2>
-                <p className="form-subtitle">
-                    We've sent a 6-digit verification code to{' '}
-                    <strong>{method === 'email' ? formData.email : formData.phone}</strong>
+        <div className={styles["forgot-password-form"]}>
+            <div className={styles["form-header"]}>
+                <h2 className={styles["form-title"]}>Verify Your Identity</h2>
+                <p className={styles["form-subtitle"]}>
+                    We've sent a 6-digit verification code to <strong>{formData.email}</strong>
                 </p>
             </div>
 
-            <div className="reset-form">
-                <div className="form-group">
-                    <label htmlFor="verificationCode" className="form-label">Verification Code</label>
+            <div className={styles["reset-form"]}>
+                <div className={styles["form-group"]}>
+                    <label htmlFor="verificationCode" className={styles["form-label"]}>Verification Code</label>
                     <input
                         type="text"
                         id="verificationCode"
-                        className="form-input verification-input"
+                        className={`${styles["form-input"]} ${styles["verification-input"]}`}
                         value={formData.verificationCode}
                         onChange={(e) => {
                             const value = e.target.value.replace(/\D/g, '').slice(0, 6);
@@ -314,21 +260,21 @@ const ForgotPassword = ({ onBackToLogin, onPasswordReset }) => {
                 </div>
 
                 {error && (
-                    <div className="error-message">
+                    <div className={styles["error-message"]}>
                         <AlertCircle size={16} />
                         <span>{error}</span>
                     </div>
                 )}
 
-                <div className="resend-section">
-                    <p className="resend-text">
+                <div className={styles["resend-section"]}>
+                    <p className={styles["resend-text"]}>
                         Didn't receive the code?{' '}
                         {resendTimer > 0 ? (
-                            <span className="resend-timer">Resend in {resendTimer}s</span>
+                            <span className={styles["resend-timer"]}>Resend in {resendTimer}s</span>
                         ) : (
                             <button
                                 type="button"
-                                className="resend-btn"
+                                className={styles["resend-btn"]}
                                 onClick={handleResendCode}
                                 disabled={isLoading}
                             >
@@ -340,13 +286,13 @@ const ForgotPassword = ({ onBackToLogin, onPasswordReset }) => {
 
                 <button
                     type="button"
-                    className="submit-btn"
+                    className={styles["submit-btn"]}
                     onClick={handleVerifyCode}
                     disabled={isLoading}
                 >
                     {isLoading ? (
                         <>
-                            <Loader2 size={16} className="spinning" />
+                            <Loader2 size={16} className={styles["spinning"]} />
                             Verifying...
                         </>
                     ) : (
@@ -358,22 +304,20 @@ const ForgotPassword = ({ onBackToLogin, onPasswordReset }) => {
     );
 
     const renderResetStep = () => (
-        <div className="forgot-password-form">
-            <div className="form-header">
-                <h2 className="form-title">Create New Password</h2>
-                <p className="form-subtitle">
-                    Please create a strong password for your account.
-                </p>
+        <div className={styles["forgot-password-form"]}>
+            <div className={styles["form-header"]}>
+                <h2 className={styles["form-title"]}>Create New Password</h2>
+                <p className={styles["form-subtitle"]}>Please create a strong password for your account.</p>
             </div>
 
-            <div className="reset-form">
-                <div className="form-group">
-                    <label htmlFor="newPassword" className="form-label">New Password</label>
-                    <div className="password-input-wrapper">
+            <div className={styles["reset-form"]}>
+                <div className={styles["form-group"]}>
+                    <label htmlFor="newPassword" className={styles["form-label"]}>New Password</label>
+                    <div className={styles["password-input-wrapper"]}>
                         <input
                             type={showPassword ? 'text' : 'password'}
                             id="newPassword"
-                            className="form-input"
+                            className={styles["form-input"]}
                             value={formData.newPassword}
                             onChange={(e) => handleInputChange('newPassword', e.target.value)}
                             onKeyPress={(e) => handleKeyPress(e, handleResetPassword)}
@@ -382,7 +326,7 @@ const ForgotPassword = ({ onBackToLogin, onPasswordReset }) => {
                         />
                         <button
                             type="button"
-                            className="password-toggle"
+                            className={styles["password-toggle"]}
                             onClick={() => setShowPassword(!showPassword)}
                         >
                             {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -390,13 +334,13 @@ const ForgotPassword = ({ onBackToLogin, onPasswordReset }) => {
                     </div>
                 </div>
 
-                <div className="form-group">
-                    <label htmlFor="confirmPassword" className="form-label">Confirm Password</label>
-                    <div className="password-input-wrapper">
+                <div className={styles["form-group"]}>
+                    <label htmlFor="confirmPassword" className={styles["form-label"]}>Confirm Password</label>
+                    <div className={styles["password-input-wrapper"]}>
                         <input
                             type={showConfirmPassword ? 'text' : 'password'}
                             id="confirmPassword"
-                            className="form-input"
+                            className={styles["form-input"]}
                             value={formData.confirmPassword}
                             onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
                             onKeyPress={(e) => handleKeyPress(e, handleResetPassword)}
@@ -405,7 +349,7 @@ const ForgotPassword = ({ onBackToLogin, onPasswordReset }) => {
                         />
                         <button
                             type="button"
-                            className="password-toggle"
+                            className={styles["password-toggle"]}
                             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                         >
                             {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -413,9 +357,9 @@ const ForgotPassword = ({ onBackToLogin, onPasswordReset }) => {
                     </div>
                 </div>
 
-                <div className="password-requirements">
-                    <p className="requirements-title">Password must contain:</p>
-                    <ul className="requirements-list">
+                <div className={styles["password-requirements"]}>
+                    <p className={styles["requirements-title"]}>Password must contain:</p>
+                    <ul className={styles["requirements-list"]}>
                         <li>At least 8 characters</li>
                         <li>One uppercase letter</li>
                         <li>One lowercase letter</li>
@@ -425,7 +369,7 @@ const ForgotPassword = ({ onBackToLogin, onPasswordReset }) => {
                 </div>
 
                 {error && (
-                    <div className="error-message">
+                    <div className={styles["error-message"]}>
                         <AlertCircle size={16} />
                         <span>{error}</span>
                     </div>
@@ -433,13 +377,13 @@ const ForgotPassword = ({ onBackToLogin, onPasswordReset }) => {
 
                 <button
                     type="button"
-                    className="submit-btn"
+                    className={styles["submit-btn"]}
                     onClick={handleResetPassword}
                     disabled={isLoading}
                 >
                     {isLoading ? (
                         <>
-                            <Loader2 size={16} className="spinning" />
+                            <Loader2 size={16} className={styles["spinning"]} />
                             Resetting...
                         </>
                     ) : (
@@ -451,18 +395,18 @@ const ForgotPassword = ({ onBackToLogin, onPasswordReset }) => {
     );
 
     const renderSuccessStep = () => (
-        <div className="forgot-password-form">
-            <div className="success-content">
-                <div className="success-icon">
+        <div className={styles["forgot-password-form"]}>
+            <div className={styles["success-content"]}>
+                <div className={styles["success-icon"]}>
                     <CheckCircle size={64} />
                 </div>
-                <h2 className="success-title">Password Reset Successful!</h2>
-                <p className="success-message">
+                <h2 className={styles["success-title"]}>Password Reset Successful!</h2>
+                <p className={styles["success-message"]}>
                     Your password has been successfully updated. You can now log in with your new password.
                 </p>
                 <button
                     type="button"
-                    className="submit-btn"
+                    className={styles["submit-btn"]}
                     onClick={onBackToLogin}
                 >
                     Back to Login
@@ -472,107 +416,37 @@ const ForgotPassword = ({ onBackToLogin, onPasswordReset }) => {
     );
 
     return (
-        <div style={{
-            minHeight: '100vh',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            padding: '2rem',
-            fontFamily: 'system-ui, -apple-system, sans-serif'
-        }}>
-            <div style={{
-                background: 'white',
-                borderRadius: '16px',
-                boxShadow: '0 20px 40px rgba(0, 0, 0, 0.1)',
-                width: '100%',
-                maxWidth: '480px',
-                padding: '2rem',
-                position: 'relative'
-            }}>
+        <div className={styles["forgot-password-container"]}>
+            <div className={styles["forgot-password-card"]}>
                 {step !== 'success' && (
                     <button
-                        style={{
-                            position: 'absolute',
-                            top: '1rem',
-                            left: '1rem',
-                            background: 'none',
-                            border: 'none',
-                            color: '#64748b',
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '0.5rem',
-                            fontSize: '0.875rem',
-                            padding: '0.5rem',
-                            borderRadius: '8px',
-                            transition: 'all 0.2s'
-                        }}
+                        className={styles["back-btn"]}
                         onClick={step === 'identify' ? onBackToLogin : () => setStep(step === 'verify' ? 'identify' : 'verify')}
                         disabled={isLoading}
-                        onMouseOver={(e) => {
-                            e.target.style.background = '#f1f5f9';
-                            e.target.style.color = '#1e293b';
-                        }}
-                        onMouseOut={(e) => {
-                            e.target.style.background = 'none';
-                            e.target.style.color = '#64748b';
-                        }}
                     >
                         <ArrowLeft size={16} />
                         Back
                     </button>
                 )}
 
-                <div style={{ margin: '2rem 0' }}>
-                    <div style={{
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        gap: '2rem',
-                        marginBottom: '2rem'
-                    }}>
-                        {[
-                            { step: 'identify', label: 'Identify', num: 1 },
-                            { step: 'verify', label: 'Verify', num: 2 },
-                            { step: 'reset', label: 'Reset', num: 3 }
-                        ].map((stepItem) => {
-                            const isActive = step === stepItem.step;
-                            const isCompleted = (step === 'verify' && stepItem.step === 'identify') ||
-                                (step === 'reset' && (stepItem.step === 'identify' || stepItem.step === 'verify')) ||
-                                (step === 'success' && stepItem.step !== 'success');
-
-                            return (
-                                <div key={stepItem.step} style={{
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    alignItems: 'center',
-                                    gap: '0.5rem',
-                                    color: isActive ? '#3b82f6' : isCompleted ? '#10b981' : '#94a3b8'
-                                }}>
-                                    <div style={{
-                                        width: '32px',
-                                        height: '32px',
-                                        borderRadius: '50%',
-                                        background: isActive ? '#3b82f6' : isCompleted ? '#10b981' : '#e2e8f0',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        fontWeight: '600',
-                                        fontSize: '0.875rem',
-                                        color: isActive || isCompleted ? 'white' : '#64748b',
-                                        transition: 'all 0.3s'
-                                    }}>
-                                        {stepItem.num}
-                                    </div>
-                                    <span style={{ fontSize: '0.875rem' }}>{stepItem.label}</span>
-                                </div>
-                            );
-                        })}
+                <div className={styles["step-indicator"]}>
+                    <div className={styles["steps"]}>
+                        <div className={`${styles["step"]} ${step === 'identify' ? styles["active"] : step !== 'identify' ? styles["completed"] : ''}`}>
+                            <div className={styles["step-circle"]}>1</div>
+                            <span>Identify</span>
+                        </div>
+                        <div className={`${styles["step"]} ${step === 'verify' ? styles["active"] : step === 'reset' || step === 'success' ? styles["completed"] : ''}`}>
+                            <div className={styles["step-circle"]}>2</div>
+                            <span>Verify</span>
+                        </div>
+                        <div className={`${styles["step"]} ${step === 'reset' ? styles["active"] : step === 'success' ? styles["completed"] : ''}`}>
+                            <div className={styles["step-circle"]}>3</div>
+                            <span>Reset</span>
+                        </div>
                     </div>
                 </div>
 
-                <div style={{ maxWidth: '400px', margin: '0 auto' }}>
+                <div className={styles["form-container"]}>
                     {step === 'identify' && renderIdentifyStep()}
                     {step === 'verify' && renderVerifyStep()}
                     {step === 'reset' && renderResetStep()}

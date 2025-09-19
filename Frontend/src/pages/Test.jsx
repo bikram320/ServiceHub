@@ -5,8 +5,6 @@ import SearchBar from "../Components/layout/Searchbar.jsx";
 import FindServices from "./User/FindServices.jsx";
 import LandingPage from "./questX/LandingPage.jsx";
 import BookingPage from "./questX/BookingPage.jsx";
-import Login from "./Auth/login.jsx";
-import Signup from "./Auth/signup.jsx";
 import UserProfileForm from "./Auth/UserProfileForm.jsx";
 import UserProfileSetup from "./questX/UserProfileSetup.jsx";
 import TechnicianProfileForm from "./Auth/TechnicianProfileForm.jsx";

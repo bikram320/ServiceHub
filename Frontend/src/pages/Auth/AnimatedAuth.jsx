@@ -157,9 +157,9 @@ const AnimatedAuth = () => {
                                     />
                                     Remember me
                                 </label>
-                                <a href="#" className={styles["forgot-link"]} onClick={e => e.preventDefault()}>
+                                <button type="button" className={styles["forgot-link"]} onClick={() => navigate("/ForgotPassword")}>
                                     Forgot Password?
-                                </a>
+                                </button>
                             </div>
 
                             <button type="submit" className={styles["auth-submit-btn"]}>Log In</button>
