@@ -40,6 +40,7 @@ public class AuthController {
     private final ResetPasswordService resetPasswordService;
     private final TokenBlackListService tokenBlackListService;
     private final PendingSignupRepository pendingSignupRepository;
+    private final SignupService signupService;
 
     // login
     @PostMapping("/login/admin")
@@ -125,52 +126,12 @@ public class AuthController {
     // --- Verify OTP & Create User/Technician ---
     @PostMapping("/signup/user/verify-otp")
     public ResponseEntity<?> verifyOtpUser(@RequestBody VerifyOtpRequest request, HttpServletResponse response) {
-        return verifyOtpAndSave(request, Role.USER, response);
+        return signupService.verifyOtpAndSave(request, Role.USER, response);
     }
 
-    @PostMapping("/signup/technician/verify-otp")
+    @PostMapping("signup/technician/verify-otp")
     public ResponseEntity<?> verifyOtpTechnician(@RequestBody VerifyOtpRequest request, HttpServletResponse response) {
-        return verifyOtpAndSave(request, Role.TECHNICIAN, response);
-    }
-
-    private ResponseEntity<?> verifyOtpAndSave(VerifyOtpRequest request, Role role, HttpServletResponse response) {
-        if (!otpService.verifyOtp(request)) {
-            return ResponseEntity.badRequest().body("OTP verification failed");
-        }
-
-        PendingSignup pending = pendingSignupRepository.findByEmail(request.getEmail())
-                .orElse(null);
-
-        if (pending == null) {
-            return ResponseEntity.badRequest().body("No pending signup found for this email");
-        }
-
-        if (role == Role.USER) {
-            User user = new User();
-            user.setName(pending.getName());
-            user.setEmail(pending.getEmail());
-            user.setPassword(pending.getPassword());
-            user.setRole(Role.USER);
-            user.setIsEmailVerified(true);
-            user.setCreatedAt(LocalDateTime.now());
-            userRepository.save(user);
-            pendingSignupRepository.deleteByEmail(pending.getEmail());
-            return ResponseEntity.ok(jwtService.generateAccessTokenAndSetCookie(user, response));
-
-        } else if (role == Role.TECHNICIAN) {
-            Technician tech = new Technician();
-            tech.setName(pending.getName());
-            tech.setEmail(pending.getEmail());
-            tech.setPassword(pending.getPassword());
-            tech.setRole(Role.TECHNICIAN);
-            tech.setIsEmailVerified(true);
-            tech.setCreatedAt(LocalDateTime.now());
-            technicianRepository.save(tech);
-            pendingSignupRepository.deleteByEmail(pending.getEmail());
-            return ResponseEntity.ok(jwtService.generateAccessTokenAndSetCookie(tech, response));
-        }
-
-        return ResponseEntity.badRequest().body("Invalid role");
+        return signupService.verifyOtpAndSave(request, Role.TECHNICIAN, response);
     }
 
     @PostMapping({"/signup/user/resend-otp",
