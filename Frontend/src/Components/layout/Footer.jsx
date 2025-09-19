@@ -1,8 +1,10 @@
 import React from 'react';
 import {Facebook, Instagram, Twitter} from "lucide-react";
 import "../../styles/Footer.css";
+import {useNavigate} from "react-router-dom";
 
 const Footer = () => {
+    const navigate = useNavigate();
     return (
         <footer className="footer">
             {/*Main content*/}
@@ -15,11 +17,11 @@ const Footer = () => {
                             Company
                         </h3>
                         <ul className="footer-links">
-                            <li><a href="#" className="footer-link">About Us</a></li>
-                            <li><a href="#" className="footer-link">Help & Support</a></li>
+                            <li><a href="#" className="footer-link" onClick={() => navigate("/AboutUs")}>About Us</a></li>
+                            <li><a href="#" className="footer-link" onClick={() => navigate("/HelpSupport")}>Help & Support</a></li>
                             <li><a href="#" className="footer-link">Careers</a></li>
-                            <li><a href="#" className="footer-link">Terms of Services</a></li>
-                            <li><a href="#" className="footer-link">Privacy Policy</a></li>
+                            <li><a href="#" className="footer-link" onClick={() => navigate("/TermsOfServices")}>Terms of Services</a></li>
+                            <li><a href="#" className="footer-link" onClick={() => navigate("/PrivacyPolicy")}>Privacy Policy</a></li>
                             <li><a href="#" className="footer-link">Partnerships</a></li>
                         </ul>
                     </div>

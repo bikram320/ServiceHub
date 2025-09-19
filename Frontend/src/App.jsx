@@ -10,6 +10,10 @@ import Test from "./pages/Test.jsx";
 import LandingPage from "./pages/questX/LandingPage.jsx";
 import AuthContainer from "./Components/layout/AuthContainer.jsx";
 import TechnicianLandingPage from "./pages/questX/TechnicianLandingPage.jsx";
+import AboutUs from "./pages/questX/AboutUs.jsx";
+import PrivacyPolicy from "./pages/questX/PrivacyPolicy.jsx";
+import TermsOfServices from "./pages/questX/TermsOfServices.jsx";
+import HelpSupport from "./pages/questX/HelpSupprt.jsx";
 
 function App() {
     return (
@@ -19,9 +23,13 @@ function App() {
                <Route path="/UserLayout/*" element={<UserLayout />} />
                <Route path="/LoginSignup/*" element={<AnimatedAuth />} />
                <Route path="/TechnicianLandingPage/*" element={<TechnicianLandingPage />} />
+               <Route path="/AboutUs/*" element={<AboutUs />} />
+               <Route path="/PrivacyPolicy/*" element={<PrivacyPolicy />} />
+               <Route path="/TermsOfServices" element={<TermsOfServices />} />
+               <Route path="/HelpSupport/*" element={<HelpSupport />} />
            </Routes>
        </Router>
-         //<Test />
+        //<Test />
 
 
 );
