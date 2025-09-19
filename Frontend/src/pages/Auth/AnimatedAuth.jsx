@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { User, Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import styles from '../../styles/AnimatedAuth.module.css';
-import { useNavigate } from "react-router-dom";
+import { useNavigate , useLocation} from "react-router-dom";
 import OTPVerificationModal from '../../Components/layout/OTPVerificationModal';
 
 const API_BASE = "http://localhost:5000";
@@ -28,6 +28,9 @@ const AnimatedAuth = () => {
         agreeToTerms: false
     });
 
+    const location = useLocation();
+    const role = location.state?.role || "user";
+
     const handleLoginChange = (e) => {
         const { name, value, type, checked } = e.target;
         setLoginData(prev => ({
@@ -52,9 +55,8 @@ const AnimatedAuth = () => {
         }
 
         try {
-            // role deteremination to be added
-            const role = 'user'; // 'admin', 'user', 'technician' depending on your login logic
-            const response = await fetch(`${API_BASE}/auth/login/${role}`, {
+
+            const response = await fetch(`http://localhost:8080/auth/login/${role}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -90,9 +92,8 @@ const AnimatedAuth = () => {
         }
 
         try {
-            // For now assuming user signup (can add role toggle)
-            const role = 'user'; // or 'technician'
-            const response = await fetch(`${API_BASE}/auth/signup/${role}`, {
+
+            const response = await fetch(`http://localhost:8080/auth/signup/${role}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -120,8 +121,8 @@ const AnimatedAuth = () => {
     const handleOTPVerify = async (otpCode) => {
         setIsVerifyingOTP(true);
         try {
-            const role = 'user'; // or 'technician'
-            const response = await fetch(`${API_BASE}/auth/signup/${role}/verify-otp`, {
+
+            const response = await fetch(`http://localhost:8080/auth/signup/${role}/verify-otp`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -150,8 +151,8 @@ const AnimatedAuth = () => {
 
     const handleResendOTP = async () => {
         try {
-            const role = 'user'; // or 'technician'
-            const response = await fetch(`${API_BASE}/auth/signup/${role}/resend-otp`, {
+
+            const response = await fetch(`http://localhost:8080/auth/signup/${role}/resend-otp`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: userEmail })

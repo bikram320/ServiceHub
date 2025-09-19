@@ -4,8 +4,13 @@ import UserDashboard from './UserDashboard';
 import UserProfileForm from '../Auth/UserProfileForm';
 import FindServices from './FindServices';
 import BookingDetail from './BookingDetail';
+import { useNavigate } from "react-router-dom";
+
 
 const UserLayout = () => {
+
+    const navigate = useNavigate();
+
     const [activeTab, setActiveTab] = useState('dashboard');
     const [userInfo, setUserInfo] = useState({
         fullName: 'John Doe',
@@ -27,10 +32,32 @@ const UserLayout = () => {
         console.log('Profile updated:', updatedProfile);
     };
 
-    const handleLogout = () => {
-        // Clear user session and redirect to login
-        console.log('User logged out');
-        // to redirect to login page or clear authentication tokens
+    const handleLogout = async () => {
+        try {
+            const response = await fetch("http://localhost:8080/auth/logout", {
+                method: "POST",
+                credentials: "include", // important to send cookies (Access + Refresh)
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+
+            if (response.ok) {
+                console.log("User logged out successfully");
+
+                localStorage.removeItem("user");
+                sessionStorage.clear();
+
+                // Redirect to homepage
+                navigate("/");
+            } else {
+                console.error("Logout failed:", await response.text());
+                alert("Failed to logout. Please try again.");
+            }
+        } catch (error) {
+            console.error("Error during logout:", error);
+            alert("Something went wrong while logging out.");
+        }
     };
 
     const renderActiveComponent = () => {
