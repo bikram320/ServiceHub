@@ -13,10 +13,19 @@ const Header = () => {
             </div>
 
             <nav className="nav">
-                <button className="btn-primary1" onClick={() => navigate("/LoginSignup")}>
+                {/* User login/signup */}
+                <button
+                    className="btn-primary1"
+                    onClick={() => navigate("/LoginSignup", { state: { role: "user" } })}
+                >
                     Sign Up / Log In
                 </button>
-                <button className="btn-secondary1" onClick={() => navigate("/TechnicianLandingPage")}>
+
+                {/* Become a technician */}
+                <button
+                    className="btn-secondary1"
+                    onClick={() => navigate("/LoginSignup", { state: { role: "technician" } })}
+                >
                     Become a Technician
                 </button>
             </nav>
