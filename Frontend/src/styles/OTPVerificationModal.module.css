@@ -1,0 +1,367 @@
+/* OTPVerificationModal.module.css */
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+    backdrop-filter: blur(5px);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.modal-container {
+    background: white;
+    border-radius: 20px;
+    width: 100%;
+    max-width: 450px;
+    position: relative;
+    box-shadow: 0 50px 100px rgba(0, 0, 0, 0.2);
+    animation: modalEnter 0.3s ease-out;
+}
+
+@keyframes modalEnter {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.close-button {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #a0aec0;
+    transition: all 0.2s ease;
+    z-index: 10;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.close-button:hover {
+    color: #76af8c;
+    background: rgba(118, 175, 140, 0.1);
+}
+
+.close-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.modal-content {
+    padding: 60px 40px 40px;
+    text-align: center;
+}
+
+.icon-container {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #85d6ab 0%, #85d6ab 100%);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 30px;
+    color: white;
+    box-shadow: 0 10px 25px rgba(133, 214, 171, 0.3);
+}
+
+.modal-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin: 0 0 15px 0;
+    letter-spacing: -1px;
+}
+
+.modal-subtitle {
+    color: #718096;
+    font-size: 1rem;
+    margin-bottom: 5px;
+    line-height: 1.5;
+}
+
+.email-display {
+    color: #76af8c;
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 40px;
+    word-break: break-word;
+}
+
+.otp-form {
+    margin-bottom: 30px;
+}
+
+.otp-inputs {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.otp-input {
+    width: 50px;
+    height: 60px;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 1.5rem;
+    font-weight: 600;
+    text-align: center;
+    outline: none;
+    transition: all 0.3s ease;
+    background: #f7fafc;
+    color: #2d3748;
+    box-sizing: border-box;
+}
+
+.otp-input:focus {
+    border-color: #76af8c;
+    box-shadow: 0 0 0 3px rgba(118, 175, 140, 0.1);
+    background: white;
+}
+
+.otp-input.error {
+    border-color: #e53e3e;
+    background: rgba(229, 62, 62, 0.05);
+}
+
+.otp-input:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.error-message {
+    color: #e53e3e;
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+    font-weight: 500;
+}
+
+.verify-button {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(135deg, #85d6ab 0%, #85d6ab 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.verify-button:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(75, 147, 112, 0.4);
+}
+
+.verify-button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.verify-button:active {
+    transform: translateY(0);
+}
+
+.verify-button.loading {
+    opacity: 0.8;
+}
+
+.spin {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.resend-section {
+    border-top: 1px solid #e2e8f0;
+    padding-top: 25px;
+}
+
+.resend-text {
+    color: #718096;
+    font-size: 0.95rem;
+    margin-bottom: 10px;
+}
+
+.resend-button {
+    background: none;
+    border: none;
+    color: #76af8c;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: underline;
+    text-decoration-color: transparent;
+}
+
+.resend-button:hover:not(:disabled) {
+    color: #5a9a70;
+    text-decoration-color: currentColor;
+}
+
+.resend-button:disabled {
+    color: #a0aec0;
+    cursor: not-allowed;
+    text-decoration: none;
+}
+
+/* Focus and Accessibility */
+.otp-input:focus,
+.close-button:focus,
+.verify-button:focus,
+.resend-button:focus {
+    outline: 2px solid #4ecdc4;
+    outline-offset: 2px;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .modal-overlay {
+        padding: 15px;
+    }
+
+    .modal-container {
+        max-width: 95%;
+    }
+
+    .modal-content {
+        padding: 50px 30px 30px;
+    }
+
+    .modal-title {
+        font-size: 2rem;
+    }
+
+    .icon-container {
+        width: 70px;
+        height: 70px;
+        margin-bottom: 25px;
+    }
+
+    .otp-inputs {
+        gap: 10px;
+    }
+
+    .otp-input {
+        width: 45px;
+        height: 55px;
+        font-size: 1.3rem;
+    }
+
+    .verify-button {
+        font-size: 1rem;
+        padding: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .modal-overlay {
+        padding: 10px;
+    }
+
+    .modal-content {
+        padding: 40px 20px 25px;
+    }
+
+    .modal-title {
+        font-size: 1.8rem;
+    }
+
+    .modal-subtitle {
+        font-size: 0.9rem;
+    }
+
+    .email-display {
+        font-size: 1rem;
+    }
+
+    .otp-inputs {
+        gap: 8px;
+    }
+
+    .otp-input {
+        width: 42px;
+        height: 52px;
+        font-size: 1.2rem;
+    }
+
+    .icon-container {
+        width: 65px;
+        height: 65px;
+    }
+}
+
+@media (max-width: 360px) {
+    .otp-inputs {
+        gap: 6px;
+    }
+
+    .otp-input {
+        width: 38px;
+        height: 48px;
+        font-size: 1.1rem;
+    }
+
+    .modal-title {
+        font-size: 1.6rem;
+    }
+}
+
+/* Animation Classes */
+.fade-enter {
+    opacity: 0;
+    transform: translateY(10px);
+}
+
+.fade-enter-active {
+    opacity: 1;
+    transform: translateY(0);
+    transition: all 0.3s ease-in-out;
+}
+
+.fade-exit {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.fade-exit-active {
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.3s ease-in-out;
+}

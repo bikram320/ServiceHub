@@ -1,13 +1,17 @@
-
 import React, { useState } from 'react';
 import { User, Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import styles from '../../styles/AnimatedAuth.module.css';
 import { useNavigate } from "react-router-dom";
+import OTPVerificationModal from '../../Components/layout/OTPVerificationModal';
 
+const API_BASE = "http://localhost:5000";
 const AnimatedAuth = () => {
     const [isLogin, setIsLogin] = useState(true);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [showOTPModal, setShowOTPModal] = useState(false); // for checking set to true, else set to false
+    const [isVerifyingOTP, setIsVerifyingOTP] = useState(false);
+    const [userEmail, setUserEmail] = useState('');
     const navigate = useNavigate();
 
     const [loginData, setLoginData] = useState({
@@ -40,17 +44,41 @@ const AnimatedAuth = () => {
         }));
     };
 
-    const handleLoginSubmit = (e) => {
+    const handleLoginSubmit = async (e) => {
         e.preventDefault();
         if (!loginData.email || !loginData.password) {
             alert('Please fill in all fields');
             return;
         }
-        console.log('Login submitted:', loginData);
-        navigate("/UserLayout");
+
+        try {
+            // role deteremination to be added
+            const role = 'user'; // 'admin', 'user', 'technician' depending on your login logic
+            const response = await fetch(`${API_BASE}/auth/login/${role}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    email: loginData.email,
+                    password: loginData.password
+                })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                console.log('Login success:', data);
+                navigate("/UserLayout"); // or navigate according to role
+            } else {
+                const errorData = await response.json();
+                alert(errorData.message || 'Login failed');
+            }
+        } catch (error) {
+            console.error('Login error:', error);
+            alert('An error occurred during login');
+        }
     };
 
-    const handleSignupSubmit = (e) => {
+
+    const handleSignupSubmit = async (e) => {
         e.preventDefault();
         if (!signupData.fullName || !signupData.email || !signupData.password || !signupData.confirmPassword) {
             alert('Please fill in all fields');
@@ -60,8 +88,90 @@ const AnimatedAuth = () => {
             alert("Passwords do not match!");
             return;
         }
-        console.log('Signup submitted:', signupData);
-        navigate("/UserLayout");
+
+        try {
+            // For now assuming user signup (can add role toggle)
+            const role = 'user'; // or 'technician'
+            const response = await fetch(`${API_BASE}/auth/signup/${role}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: signupData.fullName,
+                    email: signupData.email,
+                    password: signupData.password,
+                    confirmPassword: signupData.confirmPassword
+                })
+            });
+
+            if (response.ok) {
+                setUserEmail(signupData.email);
+                setShowOTPModal(true);
+            } else {
+                const errorData = await response.json();
+                alert(errorData.message || 'Signup failed');
+            }
+        } catch (error) {
+            console.error('Signup error:', error);
+            alert('An error occurred during signup');
+        }
+    };
+
+
+    const handleOTPVerify = async (otpCode) => {
+        setIsVerifyingOTP(true);
+        try {
+            const role = 'user'; // or 'technician'
+            const response = await fetch(`${API_BASE}/auth/signup/${role}/verify-otp`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    email: userEmail,
+                    otp: otpCode
+                })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                console.log('OTP verified:', data);
+                setShowOTPModal(false);
+                navigate("/UserLayout");
+            } else {
+                const errorData = await response.json();
+                alert(errorData.message || 'Invalid OTP');
+            }
+        } catch (error) {
+            console.error('OTP verification error:', error);
+            alert('An error occurred during verification');
+        } finally {
+            setIsVerifyingOTP(false);
+        }
+    };
+
+
+    const handleResendOTP = async () => {
+        try {
+            const role = 'user'; // or 'technician'
+            const response = await fetch(`${API_BASE}/auth/signup/${role}/resend-otp`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: userEmail })
+            });
+
+            if (response.ok) {
+                alert('OTP successfully sent');
+            } else {
+                const errorData = await response.json();
+                alert(errorData.message || 'Failed to resend OTP');
+            }
+        } catch (error) {
+            console.error('Resend OTP error:', error);
+            alert('An error occurred while resending OTP');
+        }
+    };
+
+    const handleCloseOTPModal = () => {
+        setShowOTPModal(false);
+        setUserEmail('');
     };
 
     const toggleMode = () => {
@@ -257,6 +367,17 @@ const AnimatedAuth = () => {
 
                 </div>
             </div>
+
+            {/* OTP Verification Modal */}
+            <OTPVerificationModal
+                isOpen={showOTPModal}
+                onClose={handleCloseOTPModal}
+                onVerify={handleOTPVerify}
+                onResendOTP={handleResendOTP}
+                email={userEmail}
+                isLoading={isVerifyingOTP}
+                resendCooldown={30}
+            />
         </div>
     );
 };
