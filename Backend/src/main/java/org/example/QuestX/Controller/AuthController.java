@@ -103,6 +103,8 @@ public class AuthController {
 
         Object entity = role == Role.USER ? new User() : new Technician();
 
+        otpService.sendOtpEmail(request.getEmail());
+
         if (entity instanceof User u) {
             u.setName(request.getName());
             u.setEmail(request.getEmail());
@@ -121,8 +123,6 @@ public class AuthController {
             t.setCreatedAt(LocalDateTime.now());
             technicianRepository.save(t);
         }
-
-        otpService.sendOtpEmail(request.getEmail());
         return ResponseEntity.ok("OTP has been sent to your email");
     }
 
