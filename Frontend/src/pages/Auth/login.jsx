@@ -1,4 +1,4 @@
-
+import { useLocation, useNavigate } from "react-router-dom";
 import React, {useState} from 'react';
 import {Link} from 'react-router-dom';
 import "../../styles/Login_signup.css"
@@ -7,6 +7,7 @@ import FormCard from '../../Components/layout/FormCard';
 import InputField from '../../Components/common/InputField';
 import PasswordField from '../../Components/common/PasswordField';
 import CheckboxField from '../../Components/common/CheckboxField';
+import {loginUser} from "../../Components/utils/authService.jss.js";
 
 function Login() {
     const [formData, setFormData] = useState({
@@ -15,6 +16,9 @@ function Login() {
         rememberMe: false,
     });
 
+    const navigate = useNavigate();
+    const location = useLocation();
+    const role = location.state?.role || "user";
     const [showPassword, setShowPassword] = useState(false);
 
     const handleInputChange = (e) => {
@@ -22,9 +26,23 @@ function Login() {
         setFormData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked :  value }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("Login submitted: ",formData);
+
+        if (!formData.email || !formData.password) {
+            alert("Please fill all fields");
+            return;
+        }
+
+        try {
+            await loginUser(formData, role);
+
+            if (role === "user") navigate("/UserLayout");
+            else if (role === "technician") navigate("/technician/profile");
+            else if (role === "admin") navigate("/admin/dashboard");
+        } catch (err) {
+            alert(err.message);
+        }
     };
 
     return (

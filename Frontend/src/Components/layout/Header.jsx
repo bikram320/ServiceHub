@@ -5,6 +5,16 @@ import "../../styles/Header.css";
 const Header = () => {
     const navigate = useNavigate();
 
+    const handleLoginClick = () => {
+        // Pass role as "user"
+        navigate("/LoginSignup", { state: { role: "user" } });
+    };
+
+    const handleTechnicianClick = () => {
+        // Pass role as "technician"
+        navigate("/LoginSignup", { state: { role: "technician" } });
+    };
+
     return (
         <header className="header">
             <div className="logo1" onClick={() => navigate("/")}>
@@ -13,10 +23,10 @@ const Header = () => {
             </div>
 
             <nav className="nav">
-                <button className="btn-primary1" onClick={() => navigate("/LoginSignup")}>
+                <button className="btn-primary1" onClick={handleLoginClick}>
                     Sign Up / Log In
                 </button>
-                <button className="btn-secondary1" onClick={() => navigate("/")}>
+                <button className="btn-secondary1" onClick={handleTechnicianClick}>
                     Become a Technician
                 </button>
             </nav>

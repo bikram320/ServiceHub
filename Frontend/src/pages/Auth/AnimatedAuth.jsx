@@ -2,13 +2,16 @@
 import React, { useState } from 'react';
 import { User, Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import styles from '../../styles/AnimatedAuth.module.css';
-import { useNavigate } from "react-router-dom";
+import { useNavigate , useLocation } from "react-router-dom";
+import {loginUser} from "../../Components/utils/authService.jss.js";
 
 const AnimatedAuth = () => {
     const [isLogin, setIsLogin] = useState(true);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const navigate = useNavigate();
+    const location = useLocation();
+    const role = location.state?.role || "user";
 
     const [loginData, setLoginData] = useState({
         email: '',
@@ -40,225 +43,233 @@ const AnimatedAuth = () => {
         }));
     };
 
-    const handleLoginSubmit = (e) => {
+    const handleLoginSubmit = async (e) => {
         e.preventDefault();
         if (!loginData.email || !loginData.password) {
             alert('Please fill in all fields');
             return;
         }
-        console.log('Login submitted:', loginData);
-        navigate("/UserLayout");
+            try {
+                await loginUser(loginData, role);
+
+                if (role === "user") navigate("/UserLayout");
+                else if (role === "technician") navigate("/technician/profile");
+                else if (role === "admin") navigate("/admin/dashboard");
+            } catch (err) {
+                alert(err.message);
+            }
     };
 
-    const handleSignupSubmit = (e) => {
-        e.preventDefault();
-        if (!signupData.fullName || !signupData.email || !signupData.password || !signupData.confirmPassword) {
-            alert('Please fill in all fields');
-            return;
-        }
-        if (signupData.password !== signupData.confirmPassword) {
-            alert("Passwords do not match!");
-            return;
-        }
-        console.log('Signup submitted:', signupData);
-        navigate("/UserLayout");
-    };
+        const handleSignupSubmit = (e) => {
+            e.preventDefault();
+            if (!signupData.fullName || !signupData.email || !signupData.password || !signupData.confirmPassword) {
+                alert('Please fill in all fields');
+                return;
+            }
+            if (signupData.password !== signupData.confirmPassword) {
+                alert("Passwords do not match!");
+                return;
+            }
+            console.log('Signup submitted:', signupData);
+            navigate("/UserLayout");
+        };
 
-    const toggleMode = () => {
-        setIsLogin(!isLogin);
-    };
+        const toggleMode = () => {
+            setIsLogin(!isLogin);
+        };
 
-    return (
-        <div className={styles["animated-auth-container"]}>
-            <div className={styles["auth-card"]}>
+        return (
+            <div className={styles["animated-auth-container"]}>
+                <div className={styles["auth-card"]}>
 
-                {/* Left Panel - Welcome Section */}
-                <div className={`${styles["welcome-panel"]} ${!isLogin ? styles["slide-right"] : ''}`}>
+                    {/* Left Panel - Welcome Section */}
+                    <div className={`${styles["welcome-panel"]} ${!isLogin ? styles["slide-right"] : ''}`}>
 
-                    {/* Login Welcome Content */}
-                    <div className={`${styles["welcome-content"]} ${!isLogin ? styles.hidden : styles.visible}`}>
-                        <div className={styles["welcome-icon"]}>
-                            <User size={30} />
+                        {/* Login Welcome Content */}
+                        <div className={`${styles["welcome-content"]} ${!isLogin ? styles.hidden : styles.visible}`}>
+                            <div className={styles["welcome-icon"]}>
+                                <User size={30}/>
+                            </div>
+                            <h2 className={styles["welcome-title"]}>Welcome Back!</h2>
+                            <p className={styles["welcome-subtitle"]}>
+                                To keep connected with us please login with your personal info
+                            </p>
+                            <button className={styles["welcome-button"]} onClick={toggleMode}>
+                                Sign Up
+                            </button>
                         </div>
-                        <h2 className={styles["welcome-title"]}>Welcome Back!</h2>
-                        <p className={styles["welcome-subtitle"]}>
-                            To keep connected with us please login with your personal info
-                        </p>
-                        <button className={styles["welcome-button"]} onClick={toggleMode}>
-                            Sign Up
-                        </button>
+
+                        {/* Signup Welcome Content */}
+                        <div className={`${styles["welcome-content"]} ${isLogin ? styles.hidden : styles.visible}`}>
+                            <div className={styles["welcome-icon"]}>
+                                <Mail size={30}/>
+                            </div>
+                            <h2 className={styles["welcome-title"]}>Hello, Friend!</h2>
+                            <p className={styles["welcome-subtitle"]}>
+                                Enter your personal details and start journey with us
+                            </p>
+                            <button className={styles["welcome-button"]} onClick={toggleMode}>
+                                Log In
+                            </button>
+                        </div>
+
                     </div>
 
-                    {/* Signup Welcome Content */}
-                    <div className={`${styles["welcome-content"]} ${isLogin ? styles.hidden : styles.visible}`}>
-                        <div className={styles["welcome-icon"]}>
-                            <Mail size={30} />
+                    {/* Right Panel - Forms Section */}
+                    <div className={`${styles["forms-panel"]} ${!isLogin ? styles["slide-left"] : ''}`}>
+
+                        {/* Login Form */}
+                        <div className={`${styles["form-container"]} ${!isLogin ? styles.hidden : styles.visible}`}>
+                            <h1 className={styles["form-title"]}>Log In</h1>
+                            <p className={styles["form-subtitle"]}>Use your account</p>
+
+                            <form onSubmit={handleLoginSubmit}>
+                                <div className={styles["input-group"]}>
+                                    <Mail className={styles["input-icon"]}/>
+                                    <input
+                                        type="email"
+                                        name="email"
+                                        placeholder="Email"
+                                        value={loginData.email}
+                                        onChange={handleLoginChange}
+                                        className={styles["auth-input"]}
+                                        required
+                                    />
+                                </div>
+
+                                <div className={styles["input-group"]}>
+                                    <Lock className={styles["input-icon"]}/>
+                                    <input
+                                        type={showPassword ? "text" : "password"}
+                                        name="password"
+                                        placeholder="Password"
+                                        value={loginData.password}
+                                        onChange={handleLoginChange}
+                                        className={`${styles["auth-input"]} ${styles["password-input"]}`}
+                                        required
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        className={styles["password-toggle"]}
+                                    >
+                                        {showPassword ? <EyeOff size={20}/> : <Eye size={20}/>}
+                                    </button>
+                                </div>
+
+                                <div className={styles["login-options"]}>
+                                    <label className={styles["remember-me"]}>
+                                        <input
+                                            type="checkbox"
+                                            name="rememberMe"
+                                            checked={loginData.rememberMe}
+                                            onChange={handleLoginChange}
+                                        />
+                                        Remember me
+                                    </label>
+                                    <a href="#" className={styles["forgot-link"]} onClick={e => e.preventDefault()}>
+                                        Forgot Password?
+                                    </a>
+                                </div>
+
+                                <button type="submit" className={styles["auth-submit-btn"]}>Log In</button>
+                            </form>
                         </div>
-                        <h2 className={styles["welcome-title"]}>Hello, Friend!</h2>
-                        <p className={styles["welcome-subtitle"]}>
-                            Enter your personal details and start journey with us
-                        </p>
-                        <button className={styles["welcome-button"]} onClick={toggleMode}>
-                            Log In
-                        </button>
-                    </div>
 
-                </div>
+                        {/* Signup Form */}
+                        <div
+                            className={`${styles["form-container"]} ${styles["signup-form"]} ${isLogin ? styles.hidden : styles.visible}`}>
+                            <h1 className={styles["form-title"]}>Create Account</h1>
+                            <p className={styles["form-subtitle"]}>Use your email for registration</p>
 
-                {/* Right Panel - Forms Section */}
-                <div className={`${styles["forms-panel"]} ${!isLogin ? styles["slide-left"] : ''}`}>
+                            <form onSubmit={handleSignupSubmit}>
+                                <div className={styles["input-group"]}>
+                                    <User className={styles["input-icon"]}/>
+                                    <input
+                                        type="text"
+                                        name="fullName"
+                                        placeholder="Full Name"
+                                        value={signupData.fullName}
+                                        onChange={handleSignupChange}
+                                        className={styles["auth-input"]}
+                                        required
+                                    />
+                                </div>
 
-                    {/* Login Form */}
-                    <div className={`${styles["form-container"]} ${!isLogin ? styles.hidden : styles.visible}`}>
-                        <h1 className={styles["form-title"]}>Log In</h1>
-                        <p className={styles["form-subtitle"]}>Use your account</p>
+                                <div className={styles["input-group"]}>
+                                    <Mail className={styles["input-icon"]}/>
+                                    <input
+                                        type="email"
+                                        name="email"
+                                        placeholder="Email"
+                                        value={signupData.email}
+                                        onChange={handleSignupChange}
+                                        className={styles["auth-input"]}
+                                        required
+                                    />
+                                </div>
 
-                        <form onSubmit={handleLoginSubmit}>
-                            <div className={styles["input-group"]}>
-                                <Mail className={styles["input-icon"]} />
-                                <input
-                                    type="email"
-                                    name="email"
-                                    placeholder="Email"
-                                    value={loginData.email}
-                                    onChange={handleLoginChange}
-                                    className={styles["auth-input"]}
-                                    required
-                                />
-                            </div>
+                                <div className={styles["input-group"]}>
+                                    <Lock className={styles["input-icon"]}/>
+                                    <input
+                                        type={showPassword ? "text" : "password"}
+                                        name="password"
+                                        placeholder="Password"
+                                        value={signupData.password}
+                                        onChange={handleSignupChange}
+                                        className={`${styles["auth-input"]} ${styles["password-input"]}`}
+                                        required
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        className={styles["password-toggle"]}
+                                    >
+                                        {showPassword ? <EyeOff size={20}/> : <Eye size={20}/>}
+                                    </button>
+                                </div>
 
-                            <div className={styles["input-group"]}>
-                                <Lock className={styles["input-icon"]} />
-                                <input
-                                    type={showPassword ? "text" : "password"}
-                                    name="password"
-                                    placeholder="Password"
-                                    value={loginData.password}
-                                    onChange={handleLoginChange}
-                                    className={`${styles["auth-input"]} ${styles["password-input"]}`}
-                                    required
-                                />
-                                <button
-                                    type="button"
-                                    onClick={() => setShowPassword(!showPassword)}
-                                    className={styles["password-toggle"]}
-                                >
-                                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                                </button>
-                            </div>
+                                <div className={styles["input-group"]}>
+                                    <Lock className={styles["input-icon"]}/>
+                                    <input
+                                        type={showConfirmPassword ? "text" : "password"}
+                                        name="confirmPassword"
+                                        placeholder="Confirm Password"
+                                        value={signupData.confirmPassword}
+                                        onChange={handleSignupChange}
+                                        className={`${styles["auth-input"]} ${styles["password-input"]}`}
+                                        required
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                        className={styles["password-toggle"]}
+                                    >
+                                        {showConfirmPassword ? <EyeOff size={20}/> : <Eye size={20}/>}
+                                    </button>
+                                </div>
 
-                            <div className={styles["login-options"]}>
-                                <label className={styles["remember-me"]}>
+                                <div className={styles["terms-checkbox"]}>
                                     <input
                                         type="checkbox"
-                                        name="rememberMe"
-                                        checked={loginData.rememberMe}
-                                        onChange={handleLoginChange}
+                                        name="agreeToTerms"
+                                        checked={signupData.agreeToTerms}
+                                        onChange={handleSignupChange}
+                                        required
                                     />
-                                    Remember me
-                                </label>
-                                <a href="#" className={styles["forgot-link"]} onClick={e => e.preventDefault()}>
-                                    Forgot Password?
-                                </a>
-                            </div>
+                                    <label className={styles["terms-label"]}>
+                                        I agree to all Terms, Privacy Policy and Fees
+                                    </label>
+                                </div>
 
-                            <button type="submit" className={styles["auth-submit-btn"]}>Log In</button>
-                        </form>
+                                <button type="submit" className={styles["auth-submit-btn"]}>Sign Up</button>
+                            </form>
+                        </div>
+
                     </div>
-
-                    {/* Signup Form */}
-                    <div className={`${styles["form-container"]} ${styles["signup-form"]} ${isLogin ? styles.hidden : styles.visible}`}>
-                        <h1 className={styles["form-title"]}>Create Account</h1>
-                        <p className={styles["form-subtitle"]}>Use your email for registration</p>
-
-                        <form onSubmit={handleSignupSubmit}>
-                            <div className={styles["input-group"]}>
-                                <User className={styles["input-icon"]} />
-                                <input
-                                    type="text"
-                                    name="fullName"
-                                    placeholder="Full Name"
-                                    value={signupData.fullName}
-                                    onChange={handleSignupChange}
-                                    className={styles["auth-input"]}
-                                    required
-                                />
-                            </div>
-
-                            <div className={styles["input-group"]}>
-                                <Mail className={styles["input-icon"]} />
-                                <input
-                                    type="email"
-                                    name="email"
-                                    placeholder="Email"
-                                    value={signupData.email}
-                                    onChange={handleSignupChange}
-                                    className={styles["auth-input"]}
-                                    required
-                                />
-                            </div>
-
-                            <div className={styles["input-group"]}>
-                                <Lock className={styles["input-icon"]} />
-                                <input
-                                    type={showPassword ? "text" : "password"}
-                                    name="password"
-                                    placeholder="Password"
-                                    value={signupData.password}
-                                    onChange={handleSignupChange}
-                                    className={`${styles["auth-input"]} ${styles["password-input"]}`}
-                                    required
-                                />
-                                <button
-                                    type="button"
-                                    onClick={() => setShowPassword(!showPassword)}
-                                    className={styles["password-toggle"]}
-                                >
-                                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                                </button>
-                            </div>
-
-                            <div className={styles["input-group"]}>
-                                <Lock className={styles["input-icon"]} />
-                                <input
-                                    type={showConfirmPassword ? "text" : "password"}
-                                    name="confirmPassword"
-                                    placeholder="Confirm Password"
-                                    value={signupData.confirmPassword}
-                                    onChange={handleSignupChange}
-                                    className={`${styles["auth-input"]} ${styles["password-input"]}`}
-                                    required
-                                />
-                                <button
-                                    type="button"
-                                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                    className={styles["password-toggle"]}
-                                >
-                                    {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                                </button>
-                            </div>
-
-                            <div className={styles["terms-checkbox"]}>
-                                <input
-                                    type="checkbox"
-                                    name="agreeToTerms"
-                                    checked={signupData.agreeToTerms}
-                                    onChange={handleSignupChange}
-                                    required
-                                />
-                                <label className={styles["terms-label"]}>
-                                    I agree to all Terms, Privacy Policy and Fees
-                                </label>
-                            </div>
-
-                            <button type="submit" className={styles["auth-submit-btn"]}>Sign Up</button>
-                        </form>
-                    </div>
-
                 </div>
             </div>
-        </div>
-    );
-};
+        );
+    };
 
 export default AnimatedAuth;
