@@ -1,9 +1,11 @@
 import React from 'react';
 import { Computer, Network, Settings, ChevronRight } from 'lucide-react';
+import {useNavigate} from 'react-router-dom';
 import RatingReviews from './RatingReviews';
 import '../../styles/TechnicianProfile.css';
 
 const TechnicianProfile = ({ technicianId = "tech-1", user }) => {
+    const navigate = useNavigate();
     // Mock technician data - replace with props or API call
     const technician = {
         id: technicianId,
@@ -55,7 +57,7 @@ const TechnicianProfile = ({ technicianId = "tech-1", user }) => {
                     </div>
                 </div>
 
-                <button className="book-button">
+                <button className="book-button" onClick={() => navigate("/BookingDetail")}>
                     Book Appointment
                 </button>
             </div>

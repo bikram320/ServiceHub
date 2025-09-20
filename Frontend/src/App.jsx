@@ -16,7 +16,9 @@ import ForgotPassword from "./pages/Auth/ForgotPassword.jsx";
 import TechnicianLayout from "./pages/Technician/TechnicianLayout.jsx";
 import AdminLayout from "./pages/Admin/AdminLayout.jsx";
 import AdminLogin from "./pages/Auth/AdminLogin.jsx";
-// import AdminLogin from "./pages/Auth/AdminLogin.jsx";
+import TechnicianList from "./pages/User/TechnicianListing.jsx";
+import TechnicianProfile from "./pages/Technician/TechnicianProfile.jsx";
+import BookingDetail from "./pages/User/BookingDetail.jsx";
 
 function App() {
     return (
@@ -34,6 +36,9 @@ function App() {
                <Route path="/TechnicianLayout/*" element={<TechnicianLayout />} />
                <Route path="/AdminLayout/*" element={<AdminLayout />} />
                <Route path="/AdminLogin/*" element={<AdminLogin />} />
+               <Route path="/TechnicianList/*" element={<TechnicianList />} />
+               <Route path="/TechnicianProfile/*" element={<TechnicianProfile />} />
+               <Route path="/BookingDetail/*" element={<BookingDetail />} />
            </Routes>
        </Router>
        //  <Test />

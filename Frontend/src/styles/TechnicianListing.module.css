@@ -1,0 +1,428 @@
+/* Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.pageContainer {
+    min-height: 100vh;
+    background-color: #f8f9fa;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Container */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+/* Search Section */
+.searchSection {
+    background: linear-gradient(135deg, #85d6ab 0%, #85d6ab 100%);
+    padding: 3rem 0;
+    color: white;
+}
+
+.searchHeader {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.resultsTitle {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.resultsSubtitle {
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+
+.searchFilters {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.searchContainer {
+    flex: 1;
+    min-width: 300px;
+}
+
+.searchWrapper {
+    position: relative;
+    width: 100%;
+}
+
+.searchInput {
+    width: 100%;
+    background-color: white;
+    border: none;
+    border-radius: 25px;
+    padding: 1rem 1rem 1rem 3rem;
+    font-size: 1rem;
+    color: #1f2937;
+    outline: none;
+    transition: all 0.2s;
+}
+
+.searchInput:focus {
+    box-shadow: 0 0 0 3px rgba(163, 230, 53, 0.3);
+}
+
+.searchIcon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6b7280;
+}
+
+.filterControls {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.filterSelect,
+.sortSelect {
+    background-color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+    color: #1f2937;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-width: 150px;
+}
+
+.filterSelect:hover,
+.sortSelect:hover {
+    background-color: #f3f4f6;
+}
+
+/* Technicians Grid */
+.techniciansGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+    gap: 2rem;
+    padding: 3rem 0;
+}
+
+.technicianCard {
+    background: white;
+    border-radius: 20px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    position: relative;
+    border: 1px solid #e5e7eb;
+}
+
+.technicianCard:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.topRatedBadge {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: #76af8c;
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.cardHeader {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.profileImage {
+    flex-shrink: 0;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: #f3f4f6;
+    border: 3px solid #76af8c;
+}
+
+.technicianImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.technicianInfo {
+    flex: 1;
+}
+
+.nameSection {
+    margin-bottom: 0.5rem;
+}
+
+.technicianName {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: #1f2937;
+    margin-bottom: 0.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.verifiedIcon {
+    color: #76af8c;
+    flex-shrink: 0;
+}
+
+.specialty {
+    color: #6b7280;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.cardBody {
+    margin-bottom: 1.5rem;
+}
+
+.ratingSection {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.stars {
+    display: flex;
+    gap: 0.125rem;
+}
+
+.starFilled {
+    color: #fbbf24;
+}
+
+.starEmpty {
+    color: #d1d5db;
+}
+
+.ratingText {
+    font-size: 0.85rem;
+    color: #6b7280;
+    font-weight: 500;
+}
+
+.description {
+    color: #4b5563;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+}
+
+.servicesList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.serviceTag {
+    background-color: #f0f9ff;
+    color: #0369a1;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    border: 1px solid #bae6fd;
+}
+
+.contactInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.contactItem {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #6b7280;
+    font-size: 0.85rem;
+}
+
+.contactItem svg {
+    color: #76af8c;
+    flex-shrink: 0;
+}
+
+.cardActions {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.contactBtn {
+    flex: 1;
+    background:#76af8c;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 0.75rem 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.contactBtn:hover {
+    background: rgba(96, 210, 120, 0.78);
+    transform: translateY(-1px);
+}
+
+.profileBtn {
+    flex: 1;
+    background: transparent;
+    color: #76af8c;
+    border: 2px solid #76af8c;
+    border-radius: 20px;
+    padding: 0.75rem 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.profileBtn:hover {
+    background-color: rgba(96, 210, 120, 0.78);
+    color: white;
+    transform: translateY(-1px);
+}
+
+/* No Results */
+.noResults {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #6b7280;
+}
+
+.noResults h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: #1f2937;
+}
+
+.noResults p {
+    font-size: 1rem;
+}
+
+/* Responsive Design */
+@media (max-width: 968px) {
+    .resultsTitle {
+        font-size: 2rem;
+    }
+
+    .techniciansGrid {
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .searchFilters {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .filterControls {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 768px) {
+    .header {
+        padding: 1rem;
+    }
+
+    .container {
+        padding: 0 1rem;
+    }
+
+    .resultsTitle {
+        font-size: 1.75rem;
+    }
+
+    .techniciansGrid {
+        grid-template-columns: 1fr;
+        padding: 2rem 0;
+    }
+
+    .headerButtons {
+        gap: 0.5rem;
+    }
+
+    .btnSignin,
+    .btnTechnician {
+        padding: 0.5rem 1rem;
+        font-size: 0.85rem;
+    }
+
+    .searchSection {
+        padding: 2rem 0;
+    }
+
+    .cardHeader {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .profileImage {
+        align-self: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .technicianCard {
+        padding: 1rem;
+    }
+
+    .cardActions {
+        flex-direction: column;
+    }
+
+    .resultsTitle {
+        font-size: 1.5rem;
+    }
+
+    .headerButtons {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .btnSignin,
+    .btnTechnician {
+        width: 100%;
+        min-width: 120px;
+    }
+
+    .filterControls {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .filterSelect,
+    .sortSelect {
+        width: 100%;
+    }
+}
