@@ -1,6 +1,7 @@
 import React from 'react';
 import '../../styles/PrivacyPolicy.css';
 import Header from "../../Components/layout/Header.jsx";
+import Footer from "../../Components/layout/Footer.jsx";
 
 const PrivacyPolicy = () => {
     return (
@@ -367,9 +368,9 @@ const PrivacyPolicy = () => {
             <div className="contact-info">
                 <h3>Privacy Questions or Concerns?</h3>
                 <p><strong>Data Protection Officer:</strong> privacy@questx.com</p>
-                <p><strong>General Support:</strong> support@questx.com</p>
+                <p><strong>General Support:</strong> questx.bca@gmail.com</p>
                 <p><strong>Phone:</strong> 98355555512</p>
-                <p><strong>Business Hours:</strong> Monday - Friday, 9 AM - 6 PM </p>
+                <p><strong>Business Hours:</strong> Monday - Friday, 9 AM - 5 PM </p>
 
                 <div className="response-time">
                     <p><strong>Response Time:</strong> We aim to respond to all privacy inquiries within 30 days, or sooner as required by applicable law.</p>
@@ -385,6 +386,7 @@ const PrivacyPolicy = () => {
                     Version 1.0</p>
             </div>
         </div>
+            <Footer />
         </div>
     );
 };

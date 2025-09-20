@@ -25,7 +25,9 @@ import {
     Users,
     Settings
 } from 'lucide-react';
-import "../../styles/HelpSupport.css";
+import styles from "../../styles/HelpSupport.module.css";
+import Footer from "../../Components/layout/Footer.jsx";
+import Header from "../../Components/layout/Header.jsx";
 
 function HelpSupport() {
     const [searchQuery, setSearchQuery] = useState('');
@@ -100,7 +102,7 @@ function HelpSupport() {
         {
             category: 'payment',
             question: 'What payment methods do you accept?',
-            answer: 'We accept eSewa, Khalti, IME Pay, bank transfers, and cash payments. Digital payments are processed securely through our platform. For cash payments, you pay directly to the technician after service completion.'
+            answer: 'We accept eSewa and cash payments. Digital payments are processed securely through our platform. For cash payments, you pay directly to the technician after service completion.'
         },
         {
             category: 'payment',
@@ -150,7 +152,7 @@ function HelpSupport() {
         },
         {
             method: 'WhatsApp Chat',
-            detail: '+977-9800000000',
+            detail: '+977-98355555512',
             description: 'Quick responses via WhatsApp',
             icon: MessageCircle,
             color: 'green',
@@ -158,11 +160,11 @@ function HelpSupport() {
         },
         {
             method: 'Email Support',
-            detail: 'support@questx.com.np',
+            detail: 'questx.bca@gmail.com',
             description: 'Detailed support and documentation',
             icon: Mail,
             color: 'blue',
-            available: 'Response within 4 hours'
+            available: 'Response within 12 hours'
         },
         {
             method: 'Live Chat',
@@ -234,218 +236,174 @@ function HelpSupport() {
     };
 
     return (
-        <div className="help-support-page">
-            {/* Hero Section */}
-            <section className="help-hero">
-                <div className="help-hero-container">
-                    <h1 className="help-hero-title">How can we help you?</h1>
-                    <p className="help-hero-subtitle">
-                        Find answers, get support, and learn how to make the most of QuestX
-                    </p>
-
-                    <div className="help-search-container">
-                        <div className="help-search-box">
-                            <Search className="search-icon" size={20} />
-                            <input
-                                type="text"
-                                placeholder="Search for help articles, guides, or FAQs..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                className="help-search-input"
-                            />
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* Quick Help Section */}
-            <section className="quick-help-section">
-                <div className="container">
-                    <h2 className="section-title">Popular Help Topics</h2>
-                    <div className="quick-help-grid">
-                        {quickHelp.map((item, index) => {
-                            const Icon = item.icon;
-                            return (
-                                <div key={index} className={`quick-help-card ${item.color}`}>
-                                    <div className="quick-help-icon">
-                                        <Icon size={24} />
-                                    </div>
-                                    <h3 className="quick-help-title">{item.title}</h3>
-                                    <p className="quick-help-description">{item.description}</p>
-                                    <div className="quick-help-type">
-                                        {item.type === 'guide' ? <BookOpen size={16} /> : <FileText size={16} />}
-                                        <span>{item.type === 'guide' ? 'Guide' : 'Policy'}</span>
-                                    </div>
-                                </div>
-                            );
-                        })}
-                    </div>
-                </div>
-            </section>
-
-            {/* FAQ Section */}
-            <section className="faq-section">
-                <div className="container">
-                    <h2 className="section-title">Frequently Asked Questions</h2>
-
-                    {/* Category Filter */}
-                    <div className="faq-categories">
-                        {supportCategories.map(category => {
-                            const Icon = category.icon;
-                            return (
-                                <button
-                                    key={category.id}
-                                    onClick={() => setSelectedCategory(category.id)}
-                                    className={`category-btn ${selectedCategory === category.id ? 'active' : ''}`}
-                                >
-                                    <Icon size={18} />
-                                    {category.name}
-                                </button>
-                            );
-                        })}
-                    </div>
-
-                    {/* FAQ List */}
-                    <div className="faq-list">
-                        {filteredFAQs.map((faq, index) => (
-                            <div key={index} className="faq-item">
-                                <button
-                                    onClick={() => toggleFAQ(index)}
-                                    className="faq-question"
-                                >
-                                    <span>{faq.question}</span>
-                                    {openFAQ === index ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-                                </button>
-                                {openFAQ === index && (
-                                    <div className="faq-answer">
-                                        {faq.answer}
-                                    </div>
-                                )}
-                            </div>
-                        ))}
-                    </div>
-
-                    {filteredFAQs.length === 0 && (
-                        <div className="no-results">
-                            <AlertCircle size={48} />
-                            <h3>No results found</h3>
-                            <p>Try adjusting your search or browse different categories</p>
-                        </div>
-                    )}
-                </div>
-            </section>
-
-            {/* Contact Support Section */}
-            <section className="contact-section">
-                <div className="container">
-                    <h2 className="section-title">Contact Support</h2>
-                    <p className="section-subtitle">
-                        Still need help? Our support team is here for you 24/7
-                    </p>
-
-                    <div className="contact-grid">
-                        {contactMethods.map((contact, index) => {
-                            const Icon = contact.icon;
-                            return (
-                                <div key={index} className={`contact-card ${contact.color}`}>
-                                    <div className="contact-icon">
-                                        <Icon size={24} />
-                                    </div>
-                                    <h3 className="contact-method">{contact.method}</h3>
-                                    <div className="contact-detail">{contact.detail}</div>
-                                    <p className="contact-description">{contact.description}</p>
-                                    <div className="contact-availability">
-                                        <Clock size={14} />
-                                        {contact.available}
-                                    </div>
-                                </div>
-                            );
-                        })}
-                    </div>
-                </div>
-            </section>
-
-            {/* Troubleshooting Section */}
-            <section className="troubleshooting-section">
-                <div className="container">
-                    <h2 className="section-title">Common Issues & Solutions</h2>
-
-                    <div className="troubleshooting-grid">
-                        {troubleshooting.map((item, index) => {
-                            const Icon = item.icon;
-                            return (
-                                <div key={index} className="troubleshooting-card">
-                                    <div className="troubleshooting-header">
-                                        <Icon className="troubleshooting-icon" size={20} />
-                                        <h3 className="troubleshooting-title">{item.issue}</h3>
-                                    </div>
-                                    <ul className="solution-list">
-                                        {item.solutions.map((solution, sIndex) => (
-                                            <li key={sIndex} className="solution-item">
-                                                <CheckCircle size={16} />
-                                                {solution}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            );
-                        })}
-                    </div>
-                </div>
-            </section>
-
-            {/* Additional Resources */}
-            <section className="resources-section">
-                <div className="container">
-                    <h2 className="section-title">Additional Resources</h2>
-
-                    <div className="resources-grid">
-                        <div className="resource-card">
-                            <PlayCircle className="resource-icon" size={32} />
-                            <h3>Video Tutorials</h3>
-                            <p>Watch step-by-step guides on using QuestX effectively</p>
-                            <button className="resource-btn">
-                                Watch Videos <ExternalLink size={16} />
-                            </button>
-                        </div>
-
-                        <div className="resource-card">
-                            <Download className="resource-icon" size={32} />
-                            <h3>User Manual</h3>
-                            <p>Download our comprehensive guide to all QuestX features</p>
-                            <button className="resource-btn">
-                                Download PDF <Download size={16} />
-                            </button>
-                        </div>
-
-                        <div className="resource-card">
-                            <Users className="resource-icon" size={32} />
-                            <h3>Community Forum</h3>
-                            <p>Connect with other users and get community support</p>
-                            <button className="resource-btn">
-                                Join Community <ExternalLink size={16} />
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* Emergency Contact */}
-            <section className="emergency-section">
-                <div className="emergency-container">
-                    <AlertCircle className="emergency-icon" size={32} />
-                    <div className="emergency-content">
-                        <h3 className="emergency-title">Need Immediate Help?</h3>
-                        <p className="emergency-description">
-                            For urgent issues or emergencies, contact our 24/7 support hotline
+        <div>
+            <Header />
+            <div className={styles['help-support-page']}>
+                {/* Hero Section */}
+                <section className={styles['help-hero']}>
+                    <div className={styles['help-hero-container']}>
+                        <h1 className={styles['help-hero-title']}>How can we help you?</h1>
+                        <p className={styles['help-hero-subtitle']}>
+                            Find answers, get support, and learn how to make the most of QuestX
                         </p>
-                        <div className="emergency-contact">
-                            <Phone size={20} />
-                            <span>01-5970000</span>
+                    </div>
+                </section>
+
+                {/* Quick Help Section */}
+                <section className={styles['quick-help-section']}>
+                    <div className={styles.container}>
+                        <h2 className={styles['section-title']}>Popular Help Topics</h2>
+                        <div className={styles['quick-help-grid']}>
+                            {quickHelp.map((item, index) => {
+                                const Icon = item.icon;
+                                return (
+                                    <div key={index} className={`${styles['quick-help-card']} ${styles[item.color]}`}>
+                                        <div className={styles['quick-help-icon']}>
+                                            <Icon size={24} />
+                                        </div>
+                                        <h3 className={styles['quick-help-title']}>{item.title}</h3>
+                                        <p className={styles['quick-help-description']}>{item.description}</p>
+                                        <div className={styles['quick-help-type']}>
+                                            {item.type === 'guide' ? <BookOpen size={16} /> : <FileText size={16} />}
+                                            <span>{item.type === 'guide' ? 'Guide' : 'Policy'}</span>
+                                        </div>
+                                    </div>
+                                );
+                            })}
                         </div>
                     </div>
-                </div>
-            </section>
+                </section>
+
+                {/* FAQ Section */}
+                <section className={styles['faq-section']}>
+                    <div className={styles.container}>
+                        <h2 className={styles['section-title']}>Frequently Asked Questions</h2>
+
+                        {/* Category Filter */}
+                        <div className={styles['faq-categories']}>
+                            {supportCategories.map(category => {
+                                const Icon = category.icon;
+                                return (
+                                    <button
+                                        key={category.id}
+                                        onClick={() => setSelectedCategory(category.id)}
+                                        className={`${styles['category-btn']} ${selectedCategory === category.id ? styles.active : ''}`}
+                                    >
+                                        <Icon size={18} />
+                                        {category.name}
+                                    </button>
+                                );
+                            })}
+                        </div>
+
+                        {/* FAQ List */}
+                        <div className={styles['faq-list']}>
+                            {filteredFAQs.map((faq, index) => (
+                                <div key={index} className={styles['faq-item']}>
+                                    <button
+                                        onClick={() => toggleFAQ(index)}
+                                        className={styles['faq-question']}
+                                    >
+                                        <span>{faq.question}</span>
+                                        {openFAQ === index ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                                    </button>
+                                    {openFAQ === index && (
+                                        <div className={styles['faq-answer']}>
+                                            {faq.answer}
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+
+                        {filteredFAQs.length === 0 && (
+                            <div className={styles['no-results']}>
+                                <AlertCircle size={48} />
+                                <h3>No results found</h3>
+                                <p>Try adjusting your search or browse different categories</p>
+                            </div>
+                        )}
+                    </div>
+                </section>
+
+                {/* Contact Support Section */}
+                <section className={styles['contact-section']}>
+                    <div className={styles.container}>
+                        <h2 className={styles['section-title']}>Contact Support</h2>
+                        <p className={styles['section-subtitle']}>
+                            Still need help? Our support team is here for you 24/7
+                        </p>
+
+                        <div className={styles['contact-grid']}>
+                            {contactMethods.map((contact, index) => {
+                                const Icon = contact.icon;
+                                return (
+                                    <div key={index} className={`${styles['contact-card']} ${styles[contact.color]}`}>
+                                        <div className={styles['contact-icon']}>
+                                            <Icon size={24} />
+                                        </div>
+                                        <h3 className={styles['contact-method']}>{contact.method}</h3>
+                                        <div className={styles['contact-detail']}>{contact.detail}</div>
+                                        <p className={styles['contact-description']}>{contact.description}</p>
+                                        <div className={styles['contact-availability']}>
+                                            <Clock size={14} />
+                                            {contact.available}
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </section>
+
+                {/* Troubleshooting Section */}
+                <section className={styles['troubleshooting-section']}>
+                    <div className={styles.container}>
+                        <h2 className={styles['section-title']}>Common Issues & Solutions</h2>
+
+                        <div className={styles['troubleshooting-grid']}>
+                            {troubleshooting.map((item, index) => {
+                                const Icon = item.icon;
+                                return (
+                                    <div key={index} className={styles['troubleshooting-card']}>
+                                        <div className={styles['troubleshooting-header']}>
+                                            <Icon className={styles['troubleshooting-icon']} size={20} />
+                                            <h3 className={styles['troubleshooting-title']}>{item.issue}</h3>
+                                        </div>
+                                        <ul className={styles['solution-list']}>
+                                            {item.solutions.map((solution, sIndex) => (
+                                                <li key={sIndex} className={styles['solution-item']}>
+                                                    <CheckCircle size={16} />
+                                                    {solution}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </section>
+
+
+                {/* Emergency Contact */}
+                <section className={styles['emergency-section']}>
+                    <div className={styles['emergency-container']}>
+                        <AlertCircle className={styles['emergency-icon']} size={32} />
+                        <div className={styles['emergency-content']}>
+                            <h3 className={styles['emergency-title']}>Need Immediate Help?</h3>
+                            <p className={styles['emergency-description']}>
+                                For urgent issues or emergencies, contact our 24/7 support hotline
+                            </p>
+                            <div className={styles['emergency-contact']}>
+                                <Phone size={20} />
+                                <span>01-5970000</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            <Footer />
         </div>
     );
 }

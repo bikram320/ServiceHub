@@ -7,7 +7,7 @@
 
 /* === Hero Section === */
 .help-hero {
-    background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+    background: #d9efda;
     color: white;
     padding: 4rem 0;
     text-align: center;
@@ -24,12 +24,14 @@
     font-weight: bold;
     margin-bottom: 1rem;
     line-height: 1.2;
+    color: #919298
 }
 
 .help-hero-subtitle {
     font-size: 1.2rem;
-    color: #9ca3af;
+    color: #919298;
     margin-bottom: 2rem;
+    text-align: center;
 }
 
 .help-search-container {
@@ -137,12 +139,12 @@
     border-color: var(--color);
 }
 
-.quick-help-card.blue { --color: #3b82f6; }
-.quick-help-card.green { --color: #22c55e; }
-.quick-help-card.red { --color: #ef4444; }
+.quick-help-card.blue { --color: #81a3e3; }
+.quick-help-card.green { --color: #7dc398; }
+.quick-help-card.red { --color: #bd5f5f; }
 .quick-help-card.yellow { --color: #eab308; }
-.quick-help-card.purple { --color: #a855f7; }
-.quick-help-card.orange { --color: #f97316; }
+.quick-help-card.purple { --color: #ac80cc; }
+.quick-help-card.orange { --color: #bd845c; }
 
 .quick-help-icon {
     background: rgba(var(--color-rgb), 0.1);
@@ -212,9 +214,9 @@
 
 .category-btn:hover,
 .category-btn.active {
-    background: #22c55e;
+    background: rgba(152, 195, 169, 0.78);
     color: white;
-    border-color: #22c55e;
+    border-color: rgba(96, 210, 120, 0.78);
     transform: scale(1.05);
 }
 
@@ -324,9 +326,9 @@
     border-color: var(--contact-color);
 }
 
-.contact-card.green { --contact-color: #22c55e; }
-.contact-card.blue { --contact-color: #3b82f6; }
-.contact-card.purple { --contact-color: #a855f7; }
+.contact-card.green { --contact-color: rgba(152, 195, 169, 0.78); }
+.contact-card.blue { --contact-color: #719ce4; }
+.contact-card.purple { --contact-color: #b077e4; }
 
 .contact-icon {
     background: rgba(var(--contact-color-rgb), 0.1);
@@ -337,9 +339,9 @@
     margin: 0 auto 1rem;
 }
 
-.contact-card.green .contact-icon { background: #22c55e20; color: #22c55e; }
-.contact-card.blue .contact-icon { background: #3b82f620; color: #3b82f6; }
-.contact-card.purple .contact-icon { background: #a855f720; color: #a855f7; }
+.contact-card.green .contact-icon { background: #22c55e20; color: #4fca7e; }
+.contact-card.blue .contact-icon { background: #3b82f620; color: #466daa; }
+.contact-card.purple .contact-icon { background: #a855f720; color: #7645a8; }
 
 .contact-method {
     font-size: 1.25rem;
@@ -406,7 +408,7 @@
 }
 
 .troubleshooting-icon {
-    color: #22c55e;
+    color: rgba(152, 195, 169, 0.78);
 }
 
 .troubleshooting-title {
@@ -432,76 +434,9 @@
 }
 
 .solution-item svg {
-    color: #22c55e;
+    color: rgba(152, 195, 169, 0.78);
     margin-top: 0.25rem;
     flex-shrink: 0;
-}
-
-/* === Resources Section === */
-.resources-section {
-    padding: 4rem 0;
-    background: #f8fafc;
-}
-
-.resources-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 2rem;
-    margin-top: 3rem;
-}
-
-.resource-card {
-    background: white;
-    padding: 2rem;
-    border-radius: 1rem;
-    border: 1px solid #e5e7eb;
-    text-align: center;
-    transition: all 0.3s ease;
-}
-
-.resource-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 25px rgba(0, 0, 0, 0.1);
-    border-color: #22c55e;
-}
-
-.resource-icon {
-    color: #22c55e;
-    margin-bottom: 1rem;
-}
-
-.resource-card h3 {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: #1f2937;
-    margin-bottom: 0.75rem;
-}
-
-.resource-card p {
-    color: #6b7280;
-    margin-bottom: 1.5rem;
-    line-height: 1.6;
-}
-
-.resource-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    background: #22c55e;
-    color: white;
-    border: none;
-    padding: 0.75rem 1.5rem;
-    border-radius: 0.5rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    width: 100%;
-}
-
-.resource-btn:hover {
-    background: #16a34a;
-    transform: scale(1.05);
 }
 
 /* === Emergency Section === */

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Computer, Network, Settings, ChevronRight } from 'lucide-react';
+import {Computer, Network, Settings, ChevronRight, ArrowLeft} from 'lucide-react';
 import {useNavigate} from 'react-router-dom';
 import RatingReviews from './RatingReviews';
 import '../../styles/TechnicianProfile.css';
@@ -37,9 +37,10 @@ const TechnicianProfile = ({ technicianId = "tech-1", user }) => {
         <div className="profile-container">
             {/* Breadcrumb */}
             <nav className="breadcrumb">
-                <span>Technicians</span>
-                <ChevronRight size={16} className="breadcrumb-separator" />
-                <span className="breadcrumb-current">{technician.name}</span>
+                <button className="back-button" onClick={() => navigate(-1)}> {/*Takes back to last page*/}
+                    <ArrowLeft size={20} />
+                    Back to Results
+                </button>
             </nav>
 
             <div className="profile-header">

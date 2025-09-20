@@ -1,6 +1,7 @@
 import React from 'react';
 import '../../styles/TermsOfServices.css';
 import Header from "../../Components/layout/Header.jsx";
+import Footer from "../../Components/layout/Footer.jsx";
 
 const TermsOfServices = () => {
     return (
@@ -206,7 +207,7 @@ const TermsOfServices = () => {
             <h2><span className="section-number">15.</span> Contact Information</h2>
             <div className="contact-info">
                 <h3>Questions or Concerns?</h3>
-                <p><strong>Email:</strong> support@questx.com</p>
+                <p><strong>Email:</strong> questx.bca@gmail.com</p>
                 <p><strong>Phone:</strong> 98355555512</p>
                 <p><strong>Address:</strong> QuestX Legal Department<br />
                     Gaidakot, Nawalpur<br />
@@ -226,6 +227,7 @@ const TermsOfServices = () => {
                     Version 1.0</p>
             </div>
         </div>
+            <Footer />
         </div>
     );
 };

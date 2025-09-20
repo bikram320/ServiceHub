@@ -17,30 +17,30 @@ import {
     TrendingUp,
     Heart
 } from 'lucide-react';
-import "../../styles/AboutUs.css";
+import {useNavigate} from "react-router-dom";
+import styles from "../../styles/AboutUs.module.css";
 import Header from "../../Components/layout/Header.jsx";
+import Footer from "../../Components/layout/Footer.jsx";
 
 function AboutUs() {
     const [activeStep, setActiveStep] = useState(0);
+    const navigate = useNavigate();
 
     const teamMembers = [
         {
             name: "Pragya Gurung",
             role: "Design & Documentation",
             description: "BCA 5th semester student at OCEM. Ensures every job meets QuestX standards.",
-
         },
         {
             name: "Kripsan Thakuri",
             role: "Frontend",
             description: "BCA 5th semester student at OCEM. Passionate about connecting communities through technology.",
-
         },
         {
             name: "Bikram BK",
             role: "Backend",
             description: "BCA 5th semester student at OCEM. Previously built tech solutions for major Nepali companies.",
-
         }
     ];
 
@@ -110,240 +110,241 @@ function AboutUs() {
     return (
         <div>
             <Header />
-        <div className="about-page">
-            {/* Hero Section */}
-            <section className="about-hero">
-                <div className="background-pattern"></div>
-                <div className="about-hero-container">
-                    <div className="about-hero-content">
-                        <h1 className="about-hero-title">
-                            About <span className="highlight">QuestX</span>
-                        </h1>
-                        <p className="about-hero-subtitle">
-                            Connecting Nepal's skilled professionals with customers who need them most
+            <div className={styles['about-page']}>
+                {/* Hero Section */}
+                <section className={styles['about-hero']}>
+                    <div className={styles['background-pattern']}></div>
+                    <div className={styles['about-hero-container']}>
+                        <div className={styles['about-hero-content']}>
+                            <h1 className={styles['about-hero-title']}>
+                                About <span className={styles.highlight}>QuestX</span>
+                            </h1>
+                            <p className={styles['about-hero-subtitle']}>
+                                Connecting Nepal's skilled professionals with customers who need them most
+                            </p>
+                            <p className={styles['about-hero-description']}>
+                                QuestX is Nepal's leading platform for booking verified technicians and service professionals.
+                                We're bridging the gap between skilled workers and customers, making quality services
+                                accessible, affordable, and reliable across the Kathmandu Valley.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+                {/* Mission, Vision, Values */}
+                <section className={styles['mission-section']}>
+                    <div className={styles.container}>
+                        <div className={styles['mission-grid']}>
+                            <div className={styles['mission-card']}>
+                                <div className={styles['mission-icon']}>
+                                    <Target size={32} />
+                                </div>
+                                <h3>Our Mission</h3>
+                                <p>
+                                    To empower skilled technicians with economic opportunities while providing customers
+                                    with reliable, high-quality services at fair prices. We're building a trusted
+                                    marketplace that benefits everyone in Nepal's service economy.
+                                </p>
+                            </div>
+
+                            <div className={styles['mission-card']}>
+                                <div className={styles['mission-icon']}>
+                                    <Eye size={32} />
+                                </div>
+                                <h3>Our Vision</h3>
+                                <p>
+                                    To become Nepal's most trusted platform for home and business services,
+                                    expanding across the country and setting new standards for quality,
+                                    reliability, and customer satisfaction in the service industry.
+                                </p>
+                            </div>
+
+                            <div className={styles['mission-card']}>
+                                <div className={styles['mission-icon']}>
+                                    <Users size={32} />
+                                </div>
+                                <h3>Our Values</h3>
+                                <p>
+                                    Trust, transparency and community drive everything we do. We believe in
+                                    fair opportunities for technicians, honest pricing for customers, and
+                                    building lasting relationships based on mutual respect and quality service.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* Stats Section */}
+                <section className={styles['stats-section']}>
+                    <div className={styles.container}>
+                        <h2 className={styles['section-title']}>QuestX by the Numbers</h2>
+                        <div className={styles['stats-grid']}>
+                            {stats.map((stat, index) => {
+                                const Icon = stat.icon;
+                                return (
+                                    <div key={index} className={styles['stat-item']}>
+                                        <Icon className={styles['stat-icon']} size={24} />
+                                        <div className={styles['stat-number']}>{stat.number}</div>
+                                        <div className={styles['stat-label']}>{stat.label}</div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </section>
+
+                {/* How It Works */}
+                <section className={styles['how-it-works-section']}>
+                    <div className={styles.container}>
+                        <h2 className={styles['section-title']}>How QuestX Works</h2>
+                        <p className={styles['section-subtitle']}>
+                            Simple, transparent, and designed for your convenience
                         </p>
-                        <p className="about-hero-description">
-                            QuestX is Nepal's leading platform for booking verified technicians and service professionals.
-                            We're bridging the gap between skilled workers and customers, making quality services
-                            accessible, affordable, and reliable across the Kathmandu Valley.
+
+                        <div className={styles['steps-container']}>
+                            {howItWorksSteps.map((step, index) => {
+                                const Icon = step.icon;
+                                return (
+                                    <div
+                                        key={index}
+                                        className={`${styles['step-card']} ${activeStep === index ? styles.active : ''}`}
+                                        onMouseEnter={() => setActiveStep(index)}
+                                    >
+                                        <div className={`${styles['step-number']} ${styles[step.color]}`}>
+                                            {index + 1}
+                                        </div>
+                                        <div className={`${styles['step-icon']} ${styles[step.color]}`}>
+                                            <Icon size={24} />
+                                        </div>
+                                        <h3 className={styles['step-title']}>{step.title}</h3>
+                                        <p className={styles['step-description']}>{step.description}</p>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </section>
+
+                {/* Values Section */}
+                <section className={styles['values-section']}>
+                    <div className={styles.container}>
+                        <h2 className={styles['section-title']}>What Makes QuestX Different</h2>
+                        <div className={styles['values-grid']}>
+                            {values.map((value, index) => {
+                                const Icon = value.icon;
+                                return (
+                                    <div key={index} className={styles['value-card']}>
+                                        <div className={`${styles['value-icon']} ${styles[value.color]}`}>
+                                            <Icon size={28} />
+                                        </div>
+                                        <h3 className={styles['value-title']}>{value.title}</h3>
+                                        <p className={styles['value-description']}>{value.description}</p>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </section>
+
+                {/* Platform Features */}
+                <section className={styles['features-section']}>
+                    <div className={styles.container}>
+                        <h2 className={styles['section-title']}>Platform Features</h2>
+                        <div className={styles['features-grid']}>
+                            <div className={styles['feature-group']}>
+                                <h3 className={styles['feature-group-title']}>For Customers</h3>
+                                <div className={styles['feature-list']}>
+                                    <div className={styles['feature-item']}>
+                                        <Search size={20} />
+                                        <span>Advanced search and filtering by service, location, price, and ratings</span>
+                                    </div>
+                                    <div className={styles['feature-item']}>
+                                        <Star size={20} />
+                                        <span>Genuine customer reviews and ratings for every technician</span>
+                                    </div>
+                                    <div className={styles['feature-item']}>
+                                        <Shield size={20} />
+                                        <span>Verified technicians with proper documentation and background checks</span>
+                                    </div>
+                                    <div className={styles['feature-item']}>
+                                        <Clock size={20} />
+                                        <span>Flexible scheduling with real-time availability</span>
+                                    </div>
+                                    <div className={styles['feature-item']}>
+                                        <DollarSign size={20} />
+                                        <span>Transparent pricing with no hidden fees</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className={styles['feature-group']}>
+                                <h3 className={styles['feature-group-title']}>For Technicians</h3>
+                                <div className={styles['feature-list']}>
+                                    <div className={styles['feature-item']}>
+                                        <UserCheck size={20} />
+                                        <span>Professional verification with working license validation</span>
+                                    </div>
+                                    <div className={styles['feature-item']}>
+                                        <TrendingUp size={20} />
+                                        <span>Flexible earning opportunities with competitive rates</span>
+                                    </div>
+                                    <div className={styles['feature-item']}>
+                                        <Award size={20} />
+                                        <span>Build your reputation through customer reviews and ratings</span>
+                                    </div>
+                                    <div className={styles['feature-item']}>
+                                        <Settings size={20} />
+                                        <span>Comprehensive admin management and support system</span>
+                                    </div>
+                                    <div className={styles['feature-item']}>
+                                        <MapPin size={20} />
+                                        <span>Location-based job matching for optimal convenience</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* Team Section */}
+                <section className={styles['team-section']}>
+                    <div className={styles.container}>
+                        <h2 className={styles['section-title']}>Meet Our Team</h2>
+                        <p className={styles['section-subtitle']}>
+                            The passionate people building the future of Nepal's service economy
                         </p>
-                    </div>
-                </div>
-            </section>
 
-            {/* Mission, Vision, Values */}
-            <section className="mission-section">
-                <div className="container">
-                    <div className="mission-grid">
-                        <div className="mission-card">
-                            <div className="mission-icon">
-                                <Target size={32} />
-                            </div>
-                            <h3>Our Mission</h3>
-                            <p>
-                                To empower skilled technicians with economic opportunities while providing customers
-                                with reliable, high-quality services at fair prices. We're building a trusted
-                                marketplace that benefits everyone in Nepal's service economy.
-                            </p>
-                        </div>
-
-                        <div className="mission-card">
-                            <div className="mission-icon">
-                                <Eye size={32} />
-                            </div>
-                            <h3>Our Vision</h3>
-                            <p>
-                                To become Nepal's most trusted platform for home and business services,
-                                expanding across the country and setting new standards for quality,
-                                reliability, and customer satisfaction in the service industry.
-                            </p>
-                        </div>
-
-                        <div className="mission-card">
-                            <div className="mission-icon">
-                                <Users size={32} />
-                            </div>
-                            <h3>Our Values</h3>
-                            <p>
-                                Trust, transparency, and community drive everything we do. We believe in
-                                fair opportunities for technicians, honest pricing for customers, and
-                                building lasting relationships based on mutual respect and quality service.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* Stats Section */}
-            <section className="stats-section">
-                <div className="container">
-                    <h2 className="section-title">QuestX by the Numbers</h2>
-                    <div className="stats-grid">
-                        {stats.map((stat, index) => {
-                            const Icon = stat.icon;
-                            return (
-                                <div key={index} className="stat-item">
-                                    <Icon className="stat-icon" size={24} />
-                                    <div className="stat-number">{stat.number}</div>
-                                    <div className="stat-label">{stat.label}</div>
-                                </div>
-                            );
-                        })}
-                    </div>
-                </div>
-            </section>
-
-            {/* How It Works */}
-            <section className="how-it-works-section">
-                <div className="container">
-                    <h2 className="section-title">How QuestX Works</h2>
-                    <p className="section-subtitle">
-                        Simple, transparent, and designed for your convenience
-                    </p>
-
-                    <div className="steps-container">
-                        {howItWorksSteps.map((step, index) => {
-                            const Icon = step.icon;
-                            return (
-                                <div
-                                    key={index}
-                                    className={`step-card ${activeStep === index ? 'active' : ''}`}
-                                    onMouseEnter={() => setActiveStep(index)}
-                                >
-                                    <div className={`step-number ${step.color}`}>
-                                        {index + 1}
+                        <div className={styles['team-grid']}>
+                            {teamMembers.map((member, index) => (
+                                <div key={index} className={styles['team-card']}>
+                                    <div className={styles['team-avatar']}>
+                                        {member.image}
                                     </div>
-                                    <div className={`step-icon ${step.color}`}>
-                                        <Icon size={24} />
-                                    </div>
-                                    <h3 className="step-title">{step.title}</h3>
-                                    <p className="step-description">{step.description}</p>
+                                    <h3 className={styles['team-name']}>{member.name}</h3>
+                                    <div className={styles['team-role']}>{member.role}</div>
+                                    <p className={styles['team-description']}>{member.description}</p>
                                 </div>
-                            );
-                        })}
-                    </div>
-                </div>
-            </section>
-
-            {/* Values Section */}
-            <section className="values-section">
-                <div className="container">
-                    <h2 className="section-title">What Makes QuestX Different</h2>
-                    <div className="values-grid">
-                        {values.map((value, index) => {
-                            const Icon = value.icon;
-                            return (
-                                <div key={index} className="value-card">
-                                    <div className={`value-icon ${value.color}`}>
-                                        <Icon size={28} />
-                                    </div>
-                                    <h3 className="value-title">{value.title}</h3>
-                                    <p className="value-description">{value.description}</p>
-                                </div>
-                            );
-                        })}
-                    </div>
-                </div>
-            </section>
-
-            {/* Platform Features */}
-            <section className="features-section">
-                <div className="container">
-                    <h2 className="section-title">Platform Features</h2>
-                    <div className="features-grid">
-                        <div className="feature-group">
-                            <h3 className="feature-group-title">For Customers</h3>
-                            <div className="feature-list">
-                                <div className="feature-item">
-                                    <Search size={20} />
-                                    <span>Advanced search and filtering by service, location, price, and ratings</span>
-                                </div>
-                                <div className="feature-item">
-                                    <Star size={20} />
-                                    <span>Genuine customer reviews and ratings for every technician</span>
-                                </div>
-                                <div className="feature-item">
-                                    <Shield size={20} />
-                                    <span>Verified technicians with proper documentation and background checks</span>
-                                </div>
-                                <div className="feature-item">
-                                    <Clock size={20} />
-                                    <span>Flexible scheduling with real-time availability</span>
-                                </div>
-                                <div className="feature-item">
-                                    <DollarSign size={20} />
-                                    <span>Transparent pricing with no hidden fees</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="feature-group">
-                            <h3 className="feature-group-title">For Technicians</h3>
-                            <div className="feature-list">
-                                <div className="feature-item">
-                                    <UserCheck size={20} />
-                                    <span>Professional verification with working license validation</span>
-                                </div>
-                                <div className="feature-item">
-                                    <TrendingUp size={20} />
-                                    <span>Flexible earning opportunities with competitive rates</span>
-                                </div>
-                                <div className="feature-item">
-                                    <Award size={20} />
-                                    <span>Build your reputation through customer reviews and ratings</span>
-                                </div>
-                                <div className="feature-item">
-                                    <Settings size={20} />
-                                    <span>Comprehensive admin management and support system</span>
-                                </div>
-                                <div className="feature-item">
-                                    <MapPin size={20} />
-                                    <span>Location-based job matching for optimal convenience</span>
-                                </div>
-                            </div>
+                            ))}
                         </div>
                     </div>
-                </div>
-            </section>
+                </section>
 
-            {/* Team Section */}
-            <section className="team-section">
-                <div className="container">
-                    <h2 className="section-title">Meet Our Team</h2>
-                    <p className="section-subtitle">
-                        The passionate people building the future of Nepal's service economy
-                    </p>
-
-                    <div className="team-grid">
-                        {teamMembers.map((member, index) => (
-                            <div key={index} className="team-card">
-                                <div className="team-avatar">
-                                    {member.image}
-                                </div>
-                                <h3 className="team-name">{member.name}</h3>
-                                <div className="team-role">{member.role}</div>
-                                <p className="team-description">{member.description}</p>
-                            </div>
-                        ))}
+                {/* CTA Section */}
+                <section className={styles['about-cta-section']}>
+                    <div className={styles['about-cta-container']}>
+                        <h2 className={styles['about-cta-title']}>Ready to Experience QuestX?</h2>
+                        <p className={styles['about-cta-description']}>
+                            Join thousands of satisfied customers who trust QuestX for their service needs,
+                            or become a verified technician and grow your business with us.
+                        </p>
+                        <div className={styles['about-cta-buttons']}>
+                            <button className={styles['btn-primary']} onClick={() => navigate("/FindServices")}>Find a Technician</button>
+                            <button className={styles['btn-secondary']} onClick={() => navigate("/LoginSignup")}>Become a Technician</button>
+                        </div>
                     </div>
-                </div>
-            </section>
-
-            {/* CTA Section */}
-            <section className="about-cta-section">
-                <div className="about-cta-container">
-                    <h2 className="about-cta-title">Ready to Experience QuestX?</h2>
-                    <p className="about-cta-description">
-                        Join thousands of satisfied customers who trust QuestX for their service needs,
-                        or become a verified technician and grow your business with us.
-                    </p>
-                    <div className="about-cta-buttons">
-                        <button className="btn-primary">Find a Technician</button>
-                        <button className="btn-secondary">Become a Technician</button>
-                    </div>
-                </div>
-            </section>
-        </div>
+                </section>
+            </div>
+            <Footer/>
         </div>
     );
 }

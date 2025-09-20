@@ -2,10 +2,12 @@ import React, { useState, useRef, useEffect } from 'react';
 import { ArrowLeft, Calendar, Clock, MapPin, User, Phone, Mail, CreditCard, Shield, Star, CheckCircle } from 'lucide-react';
 import "../../styles/BookingDetail.css";
 import DateTimeSelector from "../../Components/layout/DateTimeSelector.jsx";
+import {useNavigate} from "react-router-dom";
 
 
 // Service Provider Card Component
 const ServiceProviderCard = ({ provider }) => (
+
     <div className="provider-card">
         <div className="provider-header">
             <img src={provider.avatar} alt={provider.name} className="provider-avatar" />
@@ -178,6 +180,7 @@ const BookingSummary = ({ provider, selectedDate, selectedTime, formData }) => {
 
 // Main BookingDetail Component
 const BookingDetail = () => {
+    const navigate = useNavigate();
     // Mock provider data
     const provider = {
         id: 1,
@@ -269,7 +272,7 @@ const BookingDetail = () => {
             <div className="container">
                 <div className="booking-container">
                     {/* Back Button */}
-                    <button className="back-button" onClick={handleGoBack}>
+                    <button className="back-button" onClick={() => navigate(-1)}> {/*Takes back to last page*/}
                         <ArrowLeft size={20} />
                         Back to Results
                     </button>

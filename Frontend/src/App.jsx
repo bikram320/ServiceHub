@@ -19,6 +19,7 @@ import AdminLogin from "./pages/Auth/AdminLogin.jsx";
 import TechnicianList from "./pages/User/TechnicianListing.jsx";
 import TechnicianProfile from "./pages/Technician/TechnicianProfile.jsx";
 import BookingDetail from "./pages/User/BookingDetail.jsx";
+import FindServices from "./pages/User/FindServices.jsx";
 
 function App() {
     return (
@@ -39,6 +40,7 @@ function App() {
                <Route path="/TechnicianList/*" element={<TechnicianList />} />
                <Route path="/TechnicianProfile/*" element={<TechnicianProfile />} />
                <Route path="/BookingDetail/*" element={<BookingDetail />} />
+               <Route path="/FindServices" element={<FindServices />} />
            </Routes>
        </Router>
        //  <Test />

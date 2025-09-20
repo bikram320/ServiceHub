@@ -18,7 +18,7 @@ const Footer = () => {
                         <ul className="footer-nav">
                             <li>
                                 <button
-                                    onClick={() => navigate("/about-us")}
+                                    onClick={() => navigate("/AboutUs")}
                                     className="footer-link"
                                 >
                                     About Us
@@ -26,7 +26,7 @@ const Footer = () => {
                             </li>
                             <li>
                                 <button
-                                    onClick={() => navigate("/help-support")}
+                                    onClick={() => navigate("/HelpSupport")}
                                     className="footer-link"
                                 >
                                     Help & Support
@@ -41,7 +41,7 @@ const Footer = () => {
                         <ul className="footer-nav">
                             <li>
                                 <button
-                                    onClick={() => navigate("/privacy-policy")}
+                                    onClick={() => navigate("/PrivacyPolicy")}
                                     className="footer-link"
                                 >
                                     Privacy Policy
@@ -49,7 +49,7 @@ const Footer = () => {
                             </li>
                             <li>
                                 <button
-                                    onClick={() => navigate("/terms-of-service")}
+                                    onClick={() => navigate("/TermsOfServices")}
                                     className="footer-link"
                                 >
                                     Terms of Service
