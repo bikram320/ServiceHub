@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Calendar,
     CheckCircle,
@@ -26,89 +26,23 @@ const UserDashboard = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [filterStatus, setFilterStatus] = useState('all');
 
-    // Mock data for user's appointments
-    const [upcomingAppointments, setUpcomingAppointments] = useState([
-        {
-            id: 1,
-            service: 'Home Cleaning',
-            provider: 'Clean Pro Services',
-            technician: 'Sarah Wilson',
-            date: 'Today',
-            time: '2:00 PM - 4:00 PM',
-            location: 'Your Home - Thamel, Kathmandu',
-            status: 'confirmed',
-            price: '₨2,500',
-            rating: 4.8
-        },
-        {
-            id: 2,
-            service: 'Plumbing Repair',
-            provider: 'Fix It Fast',
-            technician: 'Ram Sharma',
-            date: 'Tomorrow',
-            time: '10:00 AM - 12:00 PM',
-            location: 'Your Home - Thamel, Kathmandu',
-            status: 'pending',
-            price: '₨1,800',
-            rating: 4.6
-        },
-        {
-            id: 3,
-            service: 'AC Maintenance',
-            provider: 'Cool Air Service',
-            technician: 'Bikash Thapa',
-            date: 'Nov 18',
-            time: '9:00 AM - 11:00 AM',
-            location: 'Your Office - Patan, Lalitpur',
-            status: 'confirmed',
-            price: '₨3,200',
-            rating: 4.9
-        }
-    ]);
+    // State for dynamic data
+    const [upcomingAppointments, setUpcomingAppointments] = useState([]);
+    const [appointmentHistory, setAppointmentHistory] = useState([]);
+    const [dashboardOverview, setDashboardOverview] = useState({
+        upcomingBookings: 0,
+        completedServices: 0,
+        averageRatingGiven: 0,
+        totalSpent: 0
+    });
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-    const [appointmentHistory, setAppointmentHistory] = useState([
-        {
-            id: 4,
-            service: 'House Painting',
-            provider: 'Color Masters',
-            technician: 'Dipak Rai',
-            date: 'Nov 10, 2024',
-            time: '8:00 AM - 6:00 PM',
-            location: 'Your Home - Thamel, Kathmandu',
-            status: 'completed',
-            price: '₨12,500',
-            rating: 5.0,
-            yourRating: 5,
-            review: 'Excellent work! Very professional and clean.'
-        },
-        {
-            id: 5,
-            service: 'Garden Maintenance',
-            provider: 'Green Thumb',
-            technician: 'Maya Gurung',
-            date: 'Nov 5, 2024',
-            time: '7:00 AM - 10:00 AM',
-            location: 'Your Home - Thamel, Kathmandu',
-            status: 'completed',
-            price: '₨1,500',
-            rating: 4.7,
-            yourRating: 4,
-            review: 'Good service, on time and thorough.'
-        },
-        {
-            id: 6,
-            service: 'Laptop Repair',
-            provider: 'Tech Solutions',
-            technician: 'Arjun Khadka',
-            date: 'Oct 28, 2024',
-            time: '11:00 AM - 1:00 PM',
-            location: 'Shop Visit - New Road, Kathmandu',
-            status: 'cancelled',
-            price: '₨2,200',
-            rating: null,
-            cancellationReason: 'Service provider unavailable'
-        }
-    ]);
+    // You can get this from user context/auth or props
+    const userEmail = "bkbikram727@example.com"; // Replace with actual user email
+
+    // API base URL - adjust this based on your setup
+    const API_BASE_URL = "http://localhost:8080"; // Adjust port if different
 
     // Popular services for quick booking
     const popularServices = [
@@ -120,6 +54,259 @@ const UserDashboard = () => {
         { icon: Heart, name: 'Massage', category: 'Wellness', startingPrice: '₨2,000' }
     ];
 
+    // Modal state
+    const [modalState, setModalState] = useState({
+        isOpen: false,
+        appointment: null,
+        type: 'details' // 'details' or 'cancel'
+    });
+
+    // API functions with credentials and proper error handling
+    const fetchCurrentServiceBookings = async () => {
+        try {
+            const url = `${API_BASE_URL}/users/get-current-service-booking?userEmail=${encodeURIComponent(userEmail)}`;
+            console.log('Fetching current bookings from:', url);
+
+            const response = await fetch(url, {
+                method: 'GET',
+                credentials: 'include', // Include cookies/session for authentication
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                },
+            });
+
+            console.log('Current bookings response status:', response.status);
+
+            if (response.status === 401) {
+                throw new Error('Authentication required. Please log in again.');
+            }
+
+            if (response.status === 404) {
+                throw new Error('Current bookings endpoint not found. Please check the API URL.');
+            }
+
+            if (!response.ok) {
+                throw new Error(`Failed to fetch current bookings: ${response.status} ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            console.log('Current bookings data:', data);
+            return data;
+        } catch (error) {
+            console.error('Error fetching current bookings:', error);
+            throw error;
+        }
+    };
+
+    const fetchPreviousServiceBookings = async () => {
+        try {
+            const url = `${API_BASE_URL}/users/get-previous-service-booking?userEmail=${encodeURIComponent(userEmail)}`;
+            console.log('Fetching previous bookings from:', url);
+
+            const response = await fetch(url, {
+                method: 'GET',
+                credentials: 'include', // Include cookies/session for authentication
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                },
+            });
+
+            console.log('Previous bookings response status:', response.status);
+
+            if (response.status === 401) {
+                throw new Error('Authentication required. Please log in again.');
+            }
+
+            if (response.status === 404) {
+                throw new Error('Previous bookings endpoint not found. Please check the API URL.');
+            }
+
+            if (!response.ok) {
+                throw new Error(`Failed to fetch previous bookings: ${response.status} ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            console.log('Previous bookings data:', data);
+            return data;
+        } catch (error) {
+            console.error('Error fetching previous bookings:', error);
+            throw error;
+        }
+    };
+
+    const fetchDashboardOverview = async () => {
+        try {
+            const url = `${API_BASE_URL}/users/dashboard-overview?email=${encodeURIComponent(userEmail)}`;
+            console.log('Fetching dashboard overview from:', url);
+
+            const response = await fetch(url, {
+                method: 'GET',
+                credentials: 'include', // Include cookies/session for authentication
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                },
+            });
+
+            console.log('Dashboard overview response status:', response.status);
+
+            if (response.status === 401) {
+                throw new Error('Authentication required. Please log in again.');
+            }
+
+            if (response.status === 404) {
+                throw new Error('Dashboard overview endpoint not found. Please check the API URL.');
+            }
+
+            if (!response.ok) {
+                throw new Error(`Failed to fetch dashboard overview: ${response.status} ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            console.log('Dashboard overview data:', data);
+            return data;
+        } catch (error) {
+            console.error('Error fetching dashboard overview:', error);
+            throw error;
+        }
+    };
+
+    // Transform backend data to match frontend structure
+    const transformCurrentBookingData = (backendData) => {
+        if (!Array.isArray(backendData)) return [];
+
+        return backendData.map((item, index) => ({
+            id: index + 1,
+            service: item.serviceName,
+            provider: 'Service Provider', // Default since not in DTO
+            technician: item.technicianName,
+            date: formatDate(item.appointmentTime),
+            time: formatTime(item.appointmentTime),
+            location: item.technicianAddress || 'Location not specified',
+            status: item.status?.toLowerCase() || 'pending',
+            price: `₨${item.feeCharge?.toLocaleString() || '0'}`,
+            rating: 4.8 // Default since not in DTO
+        }));
+    };
+
+    const transformPreviousBookingData = (backendData) => {
+        if (!Array.isArray(backendData)) return [];
+
+        return backendData.map((item, index) => ({
+            id: index + 100, // Different ID range for history
+            service: item.serviceName,
+            provider: 'Service Provider',
+            technician: item.technicianName,
+            date: formatDateFull(item.appointmentTime),
+            time: formatTime(item.appointmentTime),
+            location: item.technicianAddress || 'Location not specified',
+            status: item.status?.toLowerCase() || 'completed',
+            price: `₨${item.feeCharge?.toLocaleString() || '0'}`,
+            rating: 4.8,
+            yourRating: 5, // Default since not in DTO
+            review: 'Service completed successfully.'
+        }));
+    };
+
+    // Date formatting helpers
+    const formatDate = (dateTime) => {
+        if (!dateTime) return 'TBD';
+        const date = new Date(dateTime);
+        const today = new Date();
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+
+        if (date.toDateString() === today.toDateString()) return 'Today';
+        if (date.toDateString() === tomorrow.toDateString()) return 'Tomorrow';
+
+        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    };
+
+    const formatDateFull = (dateTime) => {
+        if (!dateTime) return 'Unknown Date';
+        return new Date(dateTime).toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric'
+        });
+    };
+
+    const formatTime = (dateTime) => {
+        if (!dateTime) return 'TBD';
+        const date = new Date(dateTime);
+        const startTime = date.toLocaleTimeString('en-US', {
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true
+        });
+        // Add 2 hours for end time (assuming 2-hour service duration)
+        const endDate = new Date(date.getTime() + 2 * 60 * 60 * 1000);
+        const endTime = endDate.toLocaleTimeString('en-US', {
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true
+        });
+        return `${startTime} - ${endTime}`;
+    };
+
+    // Load data on component mount with better error handling
+    useEffect(() => {
+        const loadData = async () => {
+            try {
+                setLoading(true);
+                setError(null);
+
+                // Load data sequentially to handle individual failures better
+                let currentBookings = [];
+                let previousBookings = [];
+                let overview = {
+                    upcomingBookings: 0,
+                    completedServices: 0,
+                    averageRatingGiven: 0,
+                    totalSpent: 0
+                };
+
+                try {
+                    currentBookings = await fetchCurrentServiceBookings();
+                } catch (error) {
+                    console.warn('Failed to load current bookings:', error.message);
+                }
+
+                try {
+                    previousBookings = await fetchPreviousServiceBookings();
+                } catch (error) {
+                    console.warn('Failed to load previous bookings:', error.message);
+                }
+
+                try {
+                    overview = await fetchDashboardOverview();
+                } catch (error) {
+                    console.warn('Failed to load dashboard overview:', error.message);
+                }
+
+                setUpcomingAppointments(transformCurrentBookingData(currentBookings));
+                setAppointmentHistory(transformPreviousBookingData(previousBookings));
+                setDashboardOverview(overview);
+
+            } catch (error) {
+                setError(error.message);
+                console.error('Error loading dashboard data:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        if (userEmail) {
+            loadData();
+        } else {
+            setError('User email not available. Please log in again.');
+            setLoading(false);
+        }
+    }, [userEmail]);
+
+    // Helper functions
     const getStatusColor = (status) => {
         switch (status) {
             case 'confirmed': return '#10b981';
@@ -160,18 +347,10 @@ const UserDashboard = () => {
         return matchesSearch && matchesFilter;
     });
 
-    const totalSpent = [...upcomingAppointments, ...appointmentHistory]
-        .filter(apt => apt.status === 'completed')
-        .reduce((sum, apt) => sum + parseInt(apt.price.replace('₨', '').replace(',', '')), 0);
+    // Calculate total spent from API data
+    const totalSpent = dashboardOverview.totalSpent || 0;
 
-
-    const [modalState, setModalState] = useState({
-        isOpen: false,
-        appointment: null,
-        type: 'details' // 'details' or 'cancel'
-    });
-
-// Modal component
+    // Modal component
     const AppointmentModal = ({ isOpen, appointment, type, onClose, onConfirm }) => {
         if (!isOpen || !appointment) return null;
 
@@ -295,7 +474,7 @@ const UserDashboard = () => {
         );
     };
 
-// Updated handlers
+    // Event handlers
     const handleViewDetails = (appointmentId) => {
         const appointment = [...upcomingAppointments, ...appointmentHistory].find(apt => apt.id === appointmentId);
         if (appointment) {
@@ -349,6 +528,98 @@ const UserDashboard = () => {
         }
     };
 
+    const handleBookService = (service) => {
+        console.log('Book service:', service);
+        // TODO: Implement service booking navigation
+    };
+
+    // Loading state
+    if (loading) {
+        return (
+            <div className={styles['profile-content']}>
+                <div className={styles['profile-form']}>
+                    <div className={styles['profile-header']}>
+                        <h1 className={styles['profile-title']}>My Services</h1>
+                        <p className={styles['profile-subtitle']}>Loading your service data...</p>
+                    </div>
+                    <div style={{ textAlign: 'center', padding: '2rem' }}>
+                        <div>Loading...</div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    // Error state with better UX
+    if (error) {
+        return (
+            <div className={styles['profile-content']}>
+                <div className={styles['profile-form']}>
+                    <div className={styles['profile-header']}>
+                        <h1 className={styles['profile-title']}>My Services</h1>
+                        <p className={styles['profile-subtitle']}>Having trouble loading your data</p>
+                    </div>
+                    <div style={{
+                        textAlign: 'center',
+                        padding: '2rem',
+                        backgroundColor: '#fef2f2',
+                        border: '1px solid #fecaca',
+                        borderRadius: '8px',
+                        margin: '1rem 0'
+                    }}>
+                        <div style={{ color: '#dc2626', marginBottom: '1rem' }}>
+                            {error.includes('Authentication') ? (
+                                <>
+                                    <div style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>
+                                        Authentication Required
+                                    </div>
+                                    <div>Please log in to view your services</div>
+                                </>
+                            ) : (
+                                <>
+                                    <div style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>
+                                        Unable to Load Data
+                                    </div>
+                                    <div>{error}</div>
+                                </>
+                            )}
+                        </div>
+                        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+                            <button
+                                onClick={() => window.location.reload()}
+                                style={{
+                                    padding: '0.5rem 1rem',
+                                    backgroundColor: '#dc2626',
+                                    color: 'white',
+                                    border: 'none',
+                                    borderRadius: '4px',
+                                    cursor: 'pointer'
+                                }}
+                            >
+                                Retry
+                            </button>
+                            {error.includes('Authentication') && (
+                                <button
+                                    onClick={() => window.location.href = '/login'}
+                                    style={{
+                                        padding: '0.5rem 1rem',
+                                        backgroundColor: '#3b82f6',
+                                        color: 'white',
+                                        border: 'none',
+                                        borderRadius: '4px',
+                                        cursor: 'pointer'
+                                    }}
+                                >
+                                    Go to Login
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className={styles['profile-content']}>
             <div className={styles['profile-form']}>
@@ -366,7 +637,7 @@ const UserDashboard = () => {
                                 <Calendar size={24} style={{ color: '#3b82f6' }} />
                             </div>
                             <div className={styles['user-stat-content']}>
-                                <div className={styles['user-stat-number']}>{upcomingAppointments.length}</div>
+                                <div className={styles['user-stat-number']}>{dashboardOverview.upcomingBookings || upcomingAppointments.length}</div>
                                 <div className={styles['user-stat-label']}>Upcoming Bookings</div>
                             </div>
                         </div>
@@ -377,26 +648,23 @@ const UserDashboard = () => {
                             </div>
                             <div className={styles['user-stat-content']}>
                                 <div className={styles['user-stat-number']}>
-                                    {appointmentHistory.filter(apt => apt.status === 'completed').length}
+                                    {dashboardOverview.completedServices || appointmentHistory.filter(apt => apt.status === 'completed').length}
                                 </div>
                                 <div className={styles['user-stat-label']}>Completed Services</div>
                             </div>
                         </div>
 
-                        {/*<div className={styles['user-stat-card']}>*/}
-                        {/*    <div className={styles['user-stat-icon']} style={{ backgroundColor: '#fef3c7' }}>*/}
-                        {/*        <Star size={24} style={{ color: '#eab308' }} />*/}
-                        {/*    </div>*/}
-                        {/*    <div className={styles['user-stat-content']}>*/}
-                        {/*        <div className={styles['user-stat-number']}>*/}
-                        {/*            {(appointmentHistory*/}
-                        {/*                    .filter(apt => apt.yourRating)*/}
-                        {/*                    .reduce((sum, apt) => sum + apt.yourRating, 0) /*/}
-                        {/*                appointmentHistory.filter(apt => apt.yourRating).length || 0).toFixed(1)}*/}
-                        {/*        </div>*/}
-                        {/*        <div className={styles['user-stat-label']}>Avg Rating Given</div>*/}
-                        {/*    </div>*/}
-                        {/*</div>*/}
+                        <div className={styles['user-stat-card']}>
+                            <div className={styles['user-stat-icon']} style={{ backgroundColor: '#fef3c7' }}>
+                                <Star size={24} style={{ color: '#eab308' }} />
+                            </div>
+                            <div className={styles['user-stat-content']}>
+                                <div className={styles['user-stat-number']}>
+                                    {dashboardOverview.averageRatingGiven?.toFixed(1) || '0.0'}
+                                </div>
+                                <div className={styles['user-stat-label']}>Avg Rating Given</div>
+                            </div>
+                        </div>
 
                         <div className={styles['user-stat-card']}>
                             <div className={styles['user-stat-icon']} style={{ backgroundColor: '#d1fae5' }}>
@@ -433,7 +701,12 @@ const UserDashboard = () => {
                                     <div className={styles['service-category']}>{service.category}</div>
                                     <div className={styles['service-price']}>Starting from {service.startingPrice}</div>
                                 </div>
-                                <button className={styles['book-btn']}>Book Now</button>
+                                <button
+                                    className={styles['book-btn']}
+                                    onClick={() => handleBookService(service)}
+                                >
+                                    Book Now
+                                </button>
                             </div>
                         ))}
                     </div>
