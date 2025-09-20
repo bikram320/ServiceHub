@@ -18,7 +18,7 @@ import {
     MessageSquare
 } from 'lucide-react';
 import '../../styles/AdminDashboard.css';
-import "../../styles/UserDashboard.css";
+import "../../styles/UserDashboard.module.css";
 import StatCard from '../../Components/Dashboard/StatCard';
 import ActivityItem from '../../Components/Dashboard/ActivityItem';
 import AppointmentCard from '../../Components/Dashboard/AppointmentCard';
