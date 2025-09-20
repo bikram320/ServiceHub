@@ -31,6 +31,11 @@ public class UserController {
         return ResponseEntity.ok("Profile Updated Successfully");
     }
 
+    @GetMapping("/dashboard-overview")
+    public ResponseEntity<?> getDashboardOverview(@RequestParam String email) {
+        return ResponseEntity.ok(userService.getUserDashboardOverview(email));
+    }
+
     @GetMapping("/get-technicians-based-on-skill")
     public ResponseEntity<?> getTechniciansBasedOnSkill(@RequestParam String skill) {
         var technician= userService.getTechnicianBasedOnSkill(skill);

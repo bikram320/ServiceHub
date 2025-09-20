@@ -8,6 +8,7 @@ import org.example.QuestX.Repository.*;
 import org.example.QuestX.dtos.GetTechnicianDataRequest;
 import org.example.QuestX.dtos.ServiceAndTechnicianDetailsDto;
 import org.example.QuestX.dtos.ServiceRequestDto;
+import org.example.QuestX.dtos.UserDashboardOverviewDto;
 import org.example.QuestX.exception.*;
 import org.example.QuestX.exception.IllegalAccessException;
 import org.springframework.stereotype.Service;
@@ -94,6 +95,43 @@ public class UserService {
         }
         user.setStatus(Status.PENDING);
         userRepository.save(user);
+    }
+
+    public UserDashboardOverviewDto getUserDashboardOverview(String email) {
+        // 1️⃣ Find user by email
+        User user = userRepository.findByEmail(email).orElseThrow(
+                () -> new UserNotFoundException("User Not Found")
+        );
+
+        List<ServiceStatus> upcomingStatuses = Arrays.asList(
+                ServiceStatus.PENDING,
+                ServiceStatus.IN_PROGRESS
+        );
+        List<ServiceStatus> completedBookings = Arrays.asList(
+                ServiceStatus.COMPLETED
+        );
+
+        // 2️⃣ Get counts based on status
+        Long upcomingBookings = serviceRequestRepository.countByUserAndStatuses(user, upcomingStatuses);
+        Long completedServices = serviceRequestRepository.countByUserAndStatuses(user, completedBookings);
+
+        // 3️⃣ Get average rating given (handle null case safely)
+        Double averageRatingGiven = feedBackRepository.getAverageRatingByUser(user);
+        if (averageRatingGiven == null) averageRatingGiven = 0.0;
+
+        // 4️⃣ Get total spent (handle null case safely)
+        BigDecimal totalSpent = serviceRequestRepository.getTotalAmountSpentByUser(user);
+        if (totalSpent == null) totalSpent = BigDecimal.valueOf(0.0);
+
+        // 5️⃣ Build DTO
+        UserDashboardOverviewDto dto = new UserDashboardOverviewDto();
+        dto.setUpcomingBookings(upcomingBookings);
+        dto.setCompletedServices(completedServices);
+        dto.setAverageRatingGiven(averageRatingGiven);
+        dto.setTotalSpent(totalSpent);
+
+        return dto;
+
     }
 
     public List<GetTechnicianDataRequest> getTechnicianBasedOnSkill(String skill){
