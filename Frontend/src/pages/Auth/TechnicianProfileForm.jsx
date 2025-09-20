@@ -1,5 +1,4 @@
 import React, {useCallback, useEffect, useState } from 'react';
-import Header2 from "../../Components/layout/Header2.jsx";
 import {Camera, Edit3, MapPin, Search, Loader2, Navigation, DollarSign, Wrench, User, Phone, Mail, Home, Shield, FileText, Clock} from 'lucide-react';
 
 import {
@@ -10,7 +9,7 @@ import {
     debounce,
     COMMON_TIMEZONES
 } from "../../Components/utils/locationApi.js";
-import "../../styles/TechnicianProfileForm.css";
+import styles from "../../styles/TechnicianProfileForm.module.css";
 
 const TechnicianProfileForm = ({ userInfo, onUpdateProfile }) => {
     const [formData, setFormData] = useState({
@@ -198,35 +197,33 @@ const TechnicianProfileForm = ({ userInfo, onUpdateProfile }) => {
     const serviceTypes = ['Plumbing', 'Electrical', 'HVAC', 'Carpentry', 'General Maintenance', 'Appliance Repair'];
 
     return (
-        <div>
-            <Header2 />
-        <div className="profile-content">
-            <div className="profile-form">
-                <div className="profile-header">
-                    <h1 className="profile-title">Technician Profile</h1>
-                    <p className="profile-subtitle">Manage your professional profile and service offerings.</p>
+        <div className={styles['profile-content']}>
+            <div className={styles['profile-form']}>
+                <div className={styles['profile-header']}>
+                    <h1 className={styles['profile-title']}>Technician Profile</h1>
+                    <p className={styles['profile-subtitle']}>Manage your professional profile and service offerings.</p>
                 </div>
 
                 {error && (
-                    <div className="error-message">
+                    <div className={styles['error-message']}>
                         <span>{error}</span>
                         <button onClick={() => setError(null)}>×</button>
                     </div>
                 )}
 
                 {/* Profile Picture Section */}
-                <div className="profile-picture-section">
-                    <div className="profile-picture-container">
-                        <div className="profile-picture">
+                <div className={styles['profile-picture-section']}>
+                    <div className={styles['profile-picture-container']}>
+                        <div className={styles['profile-picture']}>
                             {formData.avatar ? (
-                                <img src={formData.avatar} className="profile-image" alt="Profile Avatar" />
+                                <img src={formData.avatar} className={styles['profile-image']} alt="Profile Avatar" />
                             ) : (
-                                <div className="profile-placeholder">
+                                <div className={styles['profile-placeholder']}>
                                     {formData.fullName ? formData.fullName.charAt(0).toUpperCase() : <Wrench size={32} />}
                                 </div>
                             )}
-                            <div className="profile-picture-overlay">
-                                <label htmlFor="avatar-upload" className="camera-btn">
+                            <div className={styles['profile-picture-overlay']}>
+                                <label htmlFor="avatar-upload" className={styles['camera-btn']}>
                                     <Camera size={20} />
                                     <input
                                         type='file'
@@ -239,38 +236,38 @@ const TechnicianProfileForm = ({ userInfo, onUpdateProfile }) => {
                             </div>
                         </div>
                     </div>
-                    <div className="profile-info">
-                        <h2 className="profile-name">{formData.fullName || 'Technician Name'}</h2>
-                        <p className="profile-role">Professional Technician</p>
+                    <div className={styles['profile-info']}>
+                        <h2 className={styles['profile-name']}>{formData.fullName || 'Technician Name'}</h2>
+                        <p className={styles['profile-role']}>Professional Technician</p>
                         {formData.serviceType && (
-                            <p className="service-speciality">{formData.serviceType} Specialist</p>
+                            <p className={styles['service-speciality']}>{formData.serviceType} Specialist</p>
                         )}
                     </div>
                 </div>
 
                 {/* Personal Information */}
-                <section className="form-section">
-                    <h3 className="section-title">
+                <section className={styles['form-section']}>
+                    <h3 className={styles['section-title']}>
                         <User size={20} style={{marginRight: '0.5rem'}} />
                         Personal Information
                     </h3>
 
-                    <div className="form-group">
-                        <label htmlFor="fullName" className="form-label">Full Name</label>
-                        <div className="input-with-edit">
+                    <div className={styles['form-group']}>
+                        <label htmlFor="fullName" className={styles['form-label']}>Full Name</label>
+                        <div className={styles['input-with-edit']}>
                             {isEditing.fullName ? (
                                 <input
                                     type="text"
-                                    className="form-input"
+                                    className={styles['form-input']}
                                     value={formData.fullName}
                                     onChange={(e) => handleInputChange('fullName', e.target.value)}
                                     onBlur={() => toggleEdit('fullName')}
                                     autoFocus
                                 />
                             ) : (
-                                <div className="form-display">
+                                <div className={styles['form-display']}>
                                     <span>{formData.fullName || 'Not Provided'}</span>
-                                    <button className="edit-btn" onClick={() => toggleEdit('fullName')}>
+                                    <button className={styles['edit-btn']} onClick={() => toggleEdit('fullName')}>
                                         <Edit3 size={16} />
                                     </button>
                                 </div>
@@ -278,22 +275,22 @@ const TechnicianProfileForm = ({ userInfo, onUpdateProfile }) => {
                         </div>
                     </div>
 
-                    <div className="form-group">
-                        <label htmlFor="email" className="form-label">Email</label>
-                        <div className="input-with-edit">
+                    <div className={styles['form-group']}>
+                        <label htmlFor="email" className={styles['form-label']}>Email</label>
+                        <div className={styles['input-with-edit']}>
                             {isEditing.email ? (
                                 <input
                                     type="email"
-                                    className="form-input"
+                                    className={styles['form-input']}
                                     value={formData.email}
                                     onChange={(e) => handleInputChange('email', e.target.value)}
                                     onBlur={() => toggleEdit('email')}
                                     autoFocus
                                 />
                             ) : (
-                                <div className="form-display">
+                                <div className={styles['form-display']}>
                                     <span>{formData.email || 'Not Provided'}</span>
-                                    <button className="edit-btn" onClick={() => toggleEdit('email')}>
+                                    <button className={styles['edit-btn']} onClick={() => toggleEdit('email')}>
                                         <Edit3 size={16} />
                                     </button>
                                 </div>
@@ -301,22 +298,22 @@ const TechnicianProfileForm = ({ userInfo, onUpdateProfile }) => {
                         </div>
                     </div>
 
-                    <div className="form-group">
-                        <label htmlFor="phoneNumber" className="form-label">Phone Number</label>
-                        <div className="input-with-edit">
+                    <div className={styles['form-group']}>
+                        <label htmlFor="phoneNumber" className={styles['form-label']}>Phone Number</label>
+                        <div className={styles['input-with-edit']}>
                             {isEditing.phoneNumber ? (
                                 <input
                                     type="tel"
-                                    className="form-input"
+                                    className={styles['form-input']}
                                     value={formData.phoneNumber}
                                     onChange={(e) => handleInputChange('phoneNumber', e.target.value)}
                                     onBlur={() => toggleEdit('phoneNumber')}
                                     autoFocus
                                 />
                             ) : (
-                                <div className="form-display">
+                                <div className={styles['form-display']}>
                                     <span>{formData.phoneNumber || 'Not Provided'}</span>
-                                    <button className="edit-btn" onClick={() => toggleEdit('phoneNumber')}>
+                                    <button className={styles['edit-btn']} onClick={() => toggleEdit('phoneNumber')}>
                                         <Edit3 size={16} />
                                     </button>
                                 </div>
@@ -324,15 +321,15 @@ const TechnicianProfileForm = ({ userInfo, onUpdateProfile }) => {
                         </div>
                     </div>
 
-                    <div className="form-group">
-                        <label htmlFor="address" className="form-label">Address</label>
-                        <div className="location-input-container">
-                            <div className="location-search-wrapper">
+                    <div className={styles['form-group']}>
+                        <label htmlFor="address" className={styles['form-label']}>Address</label>
+                        <div className={styles['location-input-container']}>
+                            <div className={styles['location-search-wrapper']}>
                                 {isEditing.address ? (
-                                    <div className="location-search">
+                                    <div className={styles['location-search']}>
                                         <input
                                             type="text"
-                                            className="form-input"
+                                            className={styles['form-input']}
                                             value={locationSearch}
                                             onChange={(e) => {
                                                 setLocationSearch(e.target.value);
@@ -348,32 +345,32 @@ const TechnicianProfileForm = ({ userInfo, onUpdateProfile }) => {
                                             autoFocus
                                         />
                                         <button
-                                            className="current-location-btn"
+                                            className={styles['current-location-btn']}
                                             onClick={handleGetCurrentLocation}
                                             disabled={isGettingCurrentLocation}
                                             type="button"
                                         >
                                             {isGettingCurrentLocation ? (
-                                                <Loader2 size={16} className="spinning" />
+                                                <Loader2 size={16} className={styles.spinning} />
                                             ) : (
                                                 <Navigation size={16} />
                                             )}
                                         </button>
 
                                         {showLocationSuggestions && locationSuggestions.length > 0 && (
-                                            <div className="location-suggestions">
+                                            <div className={styles['location-suggestions']}>
                                                 {locationSuggestions.map((location, index) => (
                                                     <div
                                                         key={index}
-                                                        className="location-suggestion"
+                                                        className={styles['location-suggestion']}
                                                         onClick={() => handleLocationSelect(location)}
                                                     >
-                                                        <MapPin size={14} className="location-icon" />
-                                                        <div className="location-details">
-                                                            <div className="location-name">
+                                                        <MapPin size={14} className={styles['location-icon']} />
+                                                        <div className={styles['location-details']}>
+                                                            <div className={styles['location-name']}>
                                                                 {location.city || location.state || 'Unknown'}
                                                             </div>
-                                                            <div className="location-address">
+                                                            <div className={styles['location-address']}>
                                                                 {location.displayName}
                                                             </div>
                                                         </div>
@@ -383,10 +380,10 @@ const TechnicianProfileForm = ({ userInfo, onUpdateProfile }) => {
                                         )}
                                     </div>
                                 ) : (
-                                    <div className="form-display">
+                                    <div className={styles['form-display']}>
                                         <span>{formData.address || 'Not Provided'}</span>
                                         <button
-                                            className="edit-btn"
+                                            className={styles['edit-btn']}
                                             onClick={() => {
                                                 setLocationSearch(formData.address);
                                                 toggleEdit('address');
@@ -400,12 +397,12 @@ const TechnicianProfileForm = ({ userInfo, onUpdateProfile }) => {
                         </div>
                     </div>
 
-                    <div className="form-group">
-                        <label htmlFor="bio" className="form-label">Bio</label>
-                        <div className="input-with-edit">
+                    <div className={styles['form-group']}>
+                        <label htmlFor="bio" className={styles['form-label']}>Bio</label>
+                        <div className={styles['input-with-edit']}>
                             {isEditing.bio ? (
                                 <textarea
-                                    className="form-input"
+                                    className={styles['form-input']}
                                     rows="4"
                                     value={formData.bio}
                                     onChange={(e) => handleInputChange('bio', e.target.value)}
@@ -414,9 +411,9 @@ const TechnicianProfileForm = ({ userInfo, onUpdateProfile }) => {
                                     autoFocus
                                 />
                             ) : (
-                                <div className="form-display">
+                                <div className={styles['form-display']}>
                                     <span>{formData.bio || 'Not Provided'}</span>
-                                    <button className="edit-btn" onClick={() => toggleEdit('bio')}>
+                                    <button className={styles['edit-btn']} onClick={() => toggleEdit('bio')}>
                                         <Edit3 size={16} />
                                     </button>
                                 </div>
@@ -426,39 +423,39 @@ const TechnicianProfileForm = ({ userInfo, onUpdateProfile }) => {
                 </section>
 
                 {/* Verification Section */}
-                <section className="form-section">
-                    <h3 className="section-title">
+                <section className={styles['form-section']}>
+                    <h3 className={styles['section-title']}>
                         <Shield size={20} style={{marginRight: '0.5rem'}} />
                         Verification Documents
                     </h3>
-                    <p className="section-description">
+                    <p className={styles['section-description']}>
                         Upload verification documents to increase trust and credibility with clients.
                     </p>
 
-                    <div className="verification-grid">
-                        <div className="verification-item">
-                            <label className="form-label">
+                    <div className={styles['verification-grid']}>
+                        <div className={styles['verification-item']}>
+                            <label className={styles['form-label']}>
                                 <FileText size={16} style={{marginRight: '0.5rem'}} />
                                 User Verification (Citizenship Photo)
                             </label>
-                            <div className="file-upload-container">
-                                <div className="file-upload-area">
+                            <div className={styles['file-upload-container']}>
+                                <div className={styles['file-upload-area']}>
                                     {formData.citizenshipPhoto ? (
-                                        <div className="uploaded-image">
+                                        <div className={styles['uploaded-image']}>
                                             <img
                                                 src={formData.citizenshipPhoto}
                                                 alt="Citizenship Document"
-                                                className="verification-image"
+                                                className={styles['verification-image']}
                                             />
-                                            <div className="image-overlay">
-                                                <label htmlFor="citizenship-upload" className="change-image-btn">
+                                            <div className={styles['image-overlay']}>
+                                                <label htmlFor="citizenship-upload" className={styles['change-image-btn']}>
                                                     <Camera size={16} />
                                                     Change
                                                 </label>
                                             </div>
                                         </div>
                                     ) : (
-                                        <label htmlFor="citizenship-upload" className="upload-placeholder">
+                                        <label htmlFor="citizenship-upload" className={styles['upload-placeholder']}>
                                             <Camera size={32} />
                                             <span>Upload Citizenship Photo</span>
                                             <small>JPG, PNG up to 5MB</small>
@@ -475,29 +472,29 @@ const TechnicianProfileForm = ({ userInfo, onUpdateProfile }) => {
                             </div>
                         </div>
 
-                        <div className="verification-item">
-                            <label className="form-label">
+                        <div className={styles['verification-item']}>
+                            <label className={styles['form-label']}>
                                 <Shield size={16} style={{marginRight: '0.5rem'}} />
                                 Worker Verification (Working License)
                             </label>
-                            <div className="file-upload-container">
-                                <div className="file-upload-area">
+                            <div className={styles['file-upload-container']}>
+                                <div className={styles['file-upload-area']}>
                                     {formData.workingLicense ? (
-                                        <div className="uploaded-image">
+                                        <div className={styles['uploaded-image']}>
                                             <img
                                                 src={formData.workingLicense}
                                                 alt="Working License"
-                                                className="verification-image"
+                                                className={styles['verification-image']}
                                             />
-                                            <div className="image-overlay">
-                                                <label htmlFor="license-upload" className="change-image-btn">
+                                            <div className={styles['image-overlay']}>
+                                                <label htmlFor="license-upload" className={styles['change-image-btn']}>
                                                     <Camera size={16} />
                                                     Change
                                                 </label>
                                             </div>
                                         </div>
                                     ) : (
-                                        <label htmlFor="license-upload" className="upload-placeholder">
+                                        <label htmlFor="license-upload" className={styles['upload-placeholder']}>
                                             <Shield size={32} />
                                             <span>Upload Working License</span>
                                             <small>JPG, PNG up to 5MB</small>
@@ -517,18 +514,18 @@ const TechnicianProfileForm = ({ userInfo, onUpdateProfile }) => {
                 </section>
 
                 {/* Service Offerings */}
-                <section className="form-section">
-                    <h3 className="section-title">
+                <section className={styles['form-section']}>
+                    <h3 className={styles['section-title']}>
                         <Wrench size={20} style={{marginRight: '0.5rem'}} />
                         Service Offerings
                     </h3>
 
-                    <div className="form-group">
-                        <label htmlFor="serviceType" className="form-label">Service Type</label>
-                        <div className="input-with-edit">
+                    <div className={styles['form-group']}>
+                        <label htmlFor="serviceType" className={styles['form-label']}>Service Type</label>
+                        <div className={styles['input-with-edit']}>
                             {isEditing.serviceType ? (
                                 <select
-                                    className="form-select"
+                                    className={styles['form-select']}
                                     value={formData.serviceType}
                                     onChange={(e) => handleInputChange('serviceType', e.target.value)}
                                     onBlur={() => toggleEdit('serviceType')}
@@ -540,9 +537,9 @@ const TechnicianProfileForm = ({ userInfo, onUpdateProfile }) => {
                                     ))}
                                 </select>
                             ) : (
-                                <div className="form-display">
+                                <div className={styles['form-display']}>
                                     <span>{formData.serviceType || 'Not Provided'}</span>
-                                    <button className="edit-btn" onClick={() => toggleEdit('serviceType')}>
+                                    <button className={styles['edit-btn']} onClick={() => toggleEdit('serviceType')}>
                                         <Edit3 size={16} />
                                     </button>
                                 </div>
@@ -550,13 +547,13 @@ const TechnicianProfileForm = ({ userInfo, onUpdateProfile }) => {
                         </div>
                     </div>
 
-                    <div className="form-group">
-                        <label htmlFor="hourlyRate" className="form-label">Hourly Rate (NPR)</label>
-                        <div className="input-with-edit">
+                    <div className={styles['form-group']}>
+                        <label htmlFor="hourlyRate" className={styles['form-label']}>Hourly Rate (NPR)</label>
+                        <div className={styles['input-with-edit']}>
                             {isEditing.hourlyRate ? (
                                 <input
                                     type="number"
-                                    className="form-input"
+                                    className={styles['form-input']}
                                     value={formData.hourlyRate}
                                     onChange={(e) => handleInputChange('hourlyRate', e.target.value)}
                                     onBlur={() => toggleEdit('hourlyRate')}
@@ -564,9 +561,9 @@ const TechnicianProfileForm = ({ userInfo, onUpdateProfile }) => {
                                     autoFocus
                                 />
                             ) : (
-                                <div className="form-display">
+                                <div className={styles['form-display']}>
                                     <span>{formData.hourlyRate ? `NPR ${formData.hourlyRate}/hour` : 'Not Provided'}</span>
-                                    <button className="edit-btn" onClick={() => toggleEdit('hourlyRate')}>
+                                    <button className={styles['edit-btn']} onClick={() => toggleEdit('hourlyRate')}>
                                         <Edit3 size={16} />
                                     </button>
                                 </div>
@@ -574,12 +571,12 @@ const TechnicianProfileForm = ({ userInfo, onUpdateProfile }) => {
                         </div>
                     </div>
 
-                    <div className="form-group">
-                        <label htmlFor="serviceDescription" className="form-label">Service Description</label>
-                        <div className="input-with-edit">
+                    <div className={styles['form-group']}>
+                        <label htmlFor="serviceDescription" className={styles['form-label']}>Service Description</label>
+                        <div className={styles['input-with-edit']}>
                             {isEditing.serviceDescription ? (
                                 <textarea
-                                    className="form-input"
+                                    className={styles['form-input']}
                                     rows="4"
                                     value={formData.serviceDescription}
                                     onChange={(e) => handleInputChange('serviceDescription', e.target.value)}
@@ -588,9 +585,9 @@ const TechnicianProfileForm = ({ userInfo, onUpdateProfile }) => {
                                     autoFocus
                                 />
                             ) : (
-                                <div className="form-display">
+                                <div className={styles['form-display']}>
                                     <span>{formData.serviceDescription || 'Not Provided'}</span>
-                                    <button className="edit-btn" onClick={() => toggleEdit('serviceDescription')}>
+                                    <button className={styles['edit-btn']} onClick={() => toggleEdit('serviceDescription')}>
                                         <Edit3 size={16} />
                                     </button>
                                 </div>
@@ -600,19 +597,19 @@ const TechnicianProfileForm = ({ userInfo, onUpdateProfile }) => {
                 </section>
 
                 {/* Availability */}
-                <section className="form-section">
-                    <h3 className="section-title">
+                <section className={styles['form-section']}>
+                    <h3 className={styles['section-title']}>
                         <Clock size={20} style={{marginRight: '0.5rem'}} />
                         Availability
                     </h3>
 
-                    <div className="form-group">
-                        <label htmlFor="availability" className="form-label">General Availability</label>
-                        <div className="input-with-edit">
+                    <div className={styles['form-group']}>
+                        <label htmlFor="availability" className={styles['form-label']}>General Availability</label>
+                        <div className={styles['input-with-edit']}>
                             {isEditing.availability ? (
                                 <input
                                     type="text"
-                                    className="form-input"
+                                    className={styles['form-input']}
                                     value={formData.availability}
                                     onChange={(e) => handleInputChange('availability', e.target.value)}
                                     onBlur={() => toggleEdit('availability')}
@@ -620,9 +617,9 @@ const TechnicianProfileForm = ({ userInfo, onUpdateProfile }) => {
                                     autoFocus
                                 />
                             ) : (
-                                <div className="form-display">
+                                <div className={styles['form-display']}>
                                     <span>{formData.availability || 'Not Provided'}</span>
-                                    <button className="edit-btn" onClick={() => toggleEdit('availability')}>
+                                    <button className={styles['edit-btn']} onClick={() => toggleEdit('availability')}>
                                         <Edit3 size={16} />
                                     </button>
                                 </div>
@@ -630,12 +627,12 @@ const TechnicianProfileForm = ({ userInfo, onUpdateProfile }) => {
                         </div>
                     </div>
 
-                    <div className="form-group">
-                        <label htmlFor="availabilityDetails" className="form-label">Availability Details</label>
-                        <div className="input-with-edit">
+                    <div className={styles['form-group']}>
+                        <label htmlFor="availabilityDetails" className={styles['form-label']}>Availability Details</label>
+                        <div className={styles['input-with-edit']}>
                             {isEditing.availabilityDetails ? (
                                 <textarea
-                                    className="form-input"
+                                    className={styles['form-input']}
                                     rows="4"
                                     value={formData.availabilityDetails}
                                     onChange={(e) => handleInputChange('availabilityDetails', e.target.value)}
@@ -644,9 +641,9 @@ const TechnicianProfileForm = ({ userInfo, onUpdateProfile }) => {
                                     autoFocus
                                 />
                             ) : (
-                                <div className="form-display">
+                                <div className={styles['form-display']}>
                                     <span>{formData.availabilityDetails || 'Not Provided'}</span>
-                                    <button className="edit-btn" onClick={() => toggleEdit('availabilityDetails')}>
+                                    <button className={styles['edit-btn']} onClick={() => toggleEdit('availabilityDetails')}>
                                         <Edit3 size={16} />
                                     </button>
                                 </div>
@@ -657,13 +654,13 @@ const TechnicianProfileForm = ({ userInfo, onUpdateProfile }) => {
                 </section>
 
                 {/* Preferences */}
-                <section className="form-section">
-                    <h3 className="section-title">Preferences</h3>
+                <section className={styles['form-section']}>
+                    <h3 className={styles['section-title']}>Preferences</h3>
 
-                    <div className="form-group">
-                        <label htmlFor="preferredLanguage" className="form-label">Preferred Language</label>
+                    <div className={styles['form-group']}>
+                        <label htmlFor="preferredLanguage" className={styles['form-label']}>Preferred Language</label>
                         <select
-                            className="form-select"
+                            className={styles['form-select']}
                             value={formData.preferredLanguage}
                             onChange={(e) => handleInputChange('preferredLanguage', e.target.value)}
                         >
@@ -673,11 +670,11 @@ const TechnicianProfileForm = ({ userInfo, onUpdateProfile }) => {
                         </select>
                     </div>
 
-                    <div className="form-group">
-                        <label htmlFor="timezone" className="form-label">Time Zone</label>
-                        <div className="timezone-container">
+                    <div className={styles['form-group']}>
+                        <label htmlFor="timezone" className={styles['form-label']}>Time Zone</label>
+                        <div className={styles['timezone-container']}>
                             <select
-                                className="form-select"
+                                className={styles['form-select']}
                                 value={formData.timezone}
                                 onChange={(e) => handleInputChange('timezone', e.target.value)}
                             >
@@ -686,7 +683,7 @@ const TechnicianProfileForm = ({ userInfo, onUpdateProfile }) => {
                                 ))}
                             </select>
                             <button
-                                className="detect-timezone-btn"
+                                className={styles['detect-timezone-btn']}
                                 onClick={handleAutoDetectTimezone}
                                 type="button"
                             >
@@ -696,13 +693,12 @@ const TechnicianProfileForm = ({ userInfo, onUpdateProfile }) => {
                     </div>
                 </section>
 
-                <div className="form-actions">
-                    <button className="save-btn" onClick={handleSave}>
+                <div className={styles['form-actions']}>
+                    <button className={styles['save-btn']} onClick={handleSave}>
                         Save Changes
                     </button>
                 </div>
             </div>
-        </div>
         </div>
     );
 };

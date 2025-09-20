@@ -1,7 +1,6 @@
 import React from 'react';
 import { Computer, Network, Settings, ChevronRight } from 'lucide-react';
 import RatingReviews from './RatingReviews';
-import Header2 from "../../Components/layout/Header2.jsx";
 import '../../styles/TechnicianProfile.css';
 
 const TechnicianProfile = ({ technicianId = "tech-1", user }) => {
@@ -33,8 +32,6 @@ const TechnicianProfile = ({ technicianId = "tech-1", user }) => {
     };
 
     return (
-        <div>
-            <Header2 />
         <div className="profile-container">
             {/* Breadcrumb */}
             <nav className="breadcrumb">
@@ -95,7 +92,6 @@ const TechnicianProfile = ({ technicianId = "tech-1", user }) => {
                     <RatingReviews technicianId={technician.id} user={user} />
                 </div>
             </div>
-        </div>
         </div>
     );
 };

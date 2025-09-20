@@ -1,4 +1,66 @@
-/* Dashboard Specific Styles - Extends UserProfileForm.css */
+/* Dashboard Specific Styles - CSS Module Version */
+
+/* Profile Layout */
+.profile-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    background-color: #f8fafc;
+    min-height: 100vh;
+}
+
+.profile-form {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.profile-header {
+    padding: 2rem;
+    border-bottom: 1px solid #e2e8f0;
+    background: linear-gradient(135deg, #85d6ab 0%, #85d6ab 100%);
+    color: white;
+}
+
+.profile-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+}
+
+.profile-subtitle {
+    font-size: 1rem;
+    margin: 0;
+    opacity: 0.9;
+}
+
+/* Form Sections */
+.form-section {
+    padding: 2rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.form-section:last-child {
+    border-bottom: none;
+}
+
+.section-title {
+    display: flex;
+    align-items: center;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0 0 1.5rem 0;
+}
+
+/* Section Header Enhancements */
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
 
 /* Stats Grid */
 .stats-grid {
@@ -68,6 +130,30 @@
 
 .stat-change.neutral {
     color: #6b7280;
+}
+
+/* Buttons */
+.add-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #76af8c;
+    color: white;
+    border: none;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.add-btn:hover {
+    background: #86e1a7;
+    transform: translateY(-1px);
+}
+
+.add-btn:active {
+    transform: translateY(0);
 }
 
 /* Quick Actions */
@@ -421,23 +507,6 @@
     font-size: 0.875rem;
 }
 
-/* Section Header Enhancements */
-.section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
-}
-
-.section-title {
-    display: flex;
-    align-items: center;
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: #1f2937;
-    margin: 0;
-}
-
 /* Responsive Adjustments */
 @media (max-width: 1024px) {
     .stats-grid {
@@ -461,6 +530,18 @@
 }
 
 @media (max-width: 768px) {
+    .profile-content {
+        padding: 1rem;
+    }
+
+    .profile-header {
+        padding: 1.5rem;
+    }
+
+    .form-section {
+        padding: 1.5rem;
+    }
+
     .stats-grid {
         grid-template-columns: 1fr;
     }
@@ -493,6 +574,10 @@
 }
 
 @media (max-width: 480px) {
+    .profile-title {
+        font-size: 1.5rem;
+    }
+
     .stat-card {
         flex-direction: column;
         text-align: center;

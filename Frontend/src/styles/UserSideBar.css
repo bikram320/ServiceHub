@@ -148,6 +148,35 @@
 }
 
 /* Collapsed state adjustments */
+/* Collapsed sidebar width */
+.user-sidebar.collapsed {
+    width: 80px; /* was probably 60px before, increase slightly */
+}
+
+/* Profile section when collapsed */
+.user-sidebar.collapsed .profile-info {
+    justify-content: center;
+    padding: 0.75rem 0;
+    gap: 0;
+    flex-direction: column; /* stack avatar + logout neatly */
+}
+
+/* Smaller avatar in collapsed mode */
+.user-sidebar.collapsed .avatar {
+    width: 40px;   /* smaller than expanded mode (maybe 50-60px) */
+    height: 40px;
+    font-size: 16px; /* scale initials down */
+}
+
+/* Logout button centered below avatar */
+.user-sidebar.collapsed .logout-btn {
+    margin-top: 0.5rem;
+    width: auto;         /* shrink from full-width */
+    padding: 0.25rem 0.5rem;
+    border-radius: 8px;  /* keep it rounded */
+    align-self: center;  /* make sure it centers in flex column */
+}
+
 .user-sidebar.collapsed .nav-link {
     justify-content: center;
     padding: 0.75rem;

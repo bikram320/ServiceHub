@@ -56,20 +56,49 @@
     font-weight: 700;
     color: #1e293b;
 }
-
-.collapse-btn {
-    width: 32px;
-    height: 32px;
-    border: none;
-    background: #f8fafc;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #64748b;
-    cursor: pointer;
-    transition: all 0.2s;
+/* Collapsed sidebar width */
+.admin-sidebar.collapsed {
+    width: 80px; /* was probably 60px before, increase slightly */
 }
+
+/* Profile section when collapsed */
+.admin-sidebar.collapsed .profile-info {
+    justify-content: center;
+    padding: 0.75rem 0;
+    gap: 0;
+    flex-direction: column; /* stack avatar + logout neatly */
+}
+
+/* Smaller avatar in collapsed mode */
+.admin-sidebar.collapsed .avatar {
+    width: 40px;   /* smaller than expanded mode (maybe 50-60px) */
+    height: 40px;
+    font-size: 16px; /* scale initials down */
+}
+
+/* Logout button centered below avatar */
+.admin-sidebar.collapsed .logout-btn {
+    margin-top: 0.5rem;
+    width: auto;         /* shrink from full-width */
+    padding: 0.25rem 0.5rem;
+    border-radius: 8px;  /* keep it rounded */
+    align-self: center;  /* make sure it centers in flex column */
+}
+
+
+/*.collapse-btn {*/
+/*    width: 32px;*/
+/*    height: 32px;*/
+/*    border: none;*/
+/*    background: #f8fafc;*/
+/*    border-radius: 8px;*/
+/*    display: flex;*/
+/*    align-items: center;*/
+/*    justify-content: center;*/
+/*    color: #64748b;*/
+/*    cursor: pointer;*/
+/*    transition: all 0.2s;*/
+/*}*/
 
 .collapse-btn:hover {
     background: #e2e8f0;

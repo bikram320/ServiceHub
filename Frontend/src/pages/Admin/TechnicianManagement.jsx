@@ -1,5 +1,4 @@
 import React, { useState, useMemo } from 'react';
-import Header2 from "../../Components/layout/Header2.jsx";
 import {
     Wrench,
     Search,
@@ -332,8 +331,6 @@ const TechnicianManagement = () => {
     };
 
     return (
-        <div>
-            <Header2 />
         <div className="user-management">
             <div className="user-management-container">
                 {/* Header */}
@@ -872,7 +869,6 @@ const TechnicianManagement = () => {
                     )}
                 </Modal>
             </div>
-        </div>
         </div>
     );
 };

@@ -4,37 +4,13 @@ import {
     Calendar,
     Clock,
     MapPin,
-    Plus,
-    Search,
-    Filter,
-    Star,
     CheckCircle,
     XCircle,
     AlertCircle,
     Eye,
-    MessageSquare,
-    Phone,
-    User,
-    Home,
-    Wrench,
-    Zap,
-    Car,
-    Scissors,
-    Heart,
-    BookOpen,
-    BarChart3,
-    TrendingUp,
-    Bell,
-    Settings,
-    Activity,
-    DollarSign,
-    RefreshCw,
-    UserCheck,
-    Users,
-    AlertTriangle,
-    Check,
-    X
+    User
 } from 'lucide-react';
+import styles from '../../styles/UserDashboard.module.css';
 
 const AppointmentCard = ({ appointment, type = "upcoming", onAction }) => {
     const getStatusColor = (status) => {
@@ -60,38 +36,38 @@ const AppointmentCard = ({ appointment, type = "upcoming", onAction }) => {
     };
 
     return (
-        <div className={`appointment-card ${type === 'history' ? 'history-card' : ''}`}>
-            <div className="appointment-header">
-                <div className="appointment-service-info">
-                    <h4 className="appointment-title">{appointment.service || appointment.type}</h4>
-                    <div className="appointment-provider">{appointment.provider || `Client: ${appointment.client}`}</div>
+        <div className={`${styles['appointment-card']} ${type === 'history' ? styles['history-card'] : ''}`}>
+            <div className={styles['appointment-header']}>
+                <div className={styles['appointment-service-info']}>
+                    <h4 className={styles['appointment-title']}>{appointment.service || appointment.type}</h4>
+                    <div className={styles['appointment-provider']}>{appointment.provider || `Client: ${appointment.client}`}</div>
                 </div>
-                <div className="appointment-status">
+                <div className={styles['appointment-status']}>
                     <span
-                        className="status-badge"
+                        className={styles['status-badge']}
                         style={{ backgroundColor: getStatusColor(appointment.status) }}
                     >
                         {getStatusIcon(appointment.status)}
                         {appointment.status}
                     </span>
-                    <div className="appointment-price">{appointment.price || appointment.amount}</div>
+                    <div className={styles['appointment-price']}>{appointment.price || appointment.amount}</div>
                 </div>
             </div>
 
-            <div className="appointment-details">
-                <div className="detail-item">
+            <div className={styles['appointment-details']}>
+                <div className={styles['detail-item']}>
                     <Calendar size={16} />
                     <span>{appointment.date}, {appointment.time}</span>
                 </div>
-                <div className="detail-item">
+                <div className={styles['detail-item']}>
                     <MapPin size={16} />
                     <span>{appointment.location}</span>
                 </div>
-                <div className="detail-item">
+                <div className={styles['detail-item']}>
                     <User size={16} />
                     <span>{appointment.technician || appointment.client}</span>
                     {appointment.rating && (
-                        <div className="provider-rating">
+                        <div className={styles['provider-rating']}>
                             <StarRating rating={appointment.rating} />
                             <span>({appointment.rating})</span>
                         </div>
@@ -99,31 +75,31 @@ const AppointmentCard = ({ appointment, type = "upcoming", onAction }) => {
                 </div>
             </div>
 
-            <div className="appointment-actions">
+            <div className={styles['appointment-actions']}>
                 {type === 'upcoming' && (
                     <>
-                        <button className="action-btn secondary" onClick={() => onAction('view', appointment.id)}>
+                        <button className={`${styles['action-btn']} ${styles.secondary}`} onClick={() => onAction('view', appointment.id)}>
                             <Eye size={16} />
                             Details
                         </button>
-                        <button className="action-btn danger" onClick={() => onAction('cancel', appointment.id)}>Cancel</button>
+                        <button className={`${styles['action-btn']} ${styles.danger}`} onClick={() => onAction('cancel', appointment.id)}>Cancel</button>
                     </>
                 )}
                 {type === 'history' && (
                     <>
-                        <button className="action-btn secondary" onClick={() => onAction('view', appointment.id)}>
+                        <button className={`${styles['action-btn']} ${styles.secondary}`} onClick={() => onAction('view', appointment.id)}>
                             <Eye size={16} />
                             View Details
                         </button>
                         {appointment.status === 'completed' && (
-                            <button className="action-btn primary" onClick={() => onAction('book-again', appointment.id)}>Book Again</button>
+                            <button className={`${styles['action-btn']} ${styles.primary}`} onClick={() => onAction('book-again', appointment.id)}>Book Again</button>
                         )}
                     </>
                 )}
                 {type === 'technician' && (
                     <>
-                        <button className="action-btn primary" onClick={() => onAction('accept', appointment.id)}>Accept</button>
-                        <button className="action-btn secondary" onClick={() => onAction('reschedule', appointment.id)}>Reschedule</button>
+                        <button className={`${styles['action-btn']} ${styles.primary}`} onClick={() => onAction('accept', appointment.id)}>Accept</button>
+                        <button className={`${styles['action-btn']} ${styles.secondary}`} onClick={() => onAction('reschedule', appointment.id)}>Reschedule</button>
                     </>
                 )}
             </div>

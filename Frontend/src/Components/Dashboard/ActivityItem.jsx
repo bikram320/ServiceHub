@@ -1,39 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import {
-    Calendar,
-    Clock,
-    MapPin,
-    Plus,
-    Search,
-    Filter,
-    Star,
-    CheckCircle,
-    XCircle,
-    AlertCircle,
-    Eye,
-    MessageSquare,
-    Phone,
-    User,
-    Home,
-    Wrench,
-    Zap,
-    Car,
-    Scissors,
-    Heart,
-    BookOpen,
-    BarChart3,
-    TrendingUp,
-    Bell,
-    Settings,
-    Activity,
-    DollarSign,
-    RefreshCw,
-    UserCheck,
-    Users,
-    AlertTriangle,
-    Check,
-    X
-} from 'lucide-react';
+import {User} from 'lucide-react';
+import styles from '../../styles/UserDashboard.module.css';
 
 const ActivityItem = ({ activity, showDot = false }) => {
     const getStatusColor = (status) => {
@@ -47,16 +14,16 @@ const ActivityItem = ({ activity, showDot = false }) => {
     };
 
     return (
-        <div className="activity-item">
-            {showDot && <div className="activity-dot"></div>}
+        <div className={styles["activity-item"]}>
+            {showDot && <div className={styles["activity-dot"]}></div>}
             {!showDot && (
                 <div
-                    className="activity-status"
+                    className={styles["activity-status"]}
                     style={{ backgroundColor: getStatusColor(activity.status) }}
                 ></div>
             )}
-            <div className="activity-content">
-                <div className="activity-action">{activity.action || activity.message}</div>
+            <div className={styles["activity-content"]}>
+                <div className={styles["activity-action"]}>{activity.action || activity.message}</div>
                 <div className="activity-details">
                     {activity.client && (
                         <>
@@ -64,7 +31,7 @@ const ActivityItem = ({ activity, showDot = false }) => {
                             <span>{activity.client}</span>
                         </>
                     )}
-                    <span className="activity-time">{activity.time}</span>
+                    <span className={styles["activity-time"]}>{activity.time}</span>
                 </div>
             </div>
         </div>

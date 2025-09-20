@@ -12,6 +12,7 @@ import {
     ChevronDown
 } from 'lucide-react';
 import "../../styles/AdminSideBar.css";
+import Header2 from "../../Components/layout/Header2.jsx";
 
 const AdminSidebar = ({ activeTab, onTabChange, onLogout }) => {
     const [isCollapsed, setIsCollapsed] = useState(false);
@@ -55,12 +56,7 @@ const AdminSidebar = ({ activeTab, onTabChange, onLogout }) => {
                 <div className="logo-section">
                     {!isCollapsed && (
                         <>
-                            <div className="logo">
-                                <div className="logo-icon">
-                                    <Settings size={24} />
-                                </div>
-                                <span className="logo-text">Admin Panel</span>
-                            </div>
+                            <Header2 />
                         </>
                     )}
                 </div>

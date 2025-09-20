@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { ArrowLeft, Calendar, Clock, MapPin, User, Phone, Mail, CreditCard, Shield, Star, CheckCircle } from 'lucide-react';
 import "../../styles/BookingDetail.css";
 import DateTimeSelector from "../../Components/layout/DateTimeSelector.jsx";
-import Header2 from "../../Components/layout/Header2.jsx";
+
 
 // Service Provider Card Component
 const ServiceProviderCard = ({ provider }) => (
@@ -33,69 +33,6 @@ const ServiceProviderCard = ({ provider }) => (
         </div>
     </div>
 );
-
-// // Date Time Selector Component
-// const DateTimeSelector = ({ selectedDate, selectedTime, onDateChange, onTimeChange }) => {
-//     const timeSlots = [
-//         '09:00 AM', '10:00 AM', '11:00 AM', '01:00 PM',
-//         '02:00 PM', '03:00 PM', '04:00 PM', '05:00 PM'
-//     ];
-//
-//     const today = new Date();
-//     const dates = Array.from({ length: 14 }, (_, i) => {
-//         const date = new Date(today);
-//         date.setDate(today.getDate() + i);
-//         return date;
-//     });
-//
-//     return (
-//         <div className="datetime-selector">
-//             <div className="date-selector">
-//                 <h4 className="selector-title">
-//                     <Calendar size={18} />
-//                     Select Date
-//                 </h4>
-//                 <div className="date-grid">
-//                     {dates.map((date, index) => {
-//                         const dateStr = date.toISOString().split('T')[0];
-//                         const isSelected = selectedDate === dateStr;
-//                         const dayName = date.toLocaleDateString('en', { weekday: 'short' });
-//                         const dayNumber = date.getDate();
-//
-//                         return (
-//                             <button
-//                                 key={index}
-//                                 className={`date-option ${isSelected ? 'selected' : ''}`}
-//                                 onClick={() => onDateChange(dateStr)}
-//                             >
-//                                 <span className="day-name">{dayName}</span>
-//                                 <span className="day-number">{dayNumber}</span>
-//                             </button>
-//                         );
-//                     })}
-//                 </div>
-//             </div>
-//
-//             <div className="time-selector">
-//                 <h4 className="selector-title">
-//                     <Clock size={18} />
-//                     Select Time
-//                 </h4>
-//                 <div className="time-grid">
-//                     {timeSlots.map((time, index) => (
-//                         <button
-//                             key={index}
-//                             className={`time-option ${selectedTime === time ? 'selected' : ''}`}
-//                             onClick={() => onTimeChange(time)}
-//                         >
-//                             {time}
-//                         </button>
-//                     ))}
-//                 </div>
-//             </div>
-//         </div>
-//     );
-// };
 
 // Contact Form Component
 const ContactForm = ({ formData, onFormChange }) => (
@@ -329,7 +266,6 @@ const BookingDetail = () => {
 
     return (
         <div className="page-container">
-            <Header2 />
             <div className="container">
                 <div className="booking-container">
                     {/* Back Button */}

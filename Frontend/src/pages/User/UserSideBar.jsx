@@ -7,12 +7,11 @@ import {
     LogOut,
     Menu,
     X,
-    Settings,
-    Bell,
     ChevronDown,
     Newspaper
 } from 'lucide-react';
-import "../../styles/UserSidebar.css";
+import "../../styles/UserSideBar.css";
+import Header2 from "../../Components/layout/Header2.jsx";
 
 const UserSidebar = ({ activeTab, onTabChange, onLogout, userInfo = {} }) => {
     const [isCollapsed, setIsCollapsed] = useState(false);
@@ -80,12 +79,7 @@ const UserSidebar = ({ activeTab, onTabChange, onLogout, userInfo = {} }) => {
                 <div className="logo-section">
                     {!isCollapsed && (
                         <>
-                            <div className="logo">
-                                <div className="logo-icon">
-                                    Q
-                                </div>
-                                <span className="logo-text">QuestX</span>
-                            </div>
+                            <Header2 />
                         </>
                     )}
                 </div>

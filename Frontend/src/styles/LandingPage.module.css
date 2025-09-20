@@ -147,18 +147,33 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    padding-left: 5rem;
 }
 .hero-image-wrapper1 {
     position: relative;
     width: 100%;
     max-width: 500px;
+    background: #d8f3da; /* same as page background */
+    border-radius: 12px;
+    overflow: hidden;
 }
 .hero-image1 {
-    width: 100%;
+    width: 40rem;
     height: auto;
     border-radius: 12px;
-    object-fit: cover;
+    display: block;
 }
+
+
+.hero-image-wrapper1::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, rgba(216,243,218,0) 70%, #d8f3da 100%);
+    border-radius: 12px;
+    pointer-events: none;
+}
+
 .image-overlay {
     position: absolute;
     inset: 0;

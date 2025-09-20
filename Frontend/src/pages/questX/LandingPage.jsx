@@ -19,6 +19,7 @@ import PaintingHelp from "../../assets/PaintingHelp.jpg";
 import PhotographyHelp from "../../assets/PhotographerHelp.webp";
 import PlumbingHelp from "../../assets/PlumbingHelp.jpg";
 import ConstructionWorker from "../../assets/constructionWorker.webp";
+import FirstPageImg from "../../assets/FirstPage.png";
 import Footer from "../../Components/layout/Footer.jsx";
 
 function LandingPage() {
@@ -226,11 +227,10 @@ function LandingPage() {
                     <div className={styles["hero-right"]}>
                         <div className={styles["hero-image-wrapper1"]}>
                             <img
-                                src={ConstructionWorker}
+                                src={FirstPageImg}
                                 alt="Professional technician"
                                 className={styles["hero-image1"]}
                             />
-                            <h2>Image to be added</h2>
                             <div className={styles["image-overlay"]}></div>
 
                             <div className={styles["tag"] + " " + styles["top-right"]}>

@@ -13,6 +13,7 @@ import {
     Wrench,
     Newspaper
 } from 'lucide-react';
+import Header2 from "../../Components/layout/Header2.jsx";
 import "../../styles/TechnicianSideBar.css";
 
 const TechnicianSidebar = ({ activeTab, onTabChange, onLogout, userInfo = {} }) => {
@@ -81,12 +82,7 @@ const TechnicianSidebar = ({ activeTab, onTabChange, onLogout, userInfo = {} }) 
                 <div className="logo-section">
                     {!isCollapsed && (
                         <>
-                            <div className="logo">
-                                <div className="logo-icon">
-                                    <Wrench size={24} />
-                                </div>
-                                <span className="logo-text">TechPro</span>
-                            </div>
+                            <Header2 />
                         </>
                     )}
                 </div>
@@ -99,7 +95,7 @@ const TechnicianSidebar = ({ activeTab, onTabChange, onLogout, userInfo = {} }) 
                 </button>
             </div>
 
-            {/* Navigation Menu */}
+             {/*Navigation Menu*/}
             <nav className="sidebar-nav">
                 <div className="nav-section">
                     {!isCollapsed && <div className="nav-title">Menu</div>}

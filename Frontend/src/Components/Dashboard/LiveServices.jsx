@@ -1,38 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
-    Calendar,
-    Clock,
-    MapPin,
-    Plus,
-    Search,
-    Filter,
-    Star,
-    CheckCircle,
-    XCircle,
-    AlertCircle,
-    Eye,
-    MessageSquare,
-    Phone,
-    User,
-    Home,
-    Wrench,
-    Zap,
-    Car,
-    Scissors,
-    Heart,
-    BookOpen,
-    BarChart3,
-    TrendingUp,
-    Bell,
-    Settings,
-    Activity,
-    DollarSign,
-    RefreshCw,
-    UserCheck,
-    Users,
-    AlertTriangle,
-    Check,
-    X
+    MessageSquare
 } from 'lucide-react';
 
 const LiveServiceItem = ({ service, onMessage }) => {
