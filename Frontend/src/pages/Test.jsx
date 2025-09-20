@@ -25,11 +25,12 @@ import Footer from "../Components/layout/Footer.jsx";
 import AnimatedAuth from "./Auth/AnimatedAuth.jsx";
 import RatingReviews from "./Technician/RatingReviews.jsx";
 import ForgotPassword from "./Auth/ForgotPassword.jsx";
+import TechnicianProfile from "./Technician/TechnicianProfile.jsx";
 
 const Test = () => {
     return (
         <div>
-            <RatingReviews />
+            <ForgotPassword />
         </div>
     );
 };

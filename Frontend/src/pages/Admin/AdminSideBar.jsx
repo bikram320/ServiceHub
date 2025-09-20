@@ -131,14 +131,7 @@ const AdminSidebar = ({ activeTab, onTabChange, onLogout }) => {
 
                             {showProfileDropdown && (
                                 <div className="profile-dropdown">
-                                    <button className="dropdown-item">
-                                        <Settings size={16} />
-                                        Settings
-                                    </button>
-                                    <button className="dropdown-item">
-                                        <Bell size={16} />
-                                        Notifications
-                                    </button>
+
                                     <div className="dropdown-divider" />
                                     <button
                                         className="dropdown-item logout"

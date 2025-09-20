@@ -9,7 +9,7 @@ import {
     debounce,
     COMMON_TIMEZONES
 } from "../../Components/utils/locationApi.js";
-import "../../styles/TechnicianProfile.css";
+import "../../styles/TechnicianProfileForm.css";
 
 const TechnicianProfileForm = ({ userInfo, onUpdateProfile }) => {
     const [formData, setFormData] = useState({

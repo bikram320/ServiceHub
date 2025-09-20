@@ -9,6 +9,8 @@ function RatingReviews({ technicianId, user }) {
     const [hoveredStar, setHoveredStar] = useState(0);
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
+    const [error, setError] = useState(null);
+    const [submitError, setSubmitError] = useState(null);
     const [stats, setStats] = useState({
         averageRating: 0,
         totalReviews: 0,
@@ -32,35 +34,59 @@ function RatingReviews({ technicianId, user }) {
                 totalReviews: total,
                 ratingDistribution: distribution
             });
+        } else {
+            setStats({
+                averageRating: 0,
+                totalReviews: 0,
+                ratingDistribution: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 }
+            });
         }
     }, [reviews]);
 
-    // Fetch reviews
+    // Fetch reviews from backend
     useEffect(() => {
         const fetchReviews = async () => {
+            if (!technicianId) return;
+
             try {
                 setLoading(true);
-                const response = await fetch(`/api/technicians/${technicianId}/reviews`);
+                setError(null);
+
+                const response = await fetch(`/api/technicians/${technicianId}/reviews`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        // Add authorization header if needed
+                        // 'Authorization': `Bearer ${token}`
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch reviews: ${response.status}`);
+                }
+
                 const data = await response.json();
-                setReviews(data);
+                setReviews(Array.isArray(data) ? data : []);
             } catch (error) {
                 console.error('Error fetching reviews:', error);
+                setError('Failed to load reviews. Please try again later.');
+                setReviews([]);
             } finally {
                 setLoading(false);
             }
         };
 
-        if (technicianId) {
-            fetchReviews();
-        }
+        fetchReviews();
     }, [technicianId]);
 
-    // Submit review
+    // Submit review to backend
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!rating || !reviewText.trim()) return;
 
         setSubmitting(true);
+        setSubmitError(null);
+
         try {
             const newReview = {
                 technicianId,
@@ -73,22 +99,40 @@ function RatingReviews({ technicianId, user }) {
 
             const response = await fetch("/api/reviews", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    // Add authorization header if needed
+                    // 'Authorization': `Bearer ${token}`
+                },
                 body: JSON.stringify(newReview),
             });
 
-            if (response.ok) {
-                setReviews([newReview, ...reviews]);
-                setRating(0);
-                setReviewText("");
-                setHoveredStar(0);
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || `Failed to submit review: ${response.status}`);
             }
+
+            const savedReview = await response.json();
+
+            // Add the new review to the beginning of the list
+            setReviews([savedReview, ...reviews]);
+
+            // Reset form
+            setRating(0);
+            setReviewText("");
+            setHoveredStar(0);
         } catch (error) {
             console.error('Error submitting review:', error);
+            setSubmitError(error.message || 'Failed to submit review. Please try again.');
         } finally {
             setSubmitting(false);
         }
     };
+
+    // Create a filled star component
+    const StarFill = ({ size = 20 }) => (
+        <Star size={size} fill="currentColor" />
+    );
 
     const renderStars = (rating, interactive = false) => {
         const stars = [];
@@ -103,6 +147,7 @@ function RatingReviews({ technicianId, user }) {
                     onMouseEnter={interactive ? () => setHoveredStar(i) : undefined}
                     onMouseLeave={interactive ? () => setHoveredStar(0) : undefined}
                     disabled={!interactive}
+                    aria-label={interactive ? `Rate ${i} star${i !== 1 ? 's' : ''}` : undefined}
                 >
                     {isFilled ? <StarFill size={20} /> : <Star size={20} />}
                 </button>
@@ -112,17 +157,39 @@ function RatingReviews({ technicianId, user }) {
     };
 
     const formatDate = (dateString) => {
-        return new Date(dateString).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric'
-        });
+        try {
+            return new Date(dateString).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+        } catch (error) {
+            return 'Invalid date';
+        }
     };
 
+    // Loading state
     if (loading) {
         return (
             <div className="technician-profile">
                 <div className="loading-spinner">Loading reviews...</div>
+            </div>
+        );
+    }
+
+    // Error state
+    if (error) {
+        return (
+            <div className="technician-profile">
+                <div className="error-message">
+                    <p>{error}</p>
+                    <button
+                        onClick={() => window.location.reload()}
+                        className="retry-button"
+                    >
+                        Retry
+                    </button>
+                </div>
             </div>
         );
     }
@@ -137,9 +204,11 @@ function RatingReviews({ technicianId, user }) {
                 <div className="rating-summary">
                     <div className="overall-rating">
                         <div className="rating-display">
-                            <span className="rating-number">{stats.averageRating}</span>
+                            <span className="rating-number">
+                                {stats.totalReviews > 0 ? stats.averageRating : '0.0'}
+                            </span>
                             <div className="stars-display">
-                                {renderStars(Math.floor(stats.averageRating))}
+                                {renderStars(Math.floor(parseFloat(stats.averageRating)))}
                             </div>
                         </div>
                         <p className="rating-text">
@@ -157,7 +226,7 @@ function RatingReviews({ technicianId, user }) {
                                         <div
                                             className="bar-fill"
                                             style={{
-                                                width: `${(stats.ratingDistribution[star] / stats.totalReviews) * 100}%`
+                                                width: `${stats.totalReviews > 0 ? (stats.ratingDistribution[star] / stats.totalReviews) * 100 : 0}%`
                                             }}
                                         ></div>
                                     </div>
@@ -180,22 +249,24 @@ function RatingReviews({ technicianId, user }) {
                 ) : (
                     <div className="reviews-list">
                         {reviews.map((review, index) => (
-                            <div key={index} className="review-card">
+                            <div key={review.id || index} className="review-card">
                                 <div className="review-header">
                                     <div className="reviewer-info">
                                         <div className="reviewer-avatar">
                                             <User size={18} />
                                         </div>
                                         <div className="reviewer-details">
-                                            <span className="reviewer-name">{review.userName || 'Anonymous'}</span>
+                                            <span className="reviewer-name">
+                                                {review.userName || 'Anonymous'}
+                                            </span>
                                             <div className="review-meta">
                                                 <div className="review-stars">
-                                                    {renderStars(review.rating)}
+                                                    {renderStars(parseInt(review.rating))}
                                                 </div>
                                                 <span className="review-date">
-                          <Calendar size={14} />
+                                                    <Calendar size={14} />
                                                     {formatDate(review.date)}
-                        </span>
+                                                </span>
                                             </div>
                                         </div>
                                     </div>
@@ -219,14 +290,21 @@ function RatingReviews({ technicianId, user }) {
             {user?.role === "user" && (
                 <div className="review-form-section">
                     <h3 className="form-title">Leave a Review</h3>
+
+                    {submitError && (
+                        <div className="error-message">
+                            <p>{submitError}</p>
+                        </div>
+                    )}
+
                     <form onSubmit={handleSubmit} className="review-form">
                         <div className="form-group">
                             <label className="form-label">Your Rating *</label>
                             <div className="star-rating">
                                 {renderStars(rating, true)}
                                 <span className="rating-label">
-                  {rating > 0 && `${rating} out of 5 stars`}
-                </span>
+                                    {rating > 0 && `${rating} out of 5 stars`}
+                                </span>
                             </div>
                         </div>
 
@@ -242,10 +320,12 @@ function RatingReviews({ technicianId, user }) {
                                 onChange={(e) => setReviewText(e.target.value)}
                                 required
                                 rows="4"
+                                maxLength="500"
+                                disabled={submitting}
                             />
                             <span className="char-count">
-                {reviewText.length}/500 characters
-              </span>
+                                {reviewText.length}/500 characters
+                            </span>
                         </div>
 
                         <button
@@ -260,6 +340,6 @@ function RatingReviews({ technicianId, user }) {
             )}
         </div>
     );
-};
+}
 
 export default RatingReviews;

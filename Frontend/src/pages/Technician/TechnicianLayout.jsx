@@ -4,7 +4,8 @@ import TechnicianDashboard from './TechnicianDashboard';
 import TechnicianProfileForm from '../Auth/TechnicianProfileForm';
 import ServiceRequests from './ServiceRequests';
 import JobHistory from './JobHistory';
-import {useNavigate} from "react-router-dom";
+import TechnicianProfile from './TechnicianProfile';
+// import {useNavigate} from "react-router-dom";
 
 const TechnicianLayout = () => {
     const [activeTab, setActiveTab] = useState('dashboard');
@@ -24,7 +25,7 @@ const TechnicianLayout = () => {
         preferredLanguage: 'English',
         timezone: 'Asia/Kathmandu (UTC+05:45)'
     });
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
 
     const handleTabChange = (tabId) => {
         setActiveTab(tabId);
@@ -61,13 +62,15 @@ const TechnicianLayout = () => {
         switch (activeTab) {
             case 'dashboard':
                 return <TechnicianDashboard userInfo={userInfo} />;
-            case 'profile':
+            case 'profile-form':
                 return (
                     <TechnicianProfileForm
                         userInfo={userInfo}
                         onUpdateProfile={handleUpdateProfile}
                     />
                 );
+            case 'profile':
+                return <TechnicianProfile userInfo={userInfo} />;
             case 'service-requests':
                 return <ServiceRequests technicianInfo={userInfo} />;
             case 'job-history':

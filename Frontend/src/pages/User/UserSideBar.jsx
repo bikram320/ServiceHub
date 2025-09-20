@@ -9,7 +9,8 @@ import {
     X,
     Settings,
     Bell,
-    ChevronDown
+    ChevronDown,
+    Newspaper
 } from 'lucide-react';
 import "../../styles/UserSidebar.css";
 
@@ -24,6 +25,12 @@ const UserSidebar = ({ activeTab, onTabChange, onLogout, userInfo = {} }) => {
             icon: LayoutDashboard,
             path: '/user/dashboard'
         },
+        // {
+        //     id: 'profile-form',
+        //     label: 'My Profile Form',
+        //     icon: Newspaper,
+        //     path: '/user/profile-form'
+        // },
         {
             id: 'profile',
             label: 'User Profile',
@@ -165,14 +172,7 @@ const UserSidebar = ({ activeTab, onTabChange, onLogout, userInfo = {} }) => {
                                         <User size={16} />
                                         My Profile
                                     </button>
-                                    <button className="dropdown-item">
-                                        <Settings size={16} />
-                                        Settings
-                                    </button>
-                                    <button className="dropdown-item">
-                                        <Bell size={16} />
-                                        Notifications
-                                    </button>
+
                                     <div className="dropdown-divider" />
                                     <button
                                         className="dropdown-item logout"

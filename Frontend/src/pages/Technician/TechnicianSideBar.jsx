@@ -10,7 +10,8 @@ import {
     Settings,
     Bell,
     ChevronDown,
-    Wrench
+    Wrench,
+    Newspaper
 } from 'lucide-react';
 import "../../styles/TechnicianSideBar.css";
 
@@ -30,6 +31,12 @@ const TechnicianSidebar = ({ activeTab, onTabChange, onLogout, userInfo = {} }) 
             label: 'Technician Profile',
             icon: User,
             path: '/technician/profile'
+        },
+        {
+            id: 'profile-form',
+            label: 'Profile Form',
+            icon: Newspaper,
+            path: '/technician/profile-form'
         },
         {
             id: 'service-requests',
@@ -166,14 +173,7 @@ const TechnicianSidebar = ({ activeTab, onTabChange, onLogout, userInfo = {} }) 
                                         <User size={16} />
                                         My Profile
                                     </button>
-                                    <button className="dropdown-item">
-                                        <Settings size={16} />
-                                        Settings
-                                    </button>
-                                    <button className="dropdown-item">
-                                        <Bell size={16} />
-                                        Notifications
-                                    </button>
+
                                     <div className="dropdown-divider" />
                                     <button
                                         className="dropdown-item logout"

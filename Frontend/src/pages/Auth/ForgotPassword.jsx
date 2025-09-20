@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { ArrowLeft, CheckCircle, AlertCircle, Loader2, Eye, EyeOff } from 'lucide-react';
+import { ArrowLeft, CheckCircle, Mail, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
 import OTPVerificationModal from '../../Components/layout/OTPVerificationModal';
 import styles from '../../styles/ForgotPassword.module.css';
 
 const ForgotPassword = () => {
     const navigate = useNavigate();
-    const [step, setStep] = useState('identify'); // 'identify', 'verify', 'reset', 'success'
+    const [step, setStep] = useState('identify'); // 'identify', 'reset', 'success'
     const [formData, setFormData] = useState({
         email: '',
         newPassword: '',
@@ -17,6 +17,7 @@ const ForgotPassword = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [showOTPModal, setShowOTPModal] = useState(false);
+    const [otpToken, setOtpToken] = useState(''); // Store token from OTP verification
 
     const handleInputChange = (field, value) => {
         setFormData(prev => ({ ...prev, [field]: value }));
@@ -26,7 +27,8 @@ const ForgotPassword = () => {
     const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
     // Step 1: Identify User and Send OTP
-    const handleIdentifyUser = async () => {
+    const handleIdentifyUser = async (e) => {
+        e.preventDefault();
         setIsLoading(true);
         setError('');
 
@@ -34,7 +36,7 @@ const ForgotPassword = () => {
             if (!formData.email) throw new Error('Email address is required');
             if (!validateEmail(formData.email)) throw new Error('Please enter a valid email address');
 
-            const response = await fetch('http://localhost:5000/auth/login/user/forget-password', {
+            const response = await fetch('http://localhost:8080/auth/login/user/forget-password', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: formData.email })
@@ -55,9 +57,6 @@ const ForgotPassword = () => {
 
     // Step 2: Verify OTP from Modal
     const handleOTPVerify = async (otpCode) => {
-        setIsLoading(true);
-        setError('');
-
         try {
             const response = await fetch('http://localhost:5000/auth/login/user/forget-password/verify-otp', {
                 method: 'POST',
@@ -70,30 +69,34 @@ const ForgotPassword = () => {
                 throw new Error(errorData.message || 'Invalid OTP code');
             }
 
+            const data = await response.json();
+            setOtpToken(data.resetToken || 'verified'); // Store reset token
             setShowOTPModal(false);
             setStep('reset'); // Move to reset password step
         } catch (err) {
-            setError(err.message);
-        } finally {
-            setIsLoading(false);
+            throw new Error(err.message); // Re-throw to let modal handle the error
         }
     };
 
     const handleResendOTP = async () => {
         try {
-            await fetch('http://localhost:5000/auth/login/user/forget-password', {
+            const response = await fetch('http://localhost:5000/auth/login/user/forget-password', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: formData.email })
             });
-            alert('OTP resent successfully');
+
+            if (!response.ok) {
+                throw new Error('Failed to resend OTP');
+            }
         } catch (err) {
-            alert('Failed to resend OTP');
+            throw new Error(err.message);
         }
     };
 
     // Step 3: Reset Password
-    const handleResetPassword = async () => {
+    const handleResetPassword = async (e) => {
+        e.preventDefault();
         setIsLoading(true);
         setError('');
 
@@ -114,13 +117,12 @@ const ForgotPassword = () => {
                 throw new Error('Password must contain uppercase, lowercase, number, and special character');
             }
 
-            // Call backend reset password API
             const response = await fetch('http://localhost:5000/auth/login/user/forget-password/reset-password', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     email,
-                    resetToken: 'token-from-otp-step', // ideally should be returned from verify OTP API
+                    resetToken: otpToken,
                     password: newPassword
                 })
             });
@@ -138,75 +140,193 @@ const ForgotPassword = () => {
         }
     };
 
+    const handleBackToLogin = () => {
+        navigate('/login');
+    };
+
+    const handleBackToIdentify = () => {
+        setStep('identify');
+        setError('');
+        setFormData({
+            email: formData.email, // Keep email
+            newPassword: '',
+            confirmPassword: ''
+        });
+    };
+
     // Render step-specific UI
     const renderIdentifyStep = () => (
-        <div className={styles["forgot-password-form"]}>
-            <h2>Reset Your Password</h2>
-            <input
-                type="email"
-                placeholder="Enter your email"
-                value={formData.email}
-                onChange={e => handleInputChange('email', e.target.value)}
-                disabled={isLoading}
-            />
-            {error && <div className={styles["error-message"]}>{error}</div>}
-            <button onClick={handleIdentifyUser} disabled={isLoading}>
-                {isLoading ? 'Sending...' : 'Send Verification Code'}
+        <div className={styles["forgot-password-content"]}>
+            <div className={styles["header-section"]}>
+                <div className={styles["icon-container"]}>
+                    <Mail size={32} />
+                </div>
+                <h1 className={styles["form-title"]}>Reset Your Password</h1>
+                <p className={styles["form-subtitle"]}>
+                    Enter your email address and we'll send you a verification code
+                </p>
+            </div>
+
+            <form onSubmit={handleIdentifyUser} className={styles["forgot-form"]}>
+                <div className={styles["input-group"]}>
+                    <Mail className={styles["input-icon"]} />
+                    <input
+                        type="email"
+                        name="email"
+                        placeholder="Enter your email address"
+                        value={formData.email}
+                        onChange={(e) => handleInputChange('email', e.target.value)}
+                        className={styles["forgot-input"]}
+                        disabled={isLoading}
+                        required
+                    />
+                </div>
+
+                {error && (
+                    <div className={styles["error-message"]}>
+                        <AlertCircle size={16} />
+                        {error}
+                    </div>
+                )}
+
+                <button
+                    type="submit"
+                    className={styles["forgot-submit-btn"]}
+                    disabled={isLoading}
+                >
+                    {isLoading ? 'Sending...' : 'Send Verification Code'}
+                </button>
+            </form>
+
+            <button
+                className={styles["back-link"]}
+                onClick={() => navigate("/LoginSignup")}
+            >
+                <ArrowLeft size={16} />
+                Back to Login
             </button>
         </div>
     );
 
     const renderResetStep = () => (
-        <div className={styles["forgot-password-form"]}>
-            <h2>Create New Password</h2>
-            <div className={styles["password-input-wrapper"]}>
-                <input
-                    type={showPassword ? 'text' : 'password'}
-                    placeholder="New Password"
-                    value={formData.newPassword}
-                    onChange={e => handleInputChange('newPassword', e.target.value)}
-                    disabled={isLoading}
-                />
-                <button onClick={() => setShowPassword(!showPassword)}>
-                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                </button>
+        <div className={styles["forgot-password-content"]}>
+            <div className={styles["header-section"]}>
+                <div className={styles["icon-container"]}>
+                    <Lock size={32} />
+                </div>
+                <h1 className={styles["form-title"]}>Create New Password</h1>
+                <p className={styles["form-subtitle"]}>
+                    Your identity has been verified. Please create a new password
+                </p>
             </div>
 
-            <div className={styles["password-input-wrapper"]}>
-                <input
-                    type={showConfirmPassword ? 'text' : 'password'}
-                    placeholder="Confirm Password"
-                    value={formData.confirmPassword}
-                    onChange={e => handleInputChange('confirmPassword', e.target.value)}
+            <form onSubmit={handleResetPassword} className={styles["forgot-form"]}>
+                <div className={styles["input-group"]}>
+                    <Lock className={styles["input-icon"]} />
+                    <input
+                        type={showPassword ? 'text' : 'password'}
+                        name="newPassword"
+                        placeholder="New Password"
+                        value={formData.newPassword}
+                        onChange={(e) => handleInputChange('newPassword', e.target.value)}
+                        className={`${styles["forgot-input"]} ${styles["password-input"]}`}
+                        disabled={isLoading}
+                        required
+                    />
+                    <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className={styles["password-toggle"]}
+                    >
+                        {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                    </button>
+                </div>
+
+                <div className={styles["input-group"]}>
+                    <Lock className={styles["input-icon"]} />
+                    <input
+                        type={showConfirmPassword ? 'text' : 'password'}
+                        name="confirmPassword"
+                        placeholder="Confirm New Password"
+                        value={formData.confirmPassword}
+                        onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
+                        className={`${styles["forgot-input"]} ${styles["password-input"]}`}
+                        disabled={isLoading}
+                        required
+                    />
+                    <button
+                        type="button"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        className={styles["password-toggle"]}
+                    >
+                        {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                    </button>
+                </div>
+
+                <div className={styles["password-requirements"]}>
+                    <p>Password must contain:</p>
+                    <ul>
+                        <li>At least 8 characters</li>
+                        <li>Uppercase and lowercase letters</li>
+                        <li>At least one number</li>
+                        <li>At least one special character</li>
+                    </ul>
+                </div>
+
+                {error && (
+                    <div className={styles["error-message"]}>
+                        <AlertCircle size={16} />
+                        {error}
+                    </div>
+                )}
+
+                <button
+                    type="submit"
+                    className={styles["forgot-submit-btn"]}
                     disabled={isLoading}
-                />
-                <button onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
-                    {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                >
+                    {isLoading ? 'Resetting...' : 'Reset Password'}
                 </button>
-            </div>
+            </form>
 
-            {error && <div className={styles["error-message"]}>{error}</div>}
-
-            <button onClick={handleResetPassword} disabled={isLoading}>
-                {isLoading ? 'Resetting...' : 'Reset Password'}
+            <button
+                className={styles["back-link"]}
+                onClick={handleBackToIdentify}
+            >
+                <ArrowLeft size={16} />
+                Back
             </button>
         </div>
     );
 
     const renderSuccessStep = () => (
-        <div className={styles["forgot-password-form"]}>
-            <CheckCircle size={64} />
-            <h2>Password Reset Successful!</h2>
-            <p>You can now log in with your new password.</p>
-            <button onClick={() => navigate('/login')}>Back to Login</button>
+        <div className={styles["forgot-password-content"]}>
+            <div className={styles["success-section"]}>
+                <div className={styles["success-icon"]}>
+                    <CheckCircle size={64} />
+                </div>
+                <h1 className={styles["success-title"]}>Password Reset Successful!</h1>
+                <p className={styles["success-subtitle"]}>
+                    Your password has been successfully reset. You can now log in with your new password.
+                </p>
+
+                <button
+                    className={styles["forgot-submit-btn"]}
+                    onClick={() => navigate("/LoginSignup")}
+                >
+                    Back to Login
+                </button>
+            </div>
         </div>
     );
 
     return (
         <div className={styles["forgot-password-container"]}>
-            {step === 'identify' && renderIdentifyStep()}
-            {step === 'reset' && renderResetStep()}
-            {step === 'success' && renderSuccessStep()}
+            <div className={styles["forgot-password-card"]}>
+                {step === 'identify' && renderIdentifyStep()}
+                {step === 'reset' && renderResetStep()}
+                {step === 'success' && renderSuccessStep()}
+            </div>
 
             {/* OTP Verification Modal */}
             <OTPVerificationModal
