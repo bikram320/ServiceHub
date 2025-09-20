@@ -5,9 +5,12 @@ import TechnicianProfileForm from '../Auth/TechnicianProfileForm';
 import ServiceRequests from './ServiceRequests';
 import JobHistory from './JobHistory';
 import TechnicianProfile from './TechnicianProfile';
+import {useNavigate} from "react-router-dom";
 // import {useNavigate} from "react-router-dom";
 
-const TechnicianLayout = () => {
+const TechnicianLayout = () =>{
+
+    const navigate = useNavigate()
     const [activeTab, setActiveTab] = useState('dashboard');
     const [userInfo, setUserInfo] = useState({
         fullName: 'Alex Thompson',
@@ -39,7 +42,7 @@ const TechnicianLayout = () => {
 
     const handleLogout = async () => {
         try {
-            const response = await fetch("http://localhost:8080/auth/logout", {
+            const response = await fetch("api/auth/logout", {
                 method: "POST",
                 credentials: "include", // important to send cookies
             });
