@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Header2 from "../../Components/layout/Header2.jsx";
 import {
     Clock,
     MapPin,
@@ -297,6 +298,8 @@ const ServiceRequests = () => {
     ];
 
     return (
+        <div>
+            <Header2 />
         <div className="profile-content">
             <div className="profile-form">
                 <div className="profile-header">
@@ -585,6 +588,7 @@ const ServiceRequests = () => {
                     )}
                 </section>
             </div>
+        </div>
         </div>
     );
 };

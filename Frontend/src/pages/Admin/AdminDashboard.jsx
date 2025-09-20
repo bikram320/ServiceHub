@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Header2 from "../../Components/layout/Header2.jsx";
 import {
     Users,
     UserCheck,
@@ -18,7 +19,7 @@ import {
     MessageSquare
 } from 'lucide-react';
 import '../../styles/AdminDashboard.css';
-import "../../styles/UserDashboard.css";
+import "../../styles/UserDashboard.module.css";
 import StatCard from '../../Components/Dashboard/StatCard';
 import ActivityItem from '../../Components/Dashboard/ActivityItem';
 import AppointmentCard from '../../Components/Dashboard/AppointmentCard';
@@ -272,6 +273,8 @@ const AdminDashboard = () => {
     };
 
     return (
+        <div>
+            <Header2 />
         <div className="admin-dashboard">
             <div className="dashboard-container">
                 <div className="dashboard-header">
@@ -365,6 +368,7 @@ const AdminDashboard = () => {
                     </section>
                 </div>
             </div>
+        </div>
         </div>
     );
 };

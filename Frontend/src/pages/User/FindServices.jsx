@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import '../../styles/FindServices.css';
-import Header from "../../Components/layout/Header.jsx";
+import Header2 from "../../Components/layout/Header2.jsx";
 import HeroSection from "../../Components/questX/HeroSection.jsx";
 
 const FindServices = () => {
@@ -19,7 +19,7 @@ const FindServices = () => {
 
     return (
         <div className="page-container">
-            <Header />
+            <Header2 />
             <div className="container">
                 <HeroSection services={services} />
             </div>

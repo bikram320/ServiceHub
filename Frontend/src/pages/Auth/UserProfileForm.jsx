@@ -9,6 +9,7 @@ import {
     debounce,
     COMMON_TIMEZONES
 } from "../../Components/utils/locationApi.js";
+import Header2 from "../../Components/layout/Header2.jsx";
 
 const UserProfileForm = ({ userInfo, onUpdateProfile }) => {
     const [formData, setFormData] = useState({
@@ -196,6 +197,8 @@ const UserProfileForm = ({ userInfo, onUpdateProfile }) => {
     };
 
     return (
+        <div>
+            <Header2 />
         <div className="profile-content">
         <div className="profile-form">
             <div className="profile-header">
@@ -503,6 +506,7 @@ const UserProfileForm = ({ userInfo, onUpdateProfile }) => {
                     Save Changes
                 </button>
             </div>
+        </div>
         </div>
         </div>
     );

@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { ArrowLeft, Calendar, Clock, MapPin, User, Phone, Mail, CreditCard, Shield, Star, CheckCircle } from 'lucide-react';
 import "../../styles/BookingDetail.css";
 import DateTimeSelector from "../../Components/layout/DateTimeSelector.jsx";
-import Header from "../../Components/layout/Header.jsx";
+import Header2 from "../../Components/layout/Header2.jsx";
 
 // Service Provider Card Component
 const ServiceProviderCard = ({ provider }) => (
@@ -308,7 +308,6 @@ const BookingDetail = () => {
     if (showSuccess) {
         return (
             <div className="page-container">
-                <Header />
                 <div className="container">
                     <div className="success-message">
                         <CheckCircle className="success-icon" size={64} />
@@ -330,7 +329,7 @@ const BookingDetail = () => {
 
     return (
         <div className="page-container">
-            <Header />
+            <Header2 />
             <div className="container">
                 <div className="booking-container">
                     {/* Back Button */}

@@ -1,4 +1,5 @@
 import React, {useCallback, useEffect, useState } from 'react';
+import Header2 from "../../Components/layout/Header2.jsx";
 import {Camera, Edit3, MapPin, Search, Loader2, Navigation, DollarSign, Wrench, User, Phone, Mail, Home, Shield, FileText, Clock} from 'lucide-react';
 
 import {
@@ -197,6 +198,8 @@ const TechnicianProfileForm = ({ userInfo, onUpdateProfile }) => {
     const serviceTypes = ['Plumbing', 'Electrical', 'HVAC', 'Carpentry', 'General Maintenance', 'Appliance Repair'];
 
     return (
+        <div>
+            <Header2 />
         <div className="profile-content">
             <div className="profile-form">
                 <div className="profile-header">
@@ -699,6 +702,7 @@ const TechnicianProfileForm = ({ userInfo, onUpdateProfile }) => {
                     </button>
                 </div>
             </div>
+        </div>
         </div>
     );
 };
