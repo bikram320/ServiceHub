@@ -1,4 +1,4 @@
-/* User Dashboard Specific Styles - Extends UserProfileForm.css */
+/* User Dashboard Specific Styles - CSS Module Version */
 
 /* User Stats Grid */
 .user-stats-grid {
@@ -51,13 +51,82 @@
     color: #6b7280;
 }
 
-.add-btn{
-    background-color: #76af8c;
+/* Profile Layout */
+.profile-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    background-color: #f8fafc;
+    min-height: 100vh;
 }
 
-.add-btn:hover{
-    background-color: #86e1a7;
+.profile-form {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
 }
+
+.profile-header {
+    padding: 2rem;
+    border-bottom: 1px solid #e2e8f0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.profile-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+}
+
+.profile-subtitle {
+    font-size: 1rem;
+    margin: 0;
+    opacity: 0.9;
+}
+
+/* Form Sections */
+.form-section {
+    padding: 2rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.form-section:last-child {
+    border-bottom: none;
+}
+
+.section-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0 0 1.5rem 0;
+    color: #1e293b;
+}
+
+/* Buttons */
+.add-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: #76af8c;
+    color: white;
+    border: none;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.add-btn:hover {
+    background-color: #86e1a7;
+    transform: translateY(-1px);
+}
+
+.add-btn:active {
+    transform: translateY(0);
+}
+
 /* Services Grid */
 .services-grid {
     display: grid;
@@ -231,51 +300,6 @@
 }
 
 /* Appointments Content */
-.appointment-card {
-    background: white;
-    border: 2px solid #f3f4f6;
-    border-radius: 12px;
-    padding: 1.5rem;
-    transition: all 0.2s;
-    display: grid;
-    grid-template-columns: 1fr 1fr auto; /* 3 sections: header, details, actions */
-    gap: 1.5rem;
-    align-items: start; /* align content at the top */
-}
-
-.appointment-card:hover {
-    border-color: #e5e7eb;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-/* Appointment Header */
-.appointment-header {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    margin-bottom: 0; /* remove old margin since grid handles spacing */
-}
-
-/* Appointment Details */
-.appointment-details {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    padding: 1rem;
-    background: #f9fafb;
-    border-radius: 8px;
-    margin-bottom: 0; /* reset margin since it's inside grid */
-}
-
-/* Appointment Actions */
-.appointment-actions {
-    display: flex;
-    flex-direction: column; /* buttons stacked vertically */
-    gap: 0.75rem;
-    justify-content: flex-start; /* align to top of grid */
-}
-
-
 .appointments-content {
     min-height: 400px;
     width: 100%;
@@ -289,12 +313,34 @@
     max-width: 100%;
 }
 
+.appointment-card {
+    background: white;
+    border: 2px solid #f3f4f6;
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.2s;
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 1.5rem;
+    align-items: start;
+}
+
+.appointment-card:hover {
+    border-color: #e5e7eb;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
 
 .history-card {
     opacity: 0.9;
 }
 
-
+/* Appointment Header */
+.appointment-header {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 0;
+}
 
 .appointment-service-info {
     flex: 1;
@@ -338,7 +384,15 @@
 }
 
 /* Appointment Details */
-
+.appointment-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: #f9fafb;
+    border-radius: 8px;
+    margin-bottom: 0;
+}
 
 .detail-item {
     display: flex;
@@ -362,55 +416,6 @@
     color: #6b7280;
 }
 
-/*!* Review Section *!*/
-/*.review-section {*/
-/*    background: #f0f9ff;*/
-/*    padding: 1rem;*/
-/*    border-radius: 8px;*/
-/*    margin-bottom: 1rem;*/
-/*    border-left: 4px solid #0ea5e9;*/
-/*}*/
-
-/*.your-rating {*/
-/*    display: flex;*/
-/*    align-items: center;*/
-/*    gap: 0.5rem;*/
-/*    margin-bottom: 0.75rem;*/
-/*    font-size: 0.875rem;*/
-/*    color: #374151;*/
-/*    font-weight: 500;*/
-/*}*/
-
-/*.rate-btn {*/
-/*    background: #0ea5e9;*/
-/*    color: white;*/
-/*    border: none;*/
-/*    padding: 0.25rem 0.75rem;*/
-/*    border-radius: 4px;*/
-/*    font-size: 0.75rem;*/
-/*    cursor: pointer;*/
-/*    transition: all 0.2s;*/
-/*}*/
-
-/*.rate-btn:hover {*/
-/*    background: #0284c7;*/
-/*}*/
-
-/*.review-text {*/
-/*    font-size: 0.875rem;*/
-/*    color: #374151;*/
-/*}*/
-
-/*.review-text span {*/
-/*    font-weight: 500;*/
-/*}*/
-
-/*.review-text p {*/
-/*    margin: 0.25rem 0 0 0;*/
-/*    font-style: italic;*/
-/*    color: #6b7280;*/
-/*}*/
-
 /* Cancellation Info */
 .cancellation-info {
     background: #fef2f2;
@@ -423,7 +428,12 @@
 }
 
 /* Appointment Actions */
-
+.appointment-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    justify-content: flex-start;
+}
 
 .action-btn {
     display: flex;
@@ -529,6 +539,18 @@
 }
 
 @media (max-width: 768px) {
+    .profile-content {
+        padding: 1rem;
+    }
+
+    .profile-header {
+        padding: 1.5rem;
+    }
+
+    .form-section {
+        padding: 1.5rem;
+    }
+
     .user-stats-grid {
         grid-template-columns: 1fr;
     }
@@ -589,6 +611,10 @@
 }
 
 @media (max-width: 480px) {
+    .profile-title {
+        font-size: 1.5rem;
+    }
+
     .user-stat-card {
         flex-direction: column;
         text-align: center;
@@ -599,22 +625,26 @@
         padding: 1rem;
     }
 
+    .tabs-nav {
+        flex-direction: column;
+    }
+
+    .tab-btn {
+        justify-content: center;
+    }
+
+    .services-grid {
+        grid-template-columns: 1fr;
+    }
+
     .appointment-card {
         padding: 1rem;
+        grid-template-columns: 1fr;
+        gap: 1rem;
     }
 
     .appointment-details {
         padding: 0.75rem;
-    }
-
-    .review-section {
-        padding: 0.75rem;
-    }
-
-    .your-rating {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.5rem;
     }
 
     .empty-state {

@@ -30,7 +30,7 @@ import TechnicianProfile from "./Technician/TechnicianProfile.jsx";
 const Test = () => {
     return (
         <div>
-            <ForgotPassword />
+            <UserLayout />
         </div>
     );
 };
