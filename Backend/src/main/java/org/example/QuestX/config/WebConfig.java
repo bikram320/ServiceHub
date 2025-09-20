@@ -9,8 +9,12 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        // Map URL path /upload/** to the actual file location on disk
+        // Map URL path /upload/** to your actual QuestXDataFolder location
         registry.addResourceHandler("/upload/**")
-                .addResourceLocations("file:Backend/upload/");
+                .addResourceLocations("file:D:/ServiceHub/QuestXDataFolder/upload/");
+
+        // Alternative: Use relative path (if QuestXDataFolder is at project root)
+        // registry.addResourceHandler("/upload/**")
+        //         .addResourceLocations("file:../QuestXDataFolder/upload/");
     }
 }

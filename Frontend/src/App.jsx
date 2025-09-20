@@ -16,6 +16,7 @@ import ForgotPassword from "./pages/Auth/ForgotPassword.jsx";
 import TechnicianLayout from "./pages/Technician/TechnicianLayout.jsx";
 import AdminLayout from "./pages/Admin/AdminLayout.jsx";
 import AdminLogin from "./pages/Auth/AdminLogin.jsx";
+// import AdminLogin from "./pages/Auth/AdminLogin.jsx";
 
 function App() {
     return (

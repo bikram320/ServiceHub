@@ -5,10 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.example.QuestX.Model.*;
 import org.example.QuestX.Repository.*;
-import org.example.QuestX.dtos.GetTechnicianDataRequest;
-import org.example.QuestX.dtos.ServiceAndTechnicianDetailsDto;
-import org.example.QuestX.dtos.ServiceRequestDto;
-import org.example.QuestX.dtos.UserDashboardOverviewDto;
+import org.example.QuestX.dtos.*;
 import org.example.QuestX.exception.*;
 import org.example.QuestX.exception.IllegalAccessException;
 import org.springframework.stereotype.Service;
@@ -95,6 +92,20 @@ public class UserService {
         }
         user.setStatus(Status.PENDING);
         userRepository.save(user);
+    }
+
+    public UserDto getProfile(String email){
+        User user  = userRepository.findByEmail(email).orElseThrow(
+                () -> new UserNotFoundException("User Not Found")
+        );
+        UserDto userDto = new UserDto();
+        userDto.setUsername(user.getName());
+        userDto.setEmail(user.getEmail());
+        userDto.setPhone(user.getPhone());
+        userDto.setAddress(user.getAddress());
+        userDto.setProfileImagePath(user.getProfileImagePath());
+        userDto.setDocumentPath(user.getDocumentPath());
+        return userDto;
     }
 
     public UserDashboardOverviewDto getUserDashboardOverview(String email) {
