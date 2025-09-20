@@ -31,6 +31,11 @@ public class UserController {
         return ResponseEntity.ok("Profile Updated Successfully");
     }
 
+    @GetMapping("/profile")
+    public ResponseEntity<?> GetProfile(@RequestParam String email) {
+        return ResponseEntity.ok(userService.getProfile(email));
+    }
+
     @GetMapping("/dashboard-overview")
     public ResponseEntity<?> getDashboardOverview(@RequestParam String email) {
         return ResponseEntity.ok(userService.getUserDashboardOverview(email));

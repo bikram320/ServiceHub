@@ -56,9 +56,10 @@ const AnimatedAuth = () => {
 
         try {
 
-            const response = await fetch(`http://localhost:8080/auth/login/${role}`, {
+            const response = await fetch(`api/auth/login/${role}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
                 body: JSON.stringify({
                     email: loginData.email,
                     password: loginData.password
@@ -67,6 +68,18 @@ const AnimatedAuth = () => {
 
             if (response.ok) {
                 const data = await response.json();
+                // Store token and user data
+                localStorage.setItem('accessToken', data.accessToken);
+
+                // You might need to get user info from JWT token or make another API call
+                // For now, let's decode the JWT to get user info
+                try {
+                    const payload = JSON.parse(atob(data.accessToken.split('.')[1]));
+                    localStorage.setItem('userName', payload.name);
+                    localStorage.setItem('userEmail', payload.email);
+                } catch (decodeError) {
+                    console.error('Error decoding token:', decodeError);
+                }
                 console.log('Login success:', data);
 
                 const userRole = role || signupData.role; // ensure you have role defined
@@ -101,9 +114,10 @@ const AnimatedAuth = () => {
 
         try {
 
-            const response = await fetch(`http://localhost:8080/auth/signup/${role}`, {
+            const response = await fetch(`api/auth/signup/${role}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
                 body: JSON.stringify({
                     name: signupData.fullName,
                     email: signupData.email,
@@ -130,9 +144,10 @@ const AnimatedAuth = () => {
         setIsVerifyingOTP(true);
         try {
 
-            const response = await fetch(`http://localhost:8080/auth/signup/${role}/verify-otp`, {
+            const response = await fetch(`api/auth/signup/${role}/verify-otp`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
                 body: JSON.stringify({
                     email: userEmail,
                     otp: otpCode
@@ -141,7 +156,12 @@ const AnimatedAuth = () => {
 
             if (response.ok) {
                 const data = await response.json();
-                console.log('OTP verified:', data);
+                localStorage.setItem('userName', signupData.fullName);
+                localStorage.setItem('userEmail', signupData.email);
+                localStorage.setItem('accessToken', data.token); // Store the JWT token
+
+                console.log('OTP verification successful, user data and token stored');
+
                 setShowOTPModal(false);
 
                 const userRole = role || signupData.role; // ensure you have role defined
@@ -169,9 +189,10 @@ const AnimatedAuth = () => {
     const handleResendOTP = async () => {
         try {
 
-            const response = await fetch(`http://localhost:8080/auth/signup/${role}/resend-otp`, {
+            const response = await fetch(`api/auth/signup/${role}/resend-otp`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
+                credentials:'include',
                 body: JSON.stringify({ email: userEmail })
             });
 

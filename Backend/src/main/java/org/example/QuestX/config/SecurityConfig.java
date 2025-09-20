@@ -121,8 +121,9 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of(
-                "http://localhost:5175",
-                "http://localhost:5173" // add this port
+                "http://localhost:5173",  // Your frontend port
+                "http://localhost:5175",  // Alternative port
+                "http://localhost:8080"   // Same origin via proxy
         ));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
