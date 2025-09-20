@@ -22,8 +22,7 @@ import {
     Heart,
     BookOpen
 } from 'lucide-react';
-import styles from "../../styles/UserDashboard.module.css";
-import Header2 from "../../Components/layout/Header2.jsx";
+import "../../styles/UserDashboard.module.css";
 import StatCard from '../../Components/Dashboard/StatCard';
 import ActivityItem from '../../Components/Dashboard/ActivityItem';
 import AppointmentCard from '../../Components/Dashboard/AppointmentCard';
@@ -483,747 +482,552 @@ import ReportCard from "../../Components/Dashboard/ReportCard.jsx";
 //     );
 // };
 //
-// export default UserDashboard;
-
-// const UserDashboard = () => {
-//     const [activeTab, setActiveTab] = useState('upcoming');
-//     const [searchTerm, setSearchTerm] = useState('');
-//     const [filterStatus, setFilterStatus] = useState('all');
-//
-//     const upcomingAppointments = [
-//         {
-//             id: 1,
-//             service: 'Home Cleaning',
-//             provider: 'Clean Pro Services',
-//             technician: 'Sarah Wilson',
-//             date: 'Today',
-//             time: '2:00 PM - 4:00 PM',
-//             location: 'Your Home - Thamel, Kathmandu',
-//             status: 'confirmed',
-//             price: '₨2,500',
-//             rating: 4.8
-//         },
-//         {
-//             id: 2,
-//             service: 'Plumbing Repair',
-//             provider: 'Fix It Fast',
-//             technician: 'Ram Sharma',
-//             date: 'Tomorrow',
-//             time: '10:00 AM - 12:00 PM',
-//             location: 'Your Home - Thamel, Kathmandu',
-//             status: 'pending',
-//             price: '₨1,800',
-//             rating: 4.6
-//         },
-//         {
-//             id: 3,
-//             service: 'AC Maintenance',
-//             provider: 'Cool Air Service',
-//             technician: 'Bikash Thapa',
-//             date: 'Nov 18',
-//             time: '9:00 AM - 11:00 AM',
-//             location: 'Your Office - Patan, Lalitpur',
-//             status: 'confirmed',
-//             price: '₨3,200',
-//             rating: 4.9
-//         }
-//     ];
-//
-//     const appointmentHistory = [
-//         {
-//             id: 4,
-//             service: 'House Painting',
-//             provider: 'Color Masters',
-//             technician: 'Dipak Rai',
-//             date: 'Nov 10, 2024',
-//             time: '8:00 AM - 6:00 PM',
-//             location: 'Your Home - Thamel, Kathmandu',
-//             status: 'completed',
-//             price: '₨12,500',
-//             rating: 5.0,
-//             yourRating: 5,
-//             review: 'Excellent work! Very professional and clean.'
-//         },
-//         {
-//             id: 5,
-//             service: 'Garden Maintenance',
-//             provider: 'Green Thumb',
-//             technician: 'Maya Gurung',
-//             date: 'Nov 5, 2024',
-//             time: '7:00 AM - 10:00 AM',
-//             location: 'Your Home - Thamel, Kathmandu',
-//             status: 'completed',
-//             price: '₨1,500',
-//             rating: 4.7,
-//             yourRating: 4,
-//             review: 'Good service, on time and thorough.'
-//         },
-//         {
-//             id: 6,
-//             service: 'Laptop Repair',
-//             provider: 'Tech Solutions',
-//             technician: 'Arjun Khadka',
-//             date: 'Oct 28, 2024',
-//             time: '11:00 AM - 1:00 PM',
-//             location: 'Shop Visit - New Road, Kathmandu',
-//             status: 'cancelled',
-//             price: '₨2,200',
-//             rating: null,
-//             cancellationReason: 'Service provider unavailable'
-//         }
-//     ];
-//
-//     const popularServices = [
-//         { icon: Home, name: 'House Cleaning', category: 'Cleaning', startingPrice: '₨1,500' },
-//         { icon: Wrench, name: 'Plumbing', category: 'Repair', startingPrice: '₨800' },
-//         { icon: Zap, name: 'Electrical Work', category: 'Repair', startingPrice: '₨1,200' },
-//         { icon: Car, name: 'Car Wash', category: 'Automotive', startingPrice: '₨500' },
-//         { icon: Scissors, name: 'Hair Cut', category: 'Beauty', startingPrice: '₨300' },
-//         { icon: Heart, name: 'Massage', category: 'Wellness', startingPrice: '₨2,000' }
-//     ];
-//
-//     const totalSpent = [...upcomingAppointments, ...appointmentHistory]
-//         .filter(apt => apt.status === 'completed')
-//         .reduce((sum, apt) => sum + parseInt(apt.price.replace('₨', '').replace(',', '')), 0);
-//
-//     const avgRatingGiven = appointmentHistory
-//         .filter(apt => apt.yourRating)
-//         .reduce((sum, apt) => sum + apt.yourRating, 0) / appointmentHistory.filter(apt => apt.yourRating).length || 0;
-//
-//     const stats = [
-//         { icon: Calendar, value: upcomingAppointments.length, label: 'Upcoming Bookings', color: '#3b82f6', bgColor: '#dbeafe' },
-//         { icon: CheckCircle, value: appointmentHistory.filter(apt => apt.status === 'completed').length, label: 'Completed Services', color: '#16a34a', bgColor: '#dcfce7' },
-//         { icon: Star, value: avgRatingGiven.toFixed(1), label: 'Avg Rating Given', color: '#eab308', bgColor: '#fef7cd' },
-//         { icon: BookOpen, value: `₨${totalSpent.toLocaleString()}`, label: 'Total Spent', color: '#10b981', bgColor: '#d1fae5' }
-//     ];
-//
-//     const handleAppointmentAction = (action, appointmentId) => {
-//         console.log(`${action} appointment ${appointmentId}`);
-//     };
-//
-//     const handleBookService = (service) => {
-//         console.log('Book service:', service);
-//     };
-//
-//     const filteredAppointments = appointmentHistory.filter(apt => {
-//         const matchesSearch = apt.service.toLowerCase().includes(searchTerm.toLowerCase()) ||
-//             apt.provider.toLowerCase().includes(searchTerm.toLowerCase()) ||
-//             apt.technician.toLowerCase().includes(searchTerm.toLowerCase());
-//         const matchesFilter = filterStatus === 'all' || apt.status === filterStatus;
-//         return matchesSearch && matchesFilter;
-//     });
-//
-//     return (
-//         <div>
-//             <Header2/>
-//             <div className={styles['profile-content']}>
-//                 <div className={styles['profile-form']}>
-//                     <div className={styles['profile-header']}>
-//                         <h1 className={styles['profile-title']}>My Services</h1>
-//                         <p className={styles['profile-subtitle']}>Manage your service bookings and discover new services.</p>
-//                     </div>
-//
-//                     {/* Stats Overview */}
-//                     <section className={styles['form-section']}>
-//                         <h3 className={styles['section-title']}>Overview</h3>
-//                         <div className={styles['user-stats-grid']}>
-//                             {stats.map((stat, index) => (
-//                                 <StatCard key={index} {...stat} />
-//                             ))}
-//                         </div>
-//                     </section>
-//
-//                     {/* Quick Book Services */}
-//                     <section className={styles['form-section']}>
-//                         <SectionHeader
-//                             title="Book a Service"
-//                             icon={Plus}
-//                             actions={
-//                                 <button className={styles['add-btn']}>
-//                                     <Search size={16} />
-//                                     Browse All
-//                                 </button>
-//                             }
-//                         />
-//                         <div className={styles['services-grid']}>
-//                             {popularServices.map((service, index) => (
-//                                 <ServiceCard key={index} service={service} onBook={handleBookService} />
-//                             ))}
-//                         </div>
-//                     </section>
-//
-//                     {/* Appointments */}
-//                     <section className={styles['form-section']}>
-//                         <div className={styles['tabs-header']}>
-//                             <div className={styles['tabs-nav']}>
-//                                 <button
-//                                     className={`${styles['tab-btn']} ${activeTab === 'upcoming' ? styles.active : ''}`}
-//                                     onClick={() => setActiveTab('upcoming')}
-//                                 >
-//                                     <Calendar size={16} />
-//                                     Upcoming ({upcomingAppointments.length})
-//                                 </button>
-//                                 <button
-//                                     className={`${styles['tab-btn']} ${activeTab === 'history' ? styles.active : ''}`}
-//                                     onClick={() => setActiveTab('history')}
-//                                 >
-//                                     <Clock size={16} />
-//                                     History ({appointmentHistory.length})
-//                                 </button>
-//                             </div>
-//
-//                             {activeTab === 'history' && (
-//                                 <div className={styles['appointments-controls']}>
-//                                     <div className={styles['search-box']}>
-//                                         <Search size={16} />
-//                                         <input
-//                                             type="text"
-//                                             placeholder="Search services..."
-//                                             value={searchTerm}
-//                                             onChange={(e) => setSearchTerm(e.target.value)}
-//                                         />
-//                                     </div>
-//                                     <select
-//                                         className={styles['filter-select']}
-//                                         value={filterStatus}
-//                                         onChange={(e) => setFilterStatus(e.target.value)}
-//                                     >
-//                                         <option value="all">All Status</option>
-//                                         <option value="completed">Completed</option>
-//                                         <option value="cancelled">Cancelled</option>
-//                                     </select>
-//                                 </div>
-//                             )}
-//                         </div>
-//
-//                         <div className={styles['appointments-content']}>
-//                             {activeTab === 'upcoming' && (
-//                                 <div className={styles['appointments-list']}>
-//                                     {upcomingAppointments.length === 0 ? (
-//                                         <EmptyState
-//                                             icon={Calendar}
-//                                             title="No Upcoming Appointments"
-//                                             description="Book a service to see your upcoming appointments here."
-//                                             action={
-//                                                 <button className={styles['add-btn']}>
-//                                                     <Plus size={16} />
-//                                                     Book Service
-//                                                 </button>
-//                                             }
-//                                         />
-//                                     ) : (
-//                                         upcomingAppointments.map((appointment) => (
-//                                             <AppointmentCard
-//                                                 key={appointment.id}
-//                                                 appointment={appointment}
-//                                                 type="upcoming"
-//                                                 onAction={handleAppointmentAction}
-//                                             />
-//                                         ))
-//                                     )}
-//                                 </div>
-//                             )}
-//
-//                             {activeTab === 'history' && (
-//                                 <div className={styles['appointments-list']}>
-//                                     {filteredAppointments.length === 0 ? (
-//                                         <EmptyState
-//                                             icon={Clock}
-//                                             title="No Service History"
-//                                             description="Your completed and cancelled services will appear here."
-//                                         />
-//                                     ) : (
-//                                         filteredAppointments.map((appointment) => (
-//                                             <AppointmentCard
-//                                                 key={appointment.id}
-//                                                 appointment={appointment}
-//                                                 type="history"
-//                                                 onAction={handleAppointmentAction}
-//                                             />
-//                                         ))
-//                                     )}
-//                                 </div>
-//                             )}
-//                         </div>
-//                     </section>
-//                 </div>
-//             </div>
-//         </div>
-//     );
-// };
-//
-// export default UserDashboard;
-
-// import React, { useState, useEffect } from 'react';
-// import {
-//     Calendar,
-//     Clock,
-//     Search,
-//     Plus,
-//     Home,
-//     Wrench,
-//     Zap,
-//     Car,
-//     Scissors,
-//     Heart,
-//     CheckCircle,
-//     Star,
-//     BookOpen
-// } from 'lucide-react';
-// import Header2 from './Header2';
-// import StatCard from './StatCard';
-// import SectionHeader from './SectionHeader';
-// import ServiceCard from './ServiceCard';
-// import AppointmentCard from './AppointmentCard';
-// import EmptyState from './EmptyState';
-// import styles from './UserDashboard.module.css';
-
-// API service functions
-const apiService = {
-    // Base API URL - replace with your actual backend URL
-    baseURL: 'http://localhost:8080/api',
-
-    // Generic API call function
-    async apiCall(endpoint, options = {}) {
-        try {
-            const token = localStorage.getItem('authToken');
-            const response = await fetch(`${this.baseURL}${endpoint}`, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': token ? `Bearer ${token}` : '',
-                    ...options.headers,
-                },
-                ...options,
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            return await response.json();
-        } catch (error) {
-            console.error('API call failed:', error);
-            throw error;
-        }
-    },
-
-    // Fetch upcoming appointments
-    async getUpcomingAppointments() {
-        return this.apiCall('/appointments/upcoming');
-    },
-
-    // Fetch appointment history
-    async getAppointmentHistory(searchTerm = '', filterStatus = 'all') {
-        const params = new URLSearchParams();
-        if (searchTerm) params.append('search', searchTerm);
-        if (filterStatus !== 'all') params.append('status', filterStatus);
-
-        return this.apiCall(`/appointments/history?${params}`);
-    },
-
-    // Fetch popular services
-    async getPopularServices() {
-        return this.apiCall('/services/popular');
-    },
-
-    // Fetch user stats
-    async getUserStats() {
-        return this.apiCall('/user/stats');
-    },
-
-    // Book a service
-    async bookService(serviceId, bookingData) {
-        return this.apiCall('/appointments/book', {
-            method: 'POST',
-            body: JSON.stringify({ serviceId, ...bookingData }),
-        });
-    },
-
-    // Cancel appointment
-    async cancelAppointment(appointmentId, reason = '') {
-        return this.apiCall(`/appointments/${appointmentId}/cancel`, {
-            method: 'PUT',
-            body: JSON.stringify({ reason }),
-        });
-    },
-
-    // Reschedule appointment
-    async rescheduleAppointment(appointmentId, newDateTime) {
-        return this.apiCall(`/appointments/${appointmentId}/reschedule`, {
-            method: 'PUT',
-            body: JSON.stringify({ newDateTime }),
-        });
-    },
-
-    // Rate and review service
-    async rateService(appointmentId, rating, review) {
-        return this.apiCall(`/appointments/${appointmentId}/rate`, {
-            method: 'POST',
-            body: JSON.stringify({ rating, review }),
-        });
-    }
-};
 
 const UserDashboard = () => {
-    // State management
     const [activeTab, setActiveTab] = useState('upcoming');
     const [searchTerm, setSearchTerm] = useState('');
     const [filterStatus, setFilterStatus] = useState('all');
 
-    // Data state
+    // State for dynamic data
     const [upcomingAppointments, setUpcomingAppointments] = useState([]);
     const [appointmentHistory, setAppointmentHistory] = useState([]);
-    const [popularServices, setPopularServices] = useState([]);
-    const [userStats, setUserStats] = useState({});
-
-    // Loading and error states
-    const [loading, setLoading] = useState({
-        upcoming: true,
-        history: true,
-        services: true,
-        stats: true
+    const [dashboardOverview, setDashboardOverview] = useState({
+        upcomingBookings: 0,
+        completedServices: 0,
+        averageRatingGiven: 0,
+        totalSpent: 0
     });
-    const [error, setError] = useState({});
-    const [actionLoading, setActionLoading] = useState({});
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-    // Fetch upcoming appointments
-    const fetchUpcomingAppointments = async () => {
+    // You can get this from user context/auth or props
+    const userEmail = "bkbikram727@example.com"; // Replace with actual user email
+
+    // API base URL - adjust this based on your setup
+    const API_BASE_URL = "http://localhost:8080"; // Adjust port if different
+
+    const popularServices = [
+        { icon: Home, name: 'House Cleaning', category: 'Cleaning', startingPrice: '₨1,500' },
+        { icon: Wrench, name: 'Plumbing', category: 'Repair', startingPrice: '₨800' },
+        { icon: Zap, name: 'Electrical Work', category: 'Repair', startingPrice: '₨1,200' },
+        { icon: Car, name: 'Car Wash', category: 'Automotive', startingPrice: '₨500' },
+        { icon: Scissors, name: 'Hair Cut', category: 'Beauty', startingPrice: '₨300' },
+        { icon: Heart, name: 'Massage', category: 'Wellness', startingPrice: '₨2,000' }
+    ];
+
+    // API functions with credentials and proper error handling
+    const fetchCurrentServiceBookings = async () => {
         try {
-            setLoading(prev => ({ ...prev, upcoming: true }));
-            const data = await apiService.getUpcomingAppointments();
-            setUpcomingAppointments(data.appointments || []);
-            setError(prev => ({ ...prev, upcoming: null }));
-        } catch (err) {
-            console.error('Failed to fetch upcoming appointments:', err);
-            setError(prev => ({ ...prev, upcoming: 'Failed to load upcoming appointments' }));
-        } finally {
-            setLoading(prev => ({ ...prev, upcoming: false }));
-        }
-    };
+            const url = `${API_BASE_URL}/users/get-current-service-booking?userEmail=${encodeURIComponent(userEmail)}`;
+            console.log('Fetching current bookings from:', url);
 
-    // Fetch appointment history with search and filter
-    const fetchAppointmentHistory = async () => {
-        try {
-            setLoading(prev => ({ ...prev, history: true }));
-            const data = await apiService.getAppointmentHistory(searchTerm, filterStatus);
-            setAppointmentHistory(data.appointments || []);
-            setError(prev => ({ ...prev, history: null }));
-        } catch (err) {
-            console.error('Failed to fetch appointment history:', err);
-            setError(prev => ({ ...prev, history: 'Failed to load appointment history' }));
-        } finally {
-            setLoading(prev => ({ ...prev, history: false }));
-        }
-    };
+            const response = await fetch(url, {
+                method: 'GET',
+                credentials: 'include', // Include cookies/session for authentication
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                },
+            });
 
-    // Fetch popular services
-    const fetchPopularServices = async () => {
-        try {
-            setLoading(prev => ({ ...prev, services: true }));
-            const data = await apiService.getPopularServices();
-            setPopularServices(data.services || []);
-            setError(prev => ({ ...prev, services: null }));
-        } catch (err) {
-            console.error('Failed to fetch popular services:', err);
-            setError(prev => ({ ...prev, services: 'Failed to load services' }));
-        } finally {
-            setLoading(prev => ({ ...prev, services: false }));
-        }
-    };
+            console.log('Current bookings response status:', response.status);
 
-    // Fetch user statistics
-    const fetchUserStats = async () => {
-        try {
-            setLoading(prev => ({ ...prev, stats: true }));
-            const data = await apiService.getUserStats();
-            setUserStats(data.stats || {});
-            setError(prev => ({ ...prev, stats: null }));
-        } catch (err) {
-            console.error('Failed to fetch user stats:', err);
-            setError(prev => ({ ...prev, stats: 'Failed to load statistics' }));
-        } finally {
-            setLoading(prev => ({ ...prev, stats: false }));
-        }
-    };
-
-    // Initial data fetch
-    useEffect(() => {
-        fetchUpcomingAppointments();
-        fetchPopularServices();
-        fetchUserStats();
-    }, []);
-
-    // Fetch history when search/filter changes (with debounce)
-    useEffect(() => {
-        const debounceTimer = setTimeout(() => {
-            fetchAppointmentHistory();
-        }, 500);
-
-        return () => clearTimeout(debounceTimer);
-    }, [searchTerm, filterStatus]);
-
-    // Handle appointment actions
-    const handleAppointmentAction = async (action, appointmentId, additionalData = {}) => {
-        try {
-            setActionLoading(prev => ({ ...prev, [appointmentId]: action }));
-
-            switch (action) {
-                case 'cancel':
-                    await apiService.cancelAppointment(appointmentId, additionalData.reason);
-                    // Refresh both upcoming and history
-                    await Promise.all([
-                        fetchUpcomingAppointments(),
-                        fetchAppointmentHistory()
-                    ]);
-                    break;
-
-                case 'reschedule':
-                    await apiService.rescheduleAppointment(appointmentId, additionalData.newDateTime);
-                    await fetchUpcomingAppointments();
-                    break;
-
-                case 'rate':
-                    await apiService.rateService(appointmentId, additionalData.rating, additionalData.review);
-                    await fetchAppointmentHistory();
-                    break;
-
-                default:
-                    console.log(`${action} appointment ${appointmentId}`, additionalData);
+            if (response.status === 401) {
+                throw new Error('Authentication required. Please log in again.');
             }
-        } catch (err) {
-            console.error(`Failed to ${action} appointment:`, err);
-            // You might want to show a toast notification here
-            alert(`Failed to ${action} appointment. Please try again.`);
-        } finally {
-            setActionLoading(prev => ({ ...prev, [appointmentId]: null }));
+
+            if (response.status === 404) {
+                throw new Error('Current bookings endpoint not found. Please check the API URL.');
+            }
+
+            if (!response.ok) {
+                throw new Error(`Failed to fetch current bookings: ${response.status} ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            console.log('Current bookings data:', data);
+            return data;
+        } catch (error) {
+            console.error('Error fetching current bookings:', error);
+            throw error;
         }
     };
 
-    // Handle service booking
-    const handleBookService = async (service, bookingData = {}) => {
+    const fetchPreviousServiceBookings = async () => {
         try {
-            setActionLoading(prev => ({ ...prev, [`book-${service.id}`]: 'booking' }));
-            await apiService.bookService(service.id, bookingData);
+            const url = `${API_BASE_URL}/users/get-previous-service-booking?userEmail=${encodeURIComponent(userEmail)}`;
+            console.log('Fetching previous bookings from:', url);
 
-            // Refresh upcoming appointments and stats
-            await Promise.all([
-                fetchUpcomingAppointments(),
-                fetchUserStats()
-            ]);
+            const response = await fetch(url, {
+                method: 'GET',
+                credentials: 'include', // Include cookies/session for authentication
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                },
+            });
 
-            // You might want to show a success message or redirect
-            alert('Service booked successfully!');
-        } catch (err) {
-            console.error('Failed to book service:', err);
-            alert('Failed to book service. Please try again.');
-        } finally {
-            setActionLoading(prev => ({ ...prev, [`book-${service.id}`]: null }));
+            console.log('Previous bookings response status:', response.status);
+
+            if (response.status === 401) {
+                throw new Error('Authentication required. Please log in again.');
+            }
+
+            if (response.status === 404) {
+                throw new Error('Previous bookings endpoint not found. Please check the API URL.');
+            }
+
+            if (!response.ok) {
+                throw new Error(`Failed to fetch previous bookings: ${response.status} ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            console.log('Previous bookings data:', data);
+            return data;
+        } catch (error) {
+            console.error('Error fetching previous bookings:', error);
+            throw error;
         }
     };
 
-    // Prepare stats data
+    const fetchDashboardOverview = async () => {
+        try {
+            const url = `${API_BASE_URL}/users/dashboard-overview?email=${encodeURIComponent(userEmail)}`;
+            console.log('Fetching dashboard overview from:', url);
+
+            const response = await fetch(url, {
+                method: 'GET',
+                credentials: 'include', // Include cookies/session for authentication
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                },
+            });
+
+            console.log('Dashboard overview response status:', response.status);
+
+            if (response.status === 401) {
+                throw new Error('Authentication required. Please log in again.');
+            }
+
+            if (response.status === 404) {
+                throw new Error('Dashboard overview endpoint not found. Please check the API URL.');
+            }
+
+            if (!response.ok) {
+                throw new Error(`Failed to fetch dashboard overview: ${response.status} ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            console.log('Dashboard overview data:', data);
+            return data;
+        } catch (error) {
+            console.error('Error fetching dashboard overview:', error);
+            throw error;
+        }
+    };
+
+    // Transform backend data to match frontend structure
+    const transformCurrentBookingData = (backendData) => {
+        if (!Array.isArray(backendData)) return [];
+
+        return backendData.map((item, index) => ({
+            id: index + 1,
+            service: item.serviceName,
+            provider: 'Service Provider', // Default since not in DTO
+            technician: item.technicianName,
+            date: formatDate(item.appointmentTime),
+            time: formatTime(item.appointmentTime),
+            location: item.technicianAddress || 'Location not specified',
+            status: item.status?.toLowerCase() || 'pending',
+            price: `₨${item.feeCharge?.toLocaleString() || '0'}`,
+            rating: 4.8 // Default since not in DTO
+        }));
+    };
+
+    const transformPreviousBookingData = (backendData) => {
+        if (!Array.isArray(backendData)) return [];
+
+        return backendData.map((item, index) => ({
+            id: index + 100, // Different ID range for history
+            service: item.serviceName,
+            provider: 'Service Provider',
+            technician: item.technicianName,
+            date: formatDateFull(item.appointmentTime),
+            time: formatTime(item.appointmentTime),
+            location: item.technicianAddress || 'Location not specified',
+            status: item.status?.toLowerCase() || 'completed',
+            price: `₨${item.feeCharge?.toLocaleString() || '0'}`,
+            rating: 4.8,
+            yourRating: 5, // Default since not in DTO
+            review: 'Service completed successfully.'
+        }));
+    };
+
+    // Date formatting helpers
+    const formatDate = (dateTime) => {
+        if (!dateTime) return 'TBD';
+        const date = new Date(dateTime);
+        const today = new Date();
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+
+        if (date.toDateString() === today.toDateString()) return 'Today';
+        if (date.toDateString() === tomorrow.toDateString()) return 'Tomorrow';
+
+        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    };
+
+    const formatDateFull = (dateTime) => {
+        if (!dateTime) return 'Unknown Date';
+        return new Date(dateTime).toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric'
+        });
+    };
+
+    const formatTime = (dateTime) => {
+        if (!dateTime) return 'TBD';
+        const date = new Date(dateTime);
+        const startTime = date.toLocaleTimeString('en-US', {
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true
+        });
+        // Add 2 hours for end time (assuming 2-hour service duration)
+        const endDate = new Date(date.getTime() + 2 * 60 * 60 * 1000);
+        const endTime = endDate.toLocaleTimeString('en-US', {
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true
+        });
+        return `${startTime} - ${endTime}`;
+    };
+
+    // Load data on component mount with better error handling
+    useEffect(() => {
+        const loadData = async () => {
+            try {
+                setLoading(true);
+                setError(null);
+
+                // Load data sequentially to handle individual failures better
+                let currentBookings = [];
+                let previousBookings = [];
+                let overview = {
+                    upcomingBookings: 0,
+                    completedServices: 0,
+                    averageRatingGiven: 0,
+                    totalSpent: 0
+                };
+
+                try {
+                    currentBookings = await fetchCurrentServiceBookings();
+                } catch (error) {
+                    console.warn('Failed to load current bookings:', error.message);
+                }
+
+                try {
+                    previousBookings = await fetchPreviousServiceBookings();
+                } catch (error) {
+                    console.warn('Failed to load previous bookings:', error.message);
+                }
+
+                try {
+                    overview = await fetchDashboardOverview();
+                } catch (error) {
+                    console.warn('Failed to load dashboard overview:', error.message);
+                }
+
+                setUpcomingAppointments(transformCurrentBookingData(currentBookings));
+                setAppointmentHistory(transformPreviousBookingData(previousBookings));
+                setDashboardOverview(overview);
+
+            } catch (error) {
+                setError(error.message);
+                console.error('Error loading dashboard data:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        if (userEmail) {
+            loadData();
+        } else {
+            setError('User email not available. Please log in again.');
+            setLoading(false);
+        }
+    }, [userEmail]);
+
+    // Calculate stats from dashboard overview
     const stats = [
         {
             icon: Calendar,
-            value: upcomingAppointments.length,
+            value: dashboardOverview.upcomingBookings || 0,
             label: 'Upcoming Bookings',
             color: '#3b82f6',
-            bgColor: '#dbeafe',
-            loading: loading.upcoming
+            bgColor: '#dbeafe'
         },
         {
             icon: CheckCircle,
-            value: userStats.completedServices || 0,
+            value: dashboardOverview.completedServices || 0,
             label: 'Completed Services',
             color: '#16a34a',
-            bgColor: '#dcfce7',
-            loading: loading.stats
+            bgColor: '#dcfce7'
         },
         {
             icon: Star,
-            value: userStats.avgRatingGiven ? userStats.avgRatingGiven.toFixed(1) : '0.0',
+            value: (dashboardOverview.averageRatingGiven || 0).toFixed(1),
             label: 'Avg Rating Given',
             color: '#eab308',
-            bgColor: '#fef7cd',
-            loading: loading.stats
+            bgColor: '#fef7cd'
         },
         {
             icon: BookOpen,
-            value: userStats.totalSpent ? `₨${userStats.totalSpent.toLocaleString()}` : '₨0',
+            value: `₨${(dashboardOverview.totalSpent || 0).toLocaleString()}`,
             label: 'Total Spent',
             color: '#10b981',
-            bgColor: '#d1fae5',
-            loading: loading.stats
+            bgColor: '#d1fae5'
         }
     ];
 
-    return (
-        <div>
-            <Header2 />
-            <div className={styles['profile-content']}>
-                <div className={styles['profile-form']}>
-                    <div className={styles['profile-header']}>
-                        <h1 className={styles['profile-title']}>My Services</h1>
-                        <p className={styles['profile-subtitle']}>Manage your service bookings and discover new services.</p>
+    const handleAppointmentAction = (action, appointmentId) => {
+        console.log(`${action} appointment ${appointmentId}`);
+        // TODO: Implement API calls for appointment actions
+    };
+
+    const handleBookService = (service) => {
+        console.log('Book service:', service);
+        // TODO: Implement service booking
+    };
+
+    const filteredAppointments = appointmentHistory.filter(apt => {
+        const matchesSearch = apt.service.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            apt.provider.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            apt.technician.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesFilter = filterStatus === 'all' || apt.status === filterStatus;
+        return matchesSearch && matchesFilter;
+    });
+
+    // Loading state
+    if (loading) {
+        return (
+            <div className="profile-content">
+                <div className="profile-form">
+                    <div className="profile-header">
+                        <h1 className="profile-title">My Services</h1>
+                        <p className="profile-subtitle">Loading your service data...</p>
                     </div>
+                    <div style={{ textAlign: 'center', padding: '2rem' }}>
+                        <div>Loading...</div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
-                    {/* Stats Overview */}
-                    <section className={styles['form-section']}>
-                        <h3 className={styles['section-title']}>Overview</h3>
-                        <div className={styles['user-stats-grid']}>
-                            {stats.map((stat, index) => (
-                                <StatCard key={index} {...stat} />
-                            ))}
+    // Error state with better UX
+    if (error) {
+        return (
+            <div className="profile-content">
+                <div className="profile-form">
+                    <div className="profile-header">
+                        <h1 className="profile-title">My Services</h1>
+                        <p className="profile-subtitle">Having trouble loading your data</p>
+                    </div>
+                    <div style={{
+                        textAlign: 'center',
+                        padding: '2rem',
+                        backgroundColor: '#fef2f2',
+                        border: '1px solid #fecaca',
+                        borderRadius: '8px',
+                        margin: '1rem 0'
+                    }}>
+                        <div style={{ color: '#dc2626', marginBottom: '1rem' }}>
+                            {error.includes('Authentication') ? (
+                                <>
+                                    <div style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>
+                                        Authentication Required
+                                    </div>
+                                    <div>Please log in to view your services</div>
+                                </>
+                            ) : (
+                                <>
+                                    <div style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>
+                                        Unable to Load Data
+                                    </div>
+                                    <div>{error}</div>
+                                </>
+                            )}
                         </div>
-                    </section>
-
-                    {/* Quick Book Services */}
-                    <section className={styles['form-section']}>
-                        <SectionHeader
-                            title="Book a Service"
-                            icon={Plus}
-                            actions={
-                                <button className={styles['add-btn']}>
-                                    <Search size={16} />
-                                    Browse All
+                        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+                            <button
+                                onClick={() => window.location.reload()}
+                                style={{
+                                    padding: '0.5rem 1rem',
+                                    backgroundColor: '#dc2626',
+                                    color: 'white',
+                                    border: 'none',
+                                    borderRadius: '4px',
+                                    cursor: 'pointer'
+                                }}
+                            >
+                                Retry
+                            </button>
+                            {error.includes('Authentication') && (
+                                <button
+                                    onClick={() => window.location.href = '/login'}
+                                    style={{
+                                        padding: '0.5rem 1rem',
+                                        backgroundColor: '#3b82f6',
+                                        color: 'white',
+                                        border: 'none',
+                                        borderRadius: '4px',
+                                        cursor: 'pointer'
+                                    }}
+                                >
+                                    Go to Login
                                 </button>
-                            }
-                        />
-                        {loading.services ? (
-                            <div className={styles['loading-state']}>Loading services...</div>
-                        ) : error.services ? (
-                            <div className={styles['error-state']}>
-                                {error.services}
-                                <button onClick={fetchPopularServices}>Retry</button>
-                            </div>
-                        ) : (
-                            <div className={styles['services-grid']}>
-                                {popularServices.map((service) => (
-                                    <ServiceCard
-                                        key={service.id}
-                                        service={service}
-                                        onBook={handleBookService}
-                                        loading={actionLoading[`book-${service.id}`]}
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <div className="profile-content">
+            <div className="profile-form">
+                <div className="profile-header">
+                    <h1 className="profile-title">My Services</h1>
+                    <p className="profile-subtitle">Manage your service bookings and discover new services.</p>
+                </div>
+
+                {/* Stats Overview */}
+                <section className="form-section">
+                    <h3 className="section-title">Overview</h3>
+                    <div className="user-stats-grid">
+                        {stats.map((stat, index) => (
+                            <StatCard key={index} {...stat} />
+                        ))}
+                    </div>
+                </section>
+
+                {/* Quick Book Services */}
+                <section className="form-section">
+                    <SectionHeader
+                        title="Book a Service"
+                        icon={Plus}
+                        actions={
+                            <button className="add-btn">
+                                <Search size={16} />
+                                Browse All
+                            </button>
+                        }
+                    />
+                    <div className="services-grid">
+                        {popularServices.map((service, index) => (
+                            <ServiceCard key={index} service={service} onBook={handleBookService} />
+                        ))}
+                    </div>
+                </section>
+
+                {/* Appointments */}
+                <section className="form-section">
+                    <div className="tabs-header">
+                        <div className="tabs-nav">
+                            <button
+                                className={`tab-btn ${activeTab === 'upcoming' ? 'active' : ''}`}
+                                onClick={() => setActiveTab('upcoming')}
+                            >
+                                <Calendar size={16} />
+                                Upcoming ({upcomingAppointments.length})
+                            </button>
+                            <button
+                                className={`tab-btn ${activeTab === 'history' ? 'active' : ''}`}
+                                onClick={() => setActiveTab('history')}
+                            >
+                                <Clock size={16} />
+                                History ({appointmentHistory.length})
+                            </button>
+                        </div>
+
+                        {activeTab === 'history' && (
+                            <div className="appointments-controls">
+                                <div className="search-box">
+                                    <Search size={16} />
+                                    <input
+                                        type="text"
+                                        placeholder="Search services..."
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
                                     />
-                                ))}
+                                </div>
+                                <select
+                                    className="filter-select"
+                                    value={filterStatus}
+                                    onChange={(e) => setFilterStatus(e.target.value)}
+                                >
+                                    <option value="all">All Status</option>
+                                    <option value="completed">Completed</option>
+                                    <option value="cancelled">Cancelled</option>
+                                </select>
                             </div>
                         )}
-                    </section>
+                    </div>
 
-                    {/* Appointments */}
-                    <section className={styles['form-section']}>
-                        <div className={styles['tabs-header']}>
-                            <div className={styles['tabs-nav']}>
-                                <button
-                                    className={`${styles['tab-btn']} ${activeTab === 'upcoming' ? styles.active : ''}`}
-                                    onClick={() => setActiveTab('upcoming')}
-                                >
-                                    <Calendar size={16} />
-                                    Upcoming ({upcomingAppointments.length})
-                                </button>
-                                <button
-                                    className={`${styles['tab-btn']} ${activeTab === 'history' ? styles.active : ''}`}
-                                    onClick={() => setActiveTab('history')}
-                                >
-                                    <Clock size={16} />
-                                    History ({appointmentHistory.length})
-                                </button>
+                    <div className="appointments-content">
+                        {activeTab === 'upcoming' && (
+                            <div className="appointments-list">
+                                {upcomingAppointments.length === 0 ? (
+                                    <EmptyState
+                                        icon={Calendar}
+                                        title="No Upcoming Appointments"
+                                        description="Book a service to see your upcoming appointments here."
+                                        action={
+                                            <button className="add-btn">
+                                                <Plus size={16} />
+                                                Book Service
+                                            </button>
+                                        }
+                                    />
+                                ) : (
+                                    upcomingAppointments.map((appointment) => (
+                                        <AppointmentCard
+                                            key={appointment.id}
+                                            appointment={appointment}
+                                            type="upcoming"
+                                            onAction={handleAppointmentAction}
+                                        />
+                                    ))
+                                )}
                             </div>
+                        )}
 
-                            {activeTab === 'history' && (
-                                <div className={styles['appointments-controls']}>
-                                    <div className={styles['search-box']}>
-                                        <Search size={16} />
-                                        <input
-                                            type="text"
-                                            placeholder="Search services..."
-                                            value={searchTerm}
-                                            onChange={(e) => setSearchTerm(e.target.value)}
+                        {activeTab === 'history' && (
+                            <div className="appointments-list">
+                                {filteredAppointments.length === 0 ? (
+                                    <EmptyState
+                                        icon={Clock}
+                                        title="No Service History"
+                                        description="Your completed and cancelled services will appear here."
+                                    />
+                                ) : (
+                                    filteredAppointments.map((appointment) => (
+                                        <AppointmentCard
+                                            key={appointment.id}
+                                            appointment={appointment}
+                                            type="history"
+                                            onAction={handleAppointmentAction}
                                         />
-                                    </div>
-                                    <select
-                                        className={styles['filter-select']}
-                                        value={filterStatus}
-                                        onChange={(e) => setFilterStatus(e.target.value)}
-                                    >
-                                        <option value="all">All Status</option>
-                                        <option value="completed">Completed</option>
-                                        <option value="cancelled">Cancelled</option>
-                                    </select>
-                                </div>
-                            )}
-                        </div>
-
-                        <div className={styles['appointments-content']}>
-                            {activeTab === 'upcoming' && (
-                                <div className={styles['appointments-list']}>
-                                    {loading.upcoming ? (
-                                        <div className={styles['loading-state']}>Loading upcoming appointments...</div>
-                                    ) : error.upcoming ? (
-                                        <div className={styles['error-state']}>
-                                            {error.upcoming}
-                                            <button onClick={fetchUpcomingAppointments}>Retry</button>
-                                        </div>
-                                    ) : upcomingAppointments.length === 0 ? (
-                                        <EmptyState
-                                            icon={Calendar}
-                                            title="No Upcoming Appointments"
-                                            description="Book a service to see your upcoming appointments here."
-                                            action={
-                                                <button className={styles['add-btn']}>
-                                                    <Plus size={16} />
-                                                    Book Service
-                                                </button>
-                                            }
-                                        />
-                                    ) : (
-                                        upcomingAppointments.map((appointment) => (
-                                            <AppointmentCard
-                                                key={appointment.id}
-                                                appointment={appointment}
-                                                type="upcoming"
-                                                onAction={handleAppointmentAction}
-                                                loading={actionLoading[appointment.id]}
-                                            />
-                                        ))
-                                    )}
-                                </div>
-                            )}
-
-                            {activeTab === 'history' && (
-                                <div className={styles['appointments-list']}>
-                                    {loading.history ? (
-                                        <div className={styles['loading-state']}>Loading appointment history...</div>
-                                    ) : error.history ? (
-                                        <div className={styles['error-state']}>
-                                            {error.history}
-                                            <button onClick={fetchAppointmentHistory}>Retry</button>
-                                        </div>
-                                    ) : appointmentHistory.length === 0 ? (
-                                        <EmptyState
-                                            icon={Clock}
-                                            title={searchTerm || filterStatus !== 'all' ? 'No Results Found' : 'No Service History'}
-                                            description={searchTerm || filterStatus !== 'all'
-                                                ? 'Try adjusting your search or filter criteria.'
-                                                : 'Your completed and cancelled services will appear here.'
-                                            }
-                                        />
-                                    ) : (
-                                        appointmentHistory.map((appointment) => (
-                                            <AppointmentCard
-                                                key={appointment.id}
-                                                appointment={appointment}
-                                                type="history"
-                                                onAction={handleAppointmentAction}
-                                                loading={actionLoading[appointment.id]}
-                                            />
-                                        ))
-                                    )}
-                                </div>
-                            )}
-                        </div>
-                    </section>
-                </div>
+                                    ))
+                                )}
+                            </div>
+                        )}
+                    </div>
+                </section>
             </div>
         </div>
     );
