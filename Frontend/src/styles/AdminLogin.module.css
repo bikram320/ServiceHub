@@ -46,20 +46,6 @@
     overflow: hidden;
 }
 
-.headerBg {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, #85d6ab 0%, #85d6ab 100%);
-}
-
-.headerLine {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 4px;
-    background: linear-gradient(135deg, #85d6ab 0%, #85d6ab 100%);
-}
 
 .headerContent {
     position: relative;
@@ -88,10 +74,12 @@
 }
 
 .subtitle {
-    color: #cbd5e1;
+    color: white !important;
+    display: flex;
     font-size: 0.9rem;
     margin: 0;
     line-height: 1.4;
+    justify-content: center;
 }
 
 /* Form Section */
@@ -203,57 +191,10 @@
     cursor: not-allowed;
 }
 
-/* Options */
-.options {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.rememberMe {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    color: #4b5563;
-}
-
-.checkbox {
-    width: 16px;
-    height: 16px;
-    accent-color: #10b981;
-}
-
-.checkboxLabel {
-    user-select: none;
-}
-
-.forgotLink {
-    color: #10b981;
-    text-decoration: none;
-    font-size: 0.9rem;
-    font-weight: 500;
-    transition: color 0.2s ease;
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 4px 8px;
-}
-
-.forgotLink:hover {
-    color: #059669;
-}
-
-.forgotLink:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
 /* Submit Button */
 .submitBtn {
     width: 100%;
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    background: linear-gradient(135deg, #85d6ab 0%, #85d6ab 100%);
     color: white;
     font-weight: 600;
     padding: 16px;
@@ -264,13 +205,13 @@
     transition: all 0.2s ease;
     text-transform: uppercase;
     letter-spacing: 1px;
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    box-shadow: 0 4px 12px rgba(96, 210, 120, 0.78);
 }
 
 .submitBtn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
-    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    box-shadow: 0 8px 25px rgb(75, 147, 112);
+
 }
 
 .submitBtn:active {
