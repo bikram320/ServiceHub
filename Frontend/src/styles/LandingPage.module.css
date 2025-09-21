@@ -143,51 +143,63 @@
 }
 
 /* === Hero Image === */
+/* container */
 .hero-right {
     display: flex;
     justify-content: center;
     align-items: center;
     padding-left: 5rem;
+    position: relative;
 }
+
+/* wrapper: no color, fixed height so image can fill it */
 .hero-image-wrapper1 {
     position: relative;
     width: 100%;
     max-width: 500px;
-    background: #d8f3da; /* same as page background */
+    height: 600px;               /* set the height you want */
+    background: transparent !important;
     border-radius: 12px;
-    overflow: hidden;
+    overflow: hidden;            /* important for rounded corners */
+    box-shadow: none !important; /* in case another rule adds a shadow */
 }
+
+/* make image fill wrapper exactly */
 .hero-image1 {
-    width: 40rem;
-    height: auto;
-    border-radius: 12px;
     display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;  /* fills wrapper and crops as needed */
+    border-radius: 0;   /* wrapper handles rounding */
+    filter: none;       /* remove grayscale if you added it earlier */
+    z-index: 0;
 }
 
-
-.hero-image-wrapper1::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(to bottom, rgba(216,243,218,0) 70%, #d8f3da 100%);
-    border-radius: 12px;
-    pointer-events: none;
-}
-
+/* your dark top overlay (if needed) */
 .image-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);
+    pointer-events: none;
+    z-index: 2;
+    background: linear-gradient(to top, rgba(0,0,0,0.6), transparent 40%);
 }
-.tag {
+
+/* bottom fade that blends the image into the page color */
+.hero-image-wrapper1::after {
+    content: "";
     position: absolute;
-    background: rgba(0,0,0,0.8);
-    backdrop-filter: blur(6px);
-    padding: 0.5rem 1rem;
-    border-radius: 9999px;
-    font-weight: 600;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 30%; /* tweak to control fade length */
+    background: linear-gradient(to bottom, rgba(216,243,218,0) 0%, var(--page-bg) 100%);
+    pointer-events: none;
+    z-index: 1;
 }
-.tag.top-right { top: 1.5rem; right: 1.5rem; color: #22c55e; }
+
+/* tags must be above overlays */
+.tag { z-index: 3; position: absolute; }
+.tag.top-right { top: 1.5rem; right: 1.5rem; color: gray; }
 .tag.bottom-left { bottom: 1.5rem; left: 1.5rem; color: white; }
 
 /* === Background Pattern === */
@@ -200,8 +212,8 @@
 }
 .image {
     width: 100%;
-    max-width: 500px;
-    height: 600px;
+    max-width: 30rem;
+    height: 20rem;
     object-fit: cover;
     border-radius: 12px;
     filter: grayscale(100%);

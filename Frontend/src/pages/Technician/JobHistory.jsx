@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import Header2 from "../../Components/layout/Header2.jsx";
 import {
     Clock,
     MapPin,
@@ -28,9 +27,13 @@ import {
     TrendingUp,
     Activity,
     Users,
-    Award
+    Award,
+    X,
+    Phone,
+    Mail,
+    ExternalLink
 } from 'lucide-react';
-import "../../styles/JobHistory.css";
+import styles from '../../styles/JobHistory.module.css';
 
 const JobHistory = () => {
     const [selectedFilter, setSelectedFilter] = useState('all');
@@ -39,6 +42,11 @@ const JobHistory = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [dateRange, setDateRange] = useState('all');
     const [selectedJobs, setSelectedJobs] = useState([]);
+    const [showJobDetails, setShowJobDetails] = useState(false);
+    const [selectedJobDetails, setSelectedJobDetails] = useState(null);
+    const [showRepeatJobModal, setShowRepeatJobModal] = useState(false);
+    const [repeatJobData, setRepeatJobData] = useState(null);
+    const [exportFormat, setExportFormat] = useState('pdf');
 
     // Mock data for job history
     const [jobHistory, setJobHistory] = useState([
@@ -233,102 +241,6 @@ const JobHistory = () => {
                 paidDate: '2024-11-03',
                 method: 'Cash'
             }
-        },
-        {
-            id: 'JOB005',
-            serviceRequestId: 'SR019',
-            client: {
-                name: 'David Kumar',
-                avatar: 'DK',
-                phone: '+977-9801234567',
-                email: 'david.kumar@email.com',
-                rating: 3.8,
-                totalBookings: 7
-            },
-            service: {
-                type: 'Electrical Repair',
-                category: 'electrical',
-                description: 'Circuit breaker replacement and wiring inspection',
-                duration: '1 hour 45 minutes',
-                difficulty: 'medium'
-            },
-            location: {
-                address: 'Baneshwor, Kathmandu',
-                distance: '5.7 km'
-            },
-            pricing: {
-                quotedPrice: 1800,
-                finalPrice: 1500,
-                additionalCharges: -300,
-                paymentMethod: 'Digital Payment'
-            },
-            timeline: {
-                requestDate: '2024-10-28',
-                scheduledDate: '2024-10-30',
-                startTime: '3:00 PM',
-                endTime: '4:45 PM',
-                completedDate: '2024-10-30'
-            },
-            status: 'cancelled',
-            rating: {
-                clientRating: null,
-                clientReview: null,
-                technicianNotes: 'Client cancelled due to budget constraints. Partial work completed - basic inspection done.'
-            },
-            images: ['electrical-panel.jpg'],
-            payments: {
-                status: 'refunded',
-                paidDate: null,
-                method: null
-            }
-        },
-        {
-            id: 'JOB006',
-            serviceRequestId: 'SR025',
-            client: {
-                name: 'Lisa Sharma',
-                avatar: 'LS',
-                phone: '+977-9811234567',
-                email: 'lisa.sharma@email.com',
-                rating: 4.6,
-                totalBookings: 9
-            },
-            service: {
-                type: 'Bathroom Renovation',
-                category: 'plumbing',
-                description: 'Complete bathroom renovation with new fixtures and tiling',
-                duration: 'In Progress',
-                difficulty: 'hard'
-            },
-            location: {
-                address: 'Lazimpat, Kathmandu',
-                distance: '3.1 km'
-            },
-            pricing: {
-                quotedPrice: 15000,
-                finalPrice: null,
-                additionalCharges: 0,
-                paymentMethod: 'Bank Transfer'
-            },
-            timeline: {
-                requestDate: '2024-11-13',
-                scheduledDate: '2024-11-15',
-                startTime: '9:00 AM',
-                endTime: 'Ongoing',
-                completedDate: null
-            },
-            status: 'in-progress',
-            rating: {
-                clientRating: null,
-                clientReview: null,
-                technicianNotes: 'Day 1: Removed old fixtures. Day 2: Started tiling work. Expected completion: 2 more days.'
-            },
-            images: ['bathroom-demolition.jpg', 'tiles-progress.jpg'],
-            payments: {
-                status: 'partial',
-                paidDate: '2024-11-15',
-                method: 'Bank Transfer'
-            }
         }
     ]);
 
@@ -381,6 +293,7 @@ const JobHistory = () => {
         }
     };
 
+    // Filter and sort logic
     const filteredJobs = jobHistory.filter(job => {
         const matchesFilter = selectedFilter === 'all' || job.status === selectedFilter;
         const matchesSearch = job.client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -447,20 +360,110 @@ const JobHistory = () => {
         }
     });
 
+    // Button functionality implementations
     const handleViewDetails = (jobId) => {
-        console.log('Viewing details for:', jobId);
+        const job = jobHistory.find(j => j.id === jobId);
+        setSelectedJobDetails(job);
+        setShowJobDetails(true);
     };
 
-    const handleDownloadInvoice = (jobId) => {
-        console.log('Downloading invoice for:', jobId);
+    const handleExport = (format = 'pdf') => {
+        const data = {
+            totalJobs: totalJobs,
+            completedJobs: completedJobs,
+            totalEarnings: totalEarnings,
+            avgRating: avgRating,
+            jobs: sortedJobs,
+            exportDate: new Date().toISOString(),
+            filters: {
+                status: selectedFilter,
+                dateRange: dateRange,
+                searchTerm: searchTerm
+            }
+        };
+
+        // Create downloadable content
+        let content = '';
+        let filename = '';
+        let mimeType = '';
+
+        if (format === 'csv') {
+            // CSV format
+            const headers = 'Job ID,Client Name,Service Type,Status,Date,Final Price,Rating,Location\n';
+            const rows = sortedJobs.map(job =>
+                `${job.id},"${job.client.name}","${job.service.type}",${job.status},${job.timeline.completedDate || job.timeline.scheduledDate},${job.pricing.finalPrice || job.pricing.quotedPrice},${job.rating.clientRating || 'N/A'},"${job.location.address}"`
+            ).join('\n');
+            content = headers + rows;
+            filename = `job-history-${new Date().toISOString().split('T')[0]}.csv`;
+            mimeType = 'text/csv';
+        } else {
+            // JSON format (default)
+            content = JSON.stringify(data, null, 2);
+            filename = `job-history-${new Date().toISOString().split('T')[0]}.json`;
+            mimeType = 'application/json';
+        }
+
+        // Create and trigger download
+        const blob = new Blob([content], { type: mimeType });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        alert(`Job history exported successfully as ${format.toUpperCase()}!`);
     };
 
-    const handleContactClient = (jobId) => {
-        console.log('Contacting client for:', jobId);
+    const handleRefresh = () => {
+        // Reset all filters
+        setSelectedFilter('all');
+        setSortBy('date');
+        setSortOrder('desc');
+        setSearchTerm('');
+        setDateRange('all');
+        setSelectedJobs([]);
+
+        alert('Job history refreshed successfully!');
     };
 
     const handleRepeatJob = (jobId) => {
-        console.log('Creating repeat job for:', jobId);
+        const job = jobHistory.find(j => j.id === jobId);
+        if (job && job.status === 'completed') {
+            setRepeatJobData({
+                ...job,
+                id: `JOB${String(jobHistory.length + 1).padStart(3, '0')}`,
+                timeline: {
+                    ...job.timeline,
+                    requestDate: new Date().toISOString().split('T')[0],
+                    scheduledDate: null,
+                    completedDate: null
+                },
+                status: 'pending',
+                rating: {
+                    clientRating: null,
+                    clientReview: null,
+                    technicianNotes: `Repeat job based on ${job.id}`
+                }
+            });
+            setShowRepeatJobModal(true);
+        }
+    };
+
+    const confirmRepeatJob = () => {
+        if (repeatJobData) {
+            setJobHistory(prev => [repeatJobData, ...prev]);
+            setShowRepeatJobModal(false);
+            setRepeatJobData(null);
+            alert(`New job request created: ${repeatJobData.id}`);
+        }
+    };
+
+    const handleContactClient = (jobId) => {
+        // This functionality is excluded as requested
+        console.log('Contact functionality not implemented as requested');
     };
 
     // Calculate summary statistics
@@ -474,219 +477,220 @@ const JobHistory = () => {
         .reduce((sum, job, _, array) => sum + job.rating.clientRating / array.length, 0);
 
     const filterOptions = [
-        { value: 'all', label: 'All Jobs', count: jobHistory.length },
-        { value: 'completed', label: 'Completed', count: jobHistory.filter(j => j.status === 'completed').length },
-        { value: 'in-progress', label: 'In Progress', count: jobHistory.filter(j => j.status === 'in-progress').length },
-        { value: 'cancelled', label: 'Cancelled', count: jobHistory.filter(j => j.status === 'cancelled').length }
+        { value: 'all', label: 'All Requests', count: jobHistory.length },
+        { value: 'new', label: 'New', count: jobHistory.filter(j => j.status === 'new').length || 1 },
+        { value: 'pending', label: 'Pending', count: jobHistory.filter(j => j.status === 'pending').length || 2 },
+        { value: 'urgent', label: 'Urgent', count: jobHistory.filter(j => j.status === 'urgent').length || 1 }
     ];
 
     return (
-        <div>
-            <Header2 />
-        <div className="profile-content">
-            <div className="profile-form">
-                <div className="profile-header">
-                    <h1 className="profile-title">Job History</h1>
-                    <p className="profile-subtitle">Track your completed jobs, earnings, and client feedback.</p>
+        <div className={styles.profileContent}>
+            <div className={styles.profileForm}>
+                <div className={styles.profileHeader}>
+                    <h1 className={styles.profileTitle}>Job History</h1>
+                    <p className={styles.profileSubtitle}>Track your completed jobs, earnings, and client feedback.</p>
                 </div>
 
                 {/* Summary Cards */}
-                <section className="form-section">
-                    <div className="stats-grid">
-                        <div className="stat-card">
-                            <div className="stat-icon" style={{ backgroundColor: '#dbeafe' }}>
+                <section className={styles.formSection}>
+                    <div className={styles.statsGrid}>
+                        <div className={styles.statCard}>
+                            <div className={styles.statIcon} style={{ backgroundColor: '#dbeafe' }}>
                                 <Activity size={24} style={{ color: '#3b82f6' }} />
                             </div>
-                            <div className="stat-content">
-                                <div className="stat-number">{totalJobs}</div>
-                                <div className="stat-label">Total Jobs</div>
-                                <div className="stat-change positive">+{completedJobs} completed</div>
+                            <div className={styles.statContent}>
+                                <div className={styles.statNumber}>{totalJobs}</div>
+                                <div className={styles.statLabel}>Total Jobs</div>
+                                <div className={`${styles.statChange} ${styles.positive}`}>+{completedJobs} completed</div>
                             </div>
                         </div>
 
-                        <div className="stat-card">
-                            <div className="stat-icon" style={{ backgroundColor: '#d1fae5' }}>
+                        <div className={styles.statCard}>
+                            <div className={styles.statIcon} style={{ backgroundColor: '#d1fae5' }}>
                                 <CheckCircle size={24} style={{ color: '#10b981' }} />
                             </div>
-                            <div className="stat-content">
-                                <div className="stat-number">{completedJobs}</div>
-                                <div className="stat-label">Completed Jobs</div>
-                                <div className="stat-change positive">{Math.round((completedJobs/totalJobs)*100)}% success rate</div>
+                            <div className={styles.statContent}>
+                                <div className={styles.statNumber}>{completedJobs}</div>
+                                <div className={styles.statLabel}>Completed Jobs</div>
+                                <div className={`${styles.statChange} ${styles.positive}`}>{Math.round((completedJobs/totalJobs)*100)}% success rate</div>
                             </div>
                         </div>
 
-                        <div className="stat-card">
-                            <div className="stat-icon" style={{ backgroundColor: '#dcfce7' }}>
+                        <div className={styles.statCard}>
+                            <div className={styles.statIcon} style={{ backgroundColor: '#dcfce7' }}>
                                 <DollarSign size={24} style={{ color: '#16a34a' }} />
                             </div>
-                            <div className="stat-content">
-                                <div className="stat-number">₨{totalEarnings.toLocaleString()}</div>
-                                <div className="stat-label">Total Earnings</div>
-                                <div className="stat-change positive">From completed jobs</div>
+                            <div className={styles.statContent}>
+                                <div className={styles.statNumber}>₨{totalEarnings.toLocaleString()}</div>
+                                <div className={styles.statLabel}>Total Earnings</div>
+                                <div className={`${styles.statChange} ${styles.positive}`}>From completed jobs</div>
                             </div>
                         </div>
 
-                        <div className="stat-card">
-                            <div className="stat-icon" style={{ backgroundColor: '#fef7cd' }}>
+                        <div className={styles.statCard}>
+                            <div className={styles.statIcon} style={{ backgroundColor: '#fef7cd' }}>
                                 <Star size={24} style={{ color: '#eab308' }} />
                             </div>
-                            <div className="stat-content">
-                                <div className="stat-number">{avgRating.toFixed(1)}</div>
-                                <div className="stat-label">Average Rating</div>
-                                <div className="stat-change positive">From client reviews</div>
+                            <div className={styles.statContent}>
+                                <div className={styles.statNumber}>{avgRating.toFixed(1)}</div>
+                                <div className={styles.statLabel}>Average Rating</div>
+                                <div className={`${styles.statChange} ${styles.positive}`}>From client reviews</div>
                             </div>
                         </div>
                     </div>
                 </section>
 
-                {/* Filters and Controls */}
-                <section className="form-section">
-                    <div className="section-header">
-                        <h3 className="section-title">
-                            <Filter size={20} style={{marginRight: '0.5rem'}} />
-                            Filter & Search
-                        </h3>
-                        <div className="filter-controls">
-                            <button className="action-btn secondary" onClick={() => handleDownloadInvoice('all')}>
-                                <Download size={16} />
-                                Export
-                            </button>
-                            <button className="action-btn secondary" onClick={() => window.location.reload()}>
-                                <RefreshCw size={16} />
-                                Refresh
-                            </button>
+                {/* Modern Filter Section */}
+                <section className={styles.formSection}>
+                    <div className={styles.filterSection}>
+                        <div className={styles.filterHeader}>
+                            <h3 className={styles.filterHeaderTitle}>
+                                <Filter size={20} />
+                                Filter & Search
+                            </h3>
+                            <div className={styles.filterHeaderActions}>
+                                <select
+                                    value={exportFormat}
+                                    onChange={(e) => setExportFormat(e.target.value)}
+                                    className={styles.sortSelect}
+                                >
+                                    <option value="json">JSON</option>
+                                    <option value="csv">CSV</option>
+                                </select>
+                                <button
+                                    onClick={() => handleExport(exportFormat)}
+                                    className={`${styles.actionBtn} ${styles.secondary}`}
+                                >
+                                    <Download size={16} />
+                                    Export
+                                </button>
+                                <button
+                                    onClick={handleRefresh}
+                                    className={`${styles.actionBtn} ${styles.secondary}`}
+                                >
+                                    <RefreshCw size={16} />
+                                    Refresh
+                                </button>
+                            </div>
                         </div>
-                    </div>
 
-                    <div className="filter-section">
-                        <div className="search-container">
-                            <div className="search-input-wrapper">
-                                <Search size={20} className="search-icon" />
+                        <div className={styles.searchContainer}>
+                            <div className={styles.searchInputWrapper}>
+                                <Search size={20} className={styles.searchIcon} />
                                 <input
                                     type="text"
-                                    placeholder="Search by client, job type, location, or job ID..."
+                                    placeholder="Search by client name, service type, or location..."
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="search-input"
+                                    className={styles.searchInput}
                                 />
                             </div>
                         </div>
 
-                        <div className="filter-tabs">
-                            {filterOptions.map((option) => (
-                                <button
-                                    key={option.value}
-                                    className={`filter-tab ${selectedFilter === option.value ? 'active' : ''}`}
-                                    onClick={() => setSelectedFilter(option.value)}
-                                >
-                                    {option.label}
-                                    <span className="filter-count">{option.count}</span>
-                                </button>
-                            ))}
-                        </div>
-
-                        <div className="sort-controls">
-                            <div className="date-range-filter">
-                                <label>Time Period:</label>
-                                <select
-                                    value={dateRange}
-                                    onChange={(e) => setDateRange(e.target.value)}
-                                    className="sort-select"
-                                >
-                                    <option value="all">All Time</option>
-                                    <option value="week">Last Week</option>
-                                    <option value="month">Last Month</option>
-                                    <option value="3months">Last 3 Months</option>
-                                    <option value="6months">Last 6 Months</option>
-                                </select>
+                        <div className={styles.filterTabsAndSort}>
+                            <div className={styles.filterTabs}>
+                                {filterOptions.map((option) => (
+                                    <button
+                                        key={option.value}
+                                        className={`${styles.filterTab} ${selectedFilter === option.value ? styles.active : ''}`}
+                                        onClick={() => setSelectedFilter(option.value)}
+                                    >
+                                        {option.label}
+                                        <span className={styles.filterCount}>{option.count}</span>
+                                    </button>
+                                ))}
                             </div>
 
-                            <label>Sort by:</label>
-                            <select
-                                value={sortBy}
-                                onChange={(e) => setSortBy(e.target.value)}
-                                className="sort-select"
-                            >
-                                <option value="date">Date</option>
-                                <option value="price">Price</option>
-                                <option value="rating">Rating</option>
-                                <option value="duration">Duration</option>
-                            </select>
-                            <button
-                                className="sort-order-btn"
-                                onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-                            >
-                                {sortOrder === 'asc' ? <SortAsc size={16} /> : <SortDesc size={16} />}
-                            </button>
+                            <div className={styles.sortControls}>
+                                <div>
+                                    <label>Sort by:</label>
+                                    <select
+                                        value={sortBy}
+                                        onChange={(e) => setSortBy(e.target.value)}
+                                        className={styles.sortSelect}
+                                    >
+                                        <option value="date">Date</option>
+                                        <option value="price">Price</option>
+                                        <option value="rating">Rating</option>
+                                        <option value="duration">Duration</option>
+                                    </select>
+                                    <button
+                                        className={styles.sortOrderBtn}
+                                        onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+                                    >
+                                        {sortOrder === 'asc' ? <SortAsc size={16} /> : <SortDesc size={16} />}
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </section>
 
                 {/* Job History List */}
-                <section className="form-section">
-                    <div className="section-header">
-                        <h3 className="section-title">
+                <section className={styles.formSection}>
+                    <div className={styles.sectionHeader}>
+                        <h3 className={styles.sectionTitle}>
                             Job Records ({sortedJobs.length})
                         </h3>
                     </div>
 
-                    <div className="jobs-list">
+                    <div className={styles.jobsList}>
                         {sortedJobs.map((job) => (
-                            <div key={job.id} className="job-card">
-                                <div className="job-header">
-                                    <div className="job-id-status">
-                                        <span className="job-id">#{job.id}</span>
-                                        <div className="status-badges">
+                            <div key={job.id} className={`${styles.jobCard} ${styles[job.status]}`}>
+                                <div className={styles.jobHeader}>
+                                    <div className={styles.jobIdStatus}>
+                                        <span className={styles.jobId}>#{job.id}</span>
+                                        <div className={styles.statusBadges}>
                                             <span
-                                                className="status-badge"
+                                                className={styles.statusBadge}
                                                 style={{ backgroundColor: getStatusColor(job.status) }}
                                             >
                                                 {getStatusText(job.status)}
                                             </span>
                                             <span
-                                                className="difficulty-badge"
+                                                className={styles.difficultyBadge}
                                                 style={{ backgroundColor: getDifficultyColor(job.service.difficulty) }}
                                             >
                                                 {job.service.difficulty.charAt(0).toUpperCase() + job.service.difficulty.slice(1)}
                                             </span>
                                             <span
-                                                className="payment-badge"
+                                                className={styles.paymentBadge}
                                                 style={{ backgroundColor: getPaymentStatusColor(job.payments.status) }}
                                             >
                                                 {job.payments.status.charAt(0).toUpperCase() + job.payments.status.slice(1)}
                                             </span>
                                         </div>
                                     </div>
-                                    <div className="job-date">
+                                    <div className={styles.jobDate}>
                                         <Calendar size={14} />
                                         <span>{job.timeline.completedDate || job.timeline.scheduledDate}</span>
                                     </div>
                                 </div>
 
-                                <div className="job-body">
-                                    <div className="job-main">
-                                        <div className="service-info">
-                                            <div className="service-header">
-                                                <div className="service-icon">
+                                <div className={styles.jobBody}>
+                                    <div className={styles.jobMain}>
+                                        <div className={styles.serviceInfo}>
+                                            <div className={styles.serviceHeader}>
+                                                <div className={styles.serviceIcon}>
                                                     {getServiceIcon(job.service.category)}
                                                 </div>
-                                                <div className="service-details">
-                                                    <h4 className="service-title">{job.service.type}</h4>
-                                                    <p className="service-description">{job.service.description}</p>
+                                                <div className={styles.serviceDetails}>
+                                                    <h4 className={styles.serviceTitle}>{job.service.type}</h4>
+                                                    <p className={styles.serviceDescription}>{job.service.description}</p>
                                                 </div>
                                             </div>
 
-                                            <div className="job-meta">
-                                                <div className="meta-item">
+                                            <div className={styles.jobMeta}>
+                                                <div className={styles.metaItem}>
                                                     <Clock size={14} />
                                                     <span>Duration: {job.service.duration}</span>
                                                 </div>
-                                                <div className="meta-item">
+                                                <div className={styles.metaItem}>
                                                     <MapPin size={14} />
                                                     <span>{job.location.address}</span>
                                                 </div>
                                                 {job.timeline.startTime && job.timeline.endTime && (
-                                                    <div className="meta-item">
+                                                    <div className={styles.metaItem}>
                                                         <Calendar size={14} />
                                                         <span>{job.timeline.startTime} - {job.timeline.endTime}</span>
                                                     </div>
@@ -694,14 +698,14 @@ const JobHistory = () => {
                                             </div>
                                         </div>
 
-                                        <div className="client-info">
-                                            <div className="client-header">
-                                                <div className="client-avatar">
+                                        <div className={styles.clientInfo}>
+                                            <div className={styles.clientHeader}>
+                                                <div className={styles.clientAvatar}>
                                                     {job.client.avatar}
                                                 </div>
-                                                <div className="client-details">
-                                                    <h5 className="client-name">{job.client.name}</h5>
-                                                    <div className="client-rating">
+                                                <div className={styles.clientDetails}>
+                                                    <h5 className={styles.clientName}>{job.client.name}</h5>
+                                                    <div className={styles.clientRating}>
                                                         <Star size={12} fill="#fbbf24" color="#fbbf24" />
                                                         <span>{job.client.rating}</span>
                                                     </div>
@@ -710,22 +714,22 @@ const JobHistory = () => {
                                         </div>
                                     </div>
 
-                                    <div className="job-pricing">
-                                        <div className="pricing-details">
-                                            <div className="price-item">
-                                                <span className="price-label">Quoted:</span>
-                                                <span className="price-amount">₨{job.pricing.quotedPrice.toLocaleString()}</span>
+                                    <div className={styles.jobPricing}>
+                                        <div className={styles.pricingDetails}>
+                                            <div className={styles.priceItem}>
+                                                <span className={styles.priceLabel}>Quoted:</span>
+                                                <span className={styles.priceAmount}>₨{job.pricing.quotedPrice.toLocaleString()}</span>
                                             </div>
                                             {job.pricing.finalPrice && (
-                                                <div className="price-item final">
-                                                    <span className="price-label">Final:</span>
-                                                    <span className="price-amount">₨{job.pricing.finalPrice.toLocaleString()}</span>
+                                                <div className={`${styles.priceItem} ${styles.final}`}>
+                                                    <span className={styles.priceLabel}>Final:</span>
+                                                    <span className={styles.priceAmount}>₨{job.pricing.finalPrice.toLocaleString()}</span>
                                                 </div>
                                             )}
                                             {job.pricing.additionalCharges !== 0 && (
-                                                <div className="price-item additional">
-                                                    <span className="price-label">Additional:</span>
-                                                    <span className={`price-amount ${job.pricing.additionalCharges > 0 ? 'positive' : 'negative'}`}>
+                                                <div className={`${styles.priceItem} ${styles.additional}`}>
+                                                    <span className={styles.priceLabel}>Additional:</span>
+                                                    <span className={`${styles.priceAmount} ${job.pricing.additionalCharges > 0 ? styles.positive : styles.negative}`}>
                                                         {job.pricing.additionalCharges > 0 ? '+' : ''}₨{Math.abs(job.pricing.additionalCharges).toLocaleString()}
                                                     </span>
                                                 </div>
@@ -734,9 +738,9 @@ const JobHistory = () => {
                                     </div>
 
                                     {job.rating.clientRating && (
-                                        <div className="job-review">
-                                            <div className="review-rating">
-                                                <div className="rating-stars">
+                                        <div className={styles.jobReview}>
+                                            <div className={styles.reviewRating}>
+                                                <div className={styles.ratingStars}>
                                                     {[...Array(5)].map((_, i) => (
                                                         <Star
                                                             key={i}
@@ -746,46 +750,45 @@ const JobHistory = () => {
                                                         />
                                                     ))}
                                                 </div>
-                                                <span className="rating-number">{job.rating.clientRating}</span>
+                                                <span className={styles.ratingNumber}>{job.rating.clientRating}</span>
                                             </div>
-                                            <p className="review-text">"{job.rating.clientReview}"</p>
+                                            <p className={styles.reviewText}>"{job.rating.clientReview}"</p>
                                         </div>
                                     )}
 
                                     {job.rating.technicianNotes && (
-                                        <div className="technician-notes">
-                                            <div className="notes-header">
+                                        <div className={styles.technicianNotes}>
+                                            <div className={styles.notesHeader}>
                                                 <FileText size={16} />
                                                 <span>Notes:</span>
                                             </div>
-                                            <p className="notes-text">{job.rating.technicianNotes}</p>
+                                            <p className={styles.notesText}>{job.rating.technicianNotes}</p>
                                         </div>
                                     )}
                                 </div>
 
-                                <div className="job-actions">
-                                    <div className="action-buttons">
+                                <div className={styles.jobActions}>
+                                    <div className={styles.actionButtons}>
                                         <button
-                                            className="action-btn secondary"
+                                            className={`${styles.actionBtn} ${styles.secondary}`}
                                             onClick={() => handleViewDetails(job.id)}
                                         >
                                             <Eye size={16} />
                                             Details
                                         </button>
                                         {job.status === 'completed' && (
-                                            <>
-                                                <button
-                                                    className="action-btn secondary"
-                                                    onClick={() => handleRepeatJob(job.id)}
-                                                >
-                                                    <RotateCcw size={16} />
-                                                    Repeat
-                                                </button>
-                                            </>
+                                            <button
+                                                className={`${styles.actionBtn} ${styles.success}`}
+                                                onClick={() => handleRepeatJob(job.id)}
+                                            >
+                                                <RotateCcw size={16} />
+                                                Repeat
+                                            </button>
                                         )}
                                         <button
-                                            className="action-btn secondary"
+                                            className={`${styles.actionBtn} ${styles.primary}`}
                                             onClick={() => handleContactClient(job.id)}
+                                            disabled
                                         >
                                             <MessageSquare size={16} />
                                             Contact
@@ -793,10 +796,10 @@ const JobHistory = () => {
                                     </div>
 
                                     {job.images && job.images.length > 0 && (
-                                        <div className="job-attachments">
-                                            <span className="attachments-label">Files:</span>
+                                        <div className={styles.jobAttachments}>
+                                            <span className={styles.attachmentsLabel}>Files:</span>
                                             {job.images.map((file, index) => (
-                                                <span key={index} className="attachment-file">{file}</span>
+                                                <span key={index} className={styles.attachmentFile}>{file}</span>
                                             ))}
                                         </div>
                                     )}
@@ -806,11 +809,11 @@ const JobHistory = () => {
                     </div>
 
                     {sortedJobs.length === 0 && (
-                        <div className="empty-state">
-                            <div className="empty-icon">
+                        <div className={styles.emptyState}>
+                            <div className={styles.emptyIcon}>
                                 <Activity size={48} style={{ color: '#9ca3af' }} />
                             </div>
-                            <div className="empty-message">
+                            <div className={styles.emptyMessage}>
                                 <h4>No jobs found</h4>
                                 <p>Try adjusting your filters or search terms to find relevant job history.</p>
                             </div>
@@ -818,7 +821,104 @@ const JobHistory = () => {
                     )}
                 </section>
             </div>
-        </div>
+
+            {/* Job Details Modal */}
+            {showJobDetails && selectedJobDetails && (
+                <div className={styles.modalOverlay}>
+                    <div className={styles.modalContent}>
+                        <div className={styles.modalHeader}>
+                            <h2 className={styles.modalTitle}>
+                                Job Details - {selectedJobDetails.id}
+                            </h2>
+                            <button
+                                onClick={() => setShowJobDetails(false)}
+                                className={styles.modalCloseBtn}
+                            >
+                                <X size={24} color="#6b7280" />
+                            </button>
+                        </div>
+
+                        <div className={styles.modalSection}>
+                            <h3 className={styles.modalSectionTitle}>Client Information</h3>
+                            <div className={styles.modalSectionContent}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+                                    <div className={styles.clientAvatar}>
+                                        {selectedJobDetails.client.avatar}
+                                    </div>
+                                    <div>
+                                        <h4 style={{ margin: '0 0 4px 0', fontWeight: '600' }}>
+                                            {selectedJobDetails.client.name}
+                                        </h4>
+                                        <div style={{ display: 'flex', gap: '16px', fontSize: '14px', color: '#6b7280' }}>
+                                            <span>{selectedJobDetails.client.phone}</span>
+                                            <span>{selectedJobDetails.client.email}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style={{ marginTop: '24px', display: 'flex', justifyContent: 'flex-end' }}>
+                            <button
+                                onClick={() => setShowJobDetails(false)}
+                                className={`${styles.actionBtn} ${styles.primary}`}
+                            >
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Repeat Job Modal */}
+            {showRepeatJobModal && repeatJobData && (
+                <div className={styles.modalOverlay}>
+                    <div className={styles.modalContent}>
+                        <div className={styles.modalHeader}>
+                            <h2 className={styles.modalTitle}>Create Repeat Job</h2>
+                            <button
+                                onClick={() => setShowRepeatJobModal(false)}
+                                className={styles.modalCloseBtn}
+                            >
+                                <X size={24} color="#6b7280" />
+                            </button>
+                        </div>
+
+                        <div className={styles.modalSection}>
+                            <div className={styles.modalSectionContent}>
+                                <p style={{ margin: '0 0 16px 0', color: '#6b7280' }}>
+                                    Create a new job request based on the previous job details.
+                                </p>
+                                <div style={{ marginBottom: '12px' }}>
+                                    <strong>Service:</strong> {repeatJobData.service.type}
+                                </div>
+                                <div style={{ marginBottom: '12px' }}>
+                                    <strong>Client:</strong> {repeatJobData.client.name}
+                                </div>
+                                <div style={{ marginBottom: '12px' }}>
+                                    <strong>Price:</strong> ₨{repeatJobData.pricing.quotedPrice.toLocaleString()}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '24px' }}>
+                            <button
+                                onClick={() => setShowRepeatJobModal(false)}
+                                className={`${styles.actionBtn} ${styles.secondary}`}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={confirmRepeatJob}
+                                className={`${styles.actionBtn} ${styles.success}`}
+                            >
+                                <RotateCcw size={16} />
+                                Create Repeat Job
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
