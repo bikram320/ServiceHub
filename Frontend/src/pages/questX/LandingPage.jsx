@@ -8,6 +8,7 @@ import {
     ChevronRight,
     Star,
 } from "lucide-react";
+import {useNavigate} from "react-router-dom";
 import Header from "../../Components/layout/Header.jsx";
 import styles from "../../styles/LandingPage.module.css";
 import ElectricalHelp from "../../assets/ElectricalHelp.jpg";
@@ -19,12 +20,14 @@ import PaintingHelp from "../../assets/PaintingHelp.jpg";
 import PhotographyHelp from "../../assets/PhotographerHelp.webp";
 import PlumbingHelp from "../../assets/PlumbingHelp.jpg";
 import ConstructionWorker from "../../assets/constructionWorker.webp";
+import ConsWorker3 from "../../assets/ConsWorker3.png";
 import FirstPageImg from "../../assets/FirstPage.png";
 import Footer from "../../Components/layout/Footer.jsx";
 
 function LandingPage() {
     const [hoveredService, setHoveredService] = useState(null);
     const [hoveredProject, setHoveredProject] = useState(null);
+    const navigate = useNavigate();
 
     const services = [
         { name: "Plumbing", icon: Droplets, color: "blue" },
@@ -179,7 +182,7 @@ function LandingPage() {
                             verified experts in just a few clicks.
                         </p>
 
-                        <button className={styles["btn-secondary"]}>
+                        <button className={styles["btn-secondary"]} onClick={() => navigate("/LoginSignup/*", { state: { role: "user" } })}>
                             LET'S GET STARTED
                         </button>
 
@@ -198,7 +201,7 @@ function LandingPage() {
                                             onMouseEnter={() => setHoveredService(index)}
                                             onMouseLeave={() => setHoveredService(null)}
                                         >
-                                            <div className={styles["service-icon-wrapper"]}>
+                                            <div className={styles["service-icon-wrapper"]} >
                                                 <Icon
                                                     className={`${styles["service-icon"]} ${
                                                         hoveredService === index
@@ -215,7 +218,7 @@ function LandingPage() {
                                 })}
 
                                 {/* See More */}
-                                <div className={`${styles["service-card"]} ${styles["see-more"]}`}>
+                                <div className={`${styles["service-card"]} ${styles["see-more"]}`} onClick={() => navigate("/FindServices")}>
                                     <span>SEE MORE</span>
                                     <ChevronRight className={styles.arrow} />
                                 </div>
@@ -227,7 +230,7 @@ function LandingPage() {
                     <div className={styles["hero-right"]}>
                         <div className={styles["hero-image-wrapper1"]}>
                             <img
-                                src={FirstPageImg}
+                                src={ConsWorker3}
                                 alt="Professional technician"
                                 className={styles["hero-image1"]}
                             />

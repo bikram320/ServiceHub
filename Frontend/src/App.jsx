@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState , useEffect} from 'react';
 import './App.css';
 
 import {BrowserRouter as Router, Routes, Route} from 'react-router-dom';
+import {useLocation} from 'react-router-dom';
 import UserLayout from "./pages/User/UserLayout.jsx";
 import AnimatedAuth from "./pages/Auth/AnimatedAuth.jsx";
 import Test from "./pages/Test.jsx";
@@ -21,9 +22,20 @@ import TechnicianProfile from "./pages/Technician/TechnicianProfile.jsx";
 import BookingDetail from "./pages/User/BookingDetail.jsx";
 import FindServices from "./pages/User/FindServices.jsx";
 
+function ScrollToTop() {
+    const { pathname } = useLocation();
+
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, [pathname]);
+
+    return null;
+}
+
 function App() {
     return (
        <Router>
+           <ScrollToTop />
            <Routes>
                <Route path="/" element={<LandingPage />} />
                <Route path="/UserLayout/*" element={<UserLayout />} />
