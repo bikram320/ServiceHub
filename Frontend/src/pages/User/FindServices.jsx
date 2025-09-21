@@ -13,7 +13,13 @@ const FindServices = () => {
         "Carpenter",
         "Movers",
         "Construction Worker",
-        // "Mechanic",
+         "Mechanic",
+        "HVAC Repair",
+        "Roofing",
+        "Landscaping",
+        "Cleaning Services",
+        "Pest Control",
+        "Interior Design"
     ];
 
     return (
