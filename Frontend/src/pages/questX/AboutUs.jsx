@@ -339,7 +339,7 @@ function AboutUs() {
                         </p>
                         <div className={styles['about-cta-buttons']}>
                             <button className={styles['btn-primary']} onClick={() => navigate("/FindServices")}>Find a Technician</button>
-                            <button className={styles['btn-secondary']} onClick={() => navigate("/LoginSignup")}>Become a Technician</button>
+                            <button className={styles['btn-secondary']} onClick={() => navigate("/LoginSignup", {state: {role: "technician"}})}>Become a Technician</button>
                         </div>
                     </div>
                 </section>
