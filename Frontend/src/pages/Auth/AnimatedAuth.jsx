@@ -306,7 +306,7 @@ const AnimatedAuth = () => {
                                     />
                                     Remember me
                                 </label>
-                                <button type="button" className={styles["forgot-link"]} onClick={() => navigate("/ForgotPassword")}>
+                                <button type="button" className={styles["forgot-link"]} onClick={() => navigate("/ForgotPassword", { state: { role: role } })}>
                                     Forgot Password?
                                 </button>
                             </div>
