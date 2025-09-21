@@ -70,6 +70,7 @@ const AnimatedAuth = () => {
                 const data = await response.json();
                 // Store token and user data
                 localStorage.setItem('accessToken', data.accessToken);
+                localStorage.setItem('userEmail',loginData.email)
 
                 // You might need to get user info from JWT token or make another API call
                 // For now, let's decode the JWT to get user info
