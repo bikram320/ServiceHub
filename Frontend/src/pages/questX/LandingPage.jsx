@@ -30,7 +30,7 @@ function LandingPage() {
     const navigate = useNavigate();
 
     const services = [
-        { name: "Plumbing", icon: Droplets, color: "blue" },
+        { name: "Plumber", icon: Droplets, color: "blue" },
         { name: "Painter", icon: Paintbrush, color: "purple" },
         { name: "Electrician", icon: Zap, color: "yellow" },
         { name: "Photographer", icon: Camera, color: "green" },

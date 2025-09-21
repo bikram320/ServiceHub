@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
 import Header from "../../Components/layout/Header.jsx";
+import Footer from "../../Components/layout/Footer.jsx";
 import styles from "../../styles/TechnicianLandingPage.module.css";
 
 function TechnicianLandingPage() {
@@ -143,7 +144,7 @@ function TechnicianLandingPage() {
 
                         <div className={styles["hero-buttons"]}>
                             <button className={styles["btn-primary"]} onClick={() => navigate("/LoginSignup" , { state: { role: "technician" } })}>APPLY NOW</button>
-                            <button className={styles["btn-secondary"]}>LEARN MORE</button>
+                            <button className={styles["btn-secondary"]} onClick={() => navigate("/AboutUs")}>LEARN MORE</button>
                         </div>
                     </div>
 
@@ -256,13 +257,14 @@ function TechnicianLandingPage() {
                     <p className={styles["cta-description"]}>
                         Join hundreds of skilled technicians who are already earning great money and building successful careers with QuestX.
                     </p>
-                    <button className={styles["cta-button"]}>APPLY NOW - IT'S FREE!</button>
+                    <button className={styles["cta-button"]} onClick={() => navigate("/LoginSignup", { state: { role: "technician" } })}>APPLY NOW - IT'S FREE!</button>
                     <p className={styles["cta-note"]}>
                         Application review typically takes 2-3 business days
                     </p>
                 </div>
             </section>
         </div>
+            <Footer />
         </div>
     );
 }

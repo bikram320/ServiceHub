@@ -1,5 +1,6 @@
 import React from 'react';
-import { Facebook, Instagram, Twitter } from "lucide-react";
+import { Facebook, Instagram } from "lucide-react";
+import { FaXTwitter } from 'react-icons/fa6';
 import { useNavigate } from "react-router-dom";
 import "../../styles/Footer.css";
 
@@ -63,7 +64,7 @@ const Footer = () => {
                         <h3 className="footer-title">Follow Us</h3>
                         <div className="social-links">
                             <a
-                                href="https://facebook.com"
+                                href="https://facebook.com/roji.grg.505"
                                 className="social-link"
                                 aria-label="Facebook"
                                 target="_blank"
@@ -72,7 +73,7 @@ const Footer = () => {
                                 <Facebook size={20} />
                             </a>
                             <a
-                                href="https://instagram.com"
+                                href="https://www.instagram.com/kripsan77"
                                 className="social-link"
                                 aria-label="Instagram"
                                 target="_blank"
@@ -81,13 +82,13 @@ const Footer = () => {
                                 <Instagram size={20} />
                             </a>
                             <a
-                                href="https://twitter.com"
+                                href="https://x.com/bkbikram7"
                                 className="social-link"
                                 aria-label="Twitter"
                                 target="_blank"
                                 rel="noopener noreferrer"
                             >
-                                <Twitter size={20} />
+                                <FaXTwitter size={20} />
                             </a>
                         </div>
                     </div>
