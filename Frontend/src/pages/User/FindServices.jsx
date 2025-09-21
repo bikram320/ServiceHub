@@ -13,7 +13,9 @@ const FindServices = () => {
         "Carpenter",
         "Movers",
         "Construction Worker",
-        // "Mechanic",
+         "Mechanic",
+        "HVAC Repair",
+        "Cleaning Services"
     ];
 
     return (

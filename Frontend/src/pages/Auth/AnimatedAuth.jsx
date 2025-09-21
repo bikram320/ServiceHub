@@ -4,7 +4,6 @@ import styles from '../../styles/AnimatedAuth.module.css';
 import { useNavigate , useLocation} from "react-router-dom";
 import OTPVerificationModal from '../../Components/layout/OTPVerificationModal';
 
-const API_BASE = "http://localhost:5000";
 const AnimatedAuth = () => {
     const [isLogin, setIsLogin] = useState(true);
     const [showPassword, setShowPassword] = useState(false);
