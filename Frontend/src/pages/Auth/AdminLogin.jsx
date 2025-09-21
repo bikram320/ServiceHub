@@ -2,11 +2,13 @@
 import React, { useState } from 'react';
 import { Mail, Lock, Eye, EyeOff, Shield, AlertCircle } from 'lucide-react';
 import styles from '../../styles/AdminLogin.module.css';
+import {useNavigate} from "react-router-dom";
 
 const AdminLogin = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
+    const navigate = useNavigate()
 
     const [loginData, setLoginData] = useState({
         email: '',
@@ -37,7 +39,7 @@ const AdminLogin = () => {
 
         try {
             // Spring Boot API endpoint for admin login
-            const response =await fetch(`http://localhost:8080/auth/login/admin`, {
+            const response =await fetch(`api/auth/login/admin`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

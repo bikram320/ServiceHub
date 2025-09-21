@@ -22,6 +22,7 @@ const TechnicianProfileForm = ({ userInfo, onUpdateProfile }) => {
         preferredLanguage: 'English',
         timezone: 'Asia/Kathmandu (UTC+05:45)',
         avatar: null,
+        profileImageFile: null,
         serviceType: '',
         hourlyRate:'',
         serviceDescription: '',
@@ -29,7 +30,9 @@ const TechnicianProfileForm = ({ userInfo, onUpdateProfile }) => {
         availabilityDetails: '',
         // Verification fields
         citizenshipPhoto: null,
-        workingLicense: null
+        citizenshipPhotoFile: null,
+        workingLicense: null,
+        workingLicenseFile: null
     });
 
     const [isEditing, setIsEditing] = useState({
@@ -70,6 +73,21 @@ const TechnicianProfileForm = ({ userInfo, onUpdateProfile }) => {
     const [showLocationSuggestions, setShowLocationSuggestions] = useState(false);
     const [isGettingCurrentLocation, setIsGettingCurrentLocation] = useState(false);
     const [error, setError] = useState(null);
+    const [isUpdating, setIsUpdating] = useState(false);
+    const [successMessage, setSuccessMessage] = useState('');
+
+    // Load profile on component mount
+    useEffect(() => {
+        const loadProfile = async () => {
+            try {
+                await fetchProfile();
+            } catch (error) {
+                console.error('Failed to load profile on mount:', error);
+            }
+        };
+
+        loadProfile();
+    }, []);
 
     const handleInputChange = (field, value) => {
         setFormData(prev => ({
@@ -77,6 +95,7 @@ const TechnicianProfileForm = ({ userInfo, onUpdateProfile }) => {
             [field]: value
         }));
         setError(null);
+        setSuccessMessage('');
     };
 
     const toggleEdit = (field) => {
@@ -86,25 +105,222 @@ const TechnicianProfileForm = ({ userInfo, onUpdateProfile }) => {
         }));
     };
 
-    const handleSave = () => {
-        onUpdateProfile(formData);
-        setIsEditing({
-            fullName: false,
-            email: false,
-            phoneNumber: false,
-            address: false,
-            bio: false,
-            serviceType: false,
-            hourlyRate: false,
-            serviceDescription: false,
-            availability: false,
-            availabilityDetails: false
-        });
+    // Helper function to get JWT token from cookie
+    const getJWTFromCookie = () => {
+        const name = "Access=";
+        const decodedCookie = decodeURIComponent(document.cookie);
+        const cookieArray = decodedCookie.split(';');
+
+        console.log('All cookies:', document.cookie);
+
+        for (let i = 0; i < cookieArray.length; i++) {
+            let cookie = cookieArray[i];
+            while (cookie.charAt(0) === ' ') {
+                cookie = cookie.substring(1);
+            }
+            if (cookie.indexOf(name) === 0) {
+                const token = cookie.substring(name.length, cookie.length);
+                console.log('Found Access token:', token ? 'Token exists' : 'Token is empty');
+                return token;
+            }
+        }
+        console.log('No Access token found in cookies');
+        return null;
     };
 
+    const getProfileImageUrl = (filename) => {
+        if (!filename) return null;
+        return `/upload/technicians/profile-image/${filename}`;
+    };
+
+    const getFileUrl = (filename) => {
+        if (!filename) return null;
+        return `/upload/technicians/documents/${filename}`;
+    };
+
+    // Fetch profile data from backend
+    const fetchProfile = async () => {
+        try {
+            const email = localStorage.getItem('userEmail');
+            if (!email) {
+                console.error('No email found in localStorage');
+                return;
+            }
+
+            const response = await fetch(`api/technician/profile?email=${email}`, {
+                method: 'GET',
+                credentials: 'include',
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+
+                console.log('Profile image path:', data.profileImagePath);
+                console.log('Identity document path:', data.identityDocPath);
+                console.log('Valid document path:', data.validDocPath);
+
+                const avatarUrl = getProfileImageUrl(data.profileImagePath);
+                const identityDocUrl = getFileUrl(data.identityDocPath);
+                const validDocUrl = getFileUrl(data.validDocPath);
+
+                setFormData(prev => ({
+                    ...prev,
+                    fullName: data.username || '',
+                    email: data.email || '',
+                    phoneNumber: data.phone || '',
+                    address: data.address || '',
+                    bio: data.bio || '',
+                    coordinates: (data.latitude && data.longitude) ?
+                        {lat: data.latitude, lon: data.longitude} : null,
+                    avatar: avatarUrl || null,
+                    citizenshipPhoto: identityDocUrl || null,
+                    workingLicense: validDocUrl || null,
+                }));
+
+                if (data.username) localStorage.setItem('technicianName', data.username);
+                if (data.email) localStorage.setItem('technicianEmail', data.email);
+
+            } else {
+                console.error('Failed to fetch profile:', response.status);
+            }
+        } catch (error) {
+            console.error('Error fetching profile:', error);
+        }
+    };
+
+    // Backend API call to update profile
+    const updateProfileOnBackend = async () => {
+        const formDataToSend = new FormData();
+
+        // Add required email parameter
+        formDataToSend.append('email', formData.email);
+
+        // Add optional parameters only if they exist
+        if (formData.phoneNumber?.trim()) {
+            formDataToSend.append('phone', formData.phoneNumber);
+        }
+
+        if (formData.address?.trim()) {
+            formDataToSend.append('address', formData.address);
+        }
+
+        if (formData.coordinates?.lat) {
+            formDataToSend.append('latitude', formData.coordinates.lat.toString());
+        }
+
+        if (formData.coordinates?.lon) {
+            formDataToSend.append('longitude', formData.coordinates.lon.toString());
+        }
+
+        if (formData.bio?.trim()) {
+            formDataToSend.append('bio', formData.bio);
+        }
+
+        if (formData.profileImageFile) {
+            formDataToSend.append('profile_image', formData.profileImageFile);
+        }
+
+        if (formData.citizenshipPhotoFile) {
+            formDataToSend.append('identity_doc', formData.citizenshipPhotoFile);
+        }
+
+        if (formData.workingLicenseFile) {
+            formDataToSend.append('valid_doc', formData.workingLicenseFile);
+        }
+
+        const token = getJWTFromCookie();
+        console.log('Token for request:', token ? 'Token found' : 'No token');
+
+        // Debug: Log what we're sending
+        console.log('Sending to backend:');
+        for (let [key, value] of formDataToSend.entries()) {
+            console.log(key, typeof value === 'object' ? 'File' : value);
+        }
+
+        try {
+            const response = await fetch('api/technician/update-profile', {
+                method: 'POST',
+                headers: {
+                    ...(token && { 'Authorization': `Bearer ${token}` }),
+                },
+                credentials: 'include',
+                body: formDataToSend,
+            });
+
+            console.log('Response status:', response.status);
+
+            if (response.ok) {
+                const result = await response.text();
+                setSuccessMessage(result);
+                setError(null);
+
+                // Update localStorage with new values
+                if (formData.fullName) {
+                    localStorage.setItem('technicianName', formData.fullName);
+                }
+                if (formData.email) {
+                    localStorage.setItem('technicianEmail', formData.email);
+                }
+
+                // Call parent component callback if provided
+                if (onUpdateProfile) {
+                    onUpdateProfile(formData);
+                }
+            } else if (response.status === 401) {
+                throw new Error('Session expired or invalid. Please login again.');
+            } else {
+                const errorText = await response.text();
+                console.log('Error response:', errorText);
+                throw new Error(errorText || 'Failed to update profile');
+            }
+        } catch (error) {
+            console.error('Error updating profile:', error);
+            setError(error.message || 'Failed to update profile. Please try again.');
+            setSuccessMessage('');
+        }
+    };
+
+    const handleSave = async () => {
+        if (!formData.email?.trim()) {
+            setError('Email is required to update profile');
+            return;
+        }
+
+        setIsUpdating(true);
+        setError(null);
+        setSuccessMessage('');
+
+        try {
+            await updateProfileOnBackend();
+
+            // Reset editing states
+            setIsEditing({
+                fullName: false,
+                email: false,
+                phoneNumber: false,
+                address: false,
+                bio: false,
+                serviceType: false,
+                hourlyRate: false,
+                serviceDescription: false,
+                availability: false,
+                availabilityDetails: false
+            });
+        } catch (error) {
+            console.error('Save operation failed:', error);
+        } finally {
+            setIsUpdating(false);
+        }
+    };
+
+    // Convert file to base64 for preview while keeping original file for upload
     const handleAvatarChange = (event) => {
         const file = event.target.files[0];
         if (file) {
+            // Store the actual file for backend upload
+            handleInputChange('profileImageFile', file);
+
+            // Create preview
             const reader = new FileReader();
             reader.onload = (e) => {
                 handleInputChange('avatar', e.target.result);
@@ -116,6 +332,14 @@ const TechnicianProfileForm = ({ userInfo, onUpdateProfile }) => {
     const handleVerificationFileChange = (event, fieldName) => {
         const file = event.target.files[0];
         if (file) {
+            // Store the actual file for backend upload
+            if (fieldName === 'citizenshipPhoto') {
+                handleInputChange('citizenshipPhotoFile', file);
+            } else if (fieldName === 'workingLicense') {
+                handleInputChange('workingLicenseFile', file);
+            }
+
+            // Create preview
             const reader = new FileReader();
             reader.onload = (e) => {
                 handleInputChange(fieldName, e.target.result);
@@ -195,7 +419,6 @@ const TechnicianProfileForm = ({ userInfo, onUpdateProfile }) => {
 
     const languages = ['English', 'Nepali', 'Hindi'];
     const serviceTypes = ['Plumbing', 'Electrical', 'HVAC', 'Carpentry', 'General Maintenance', 'Appliance Repair'];
-
     return (
         <div className={styles['profile-content']}>
             <div className={styles['profile-form']}>

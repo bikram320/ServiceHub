@@ -9,6 +9,7 @@ import org.example.QuestX.Repository.TechnicianRepository;
 import org.example.QuestX.dtos.PaymentDetailsDto;
 import org.example.QuestX.dtos.ServiceAndTechnicianDetailsDto;
 import org.example.QuestX.dtos.ServiceAndUserDetailsDto;
+import org.example.QuestX.dtos.TechnicianDto;
 import org.example.QuestX.exception.ServiceNotFoundException;
 import org.example.QuestX.exception.StatusInvalidException;
 import org.example.QuestX.exception.TechnicianNotFoundException;
@@ -134,6 +135,24 @@ public class TechnicianService {
                 serviceRequest.getAppointmentTime(),
                 ServiceStatus.REJECTED);
     }
+
+    public TechnicianDto getProfile(String email){
+        Technician tech = technicianRepository.findByEmail(email);
+        if(tech == null){
+            throw new TechnicianNotFoundException("Technician not found");
+        }
+        TechnicianDto technicianDto = new TechnicianDto();
+        technicianDto.setTechnicianName(tech.getName());
+        technicianDto.setEmail(tech.getEmail());
+        technicianDto.setPhone(tech.getPhone());
+        technicianDto.setAddress(tech.getAddress());
+        technicianDto.setProfileImagePath(tech.getProfileImagePath());
+        technicianDto.setDocumentPath(tech.getValidDocumentPath());
+        technicianDto.setIdentityPath(tech.getIdentityPath());
+
+        return technicianDto;
+    }
+
 
     public List<ServiceAndUserDetailsDto> getCurrentRequest(String email){
         var technician = technicianRepository.findByEmail(email);

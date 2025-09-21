@@ -40,6 +40,10 @@ public class TechnicianController {
         List<ServiceAndUserDetailsDto> currentRequest = technicianService.getCurrentRequest(email);
         return ResponseEntity.ok(currentRequest);
     }
+    @GetMapping("/profile")
+    public ResponseEntity<?> GetProfile(@RequestParam String email) {
+        return ResponseEntity.ok(technicianService.getProfile(email));
+    }
     @GetMapping("/get-previous-request")
     public ResponseEntity<?> getPreviousRequest(@RequestParam String email) {
         List<ServiceAndUserDetailsDto> previousRequest = technicianService.getPreviousRequest(email);
