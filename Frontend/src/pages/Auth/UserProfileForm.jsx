@@ -1,6 +1,9 @@
 import React, {useCallback, useEffect, useState} from "react";
 import {Camera, Edit3, MapPin, Plus, Search, Loader2, Navigation, Shield, FileText} from 'lucide-react';
-import '../../styles/UserProfileForm.css';
+import {
+    Verified
+} from "@mui/icons-material";
+import styles from '../../styles/TechnicianProfileForm.module.css';
 import {
     searchLocations,
     getCurrentLocation,
@@ -23,6 +26,8 @@ const UserProfileForm = ({ userInfo, onUpdateProfile }) => {
         profileImageFile: null,
         citizenshipPhoto: null,
         citizenshipPhotoFile: null,
+        isVerified: false,
+        verificationDate: null
     });
 
     const [isEditing, setIsEditing] = useState({
@@ -143,6 +148,8 @@ const UserProfileForm = ({ userInfo, onUpdateProfile }) => {
                     address: data.address || '',
                     avatar: avatarUrl || null,
                     citizenshipPhoto: docUrl || null,
+                    verificationStatus: data.verificationStatus || determineVerificationStatus(data),
+                    verificationDate: data.verificationDate || null,
                 }));
 
                 // 5️⃣ Optionally update localStorage
@@ -287,6 +294,203 @@ const UserProfileForm = ({ userInfo, onUpdateProfile }) => {
         }
     };
 
+    // 3. Mock function to determine verification status based on profile completeness
+    const determineVerificationStatus = (profileData) => {
+        const hasProfileImage = profileData.profileImagePath;
+        const hasDocuments = profileData.documentPath;
+        const hasCompleteInfo = profileData.username && profileData.phone && profileData.address;
+
+        // Mock logic - you can customize this based on your requirements
+        if (hasProfileImage && hasDocuments && hasCompleteInfo) {
+            // Simulate some users being verified, some pending
+            const randomStatus = Math.random();
+            if (randomStatus > 0.7) return 'verified';
+            if (randomStatus > 0.3) return 'pending';
+            return 'unverified';
+        }
+
+        return 'unverified';
+    };
+
+// 4. Verification Badge Component
+    const VerificationBadge = ({ status, verificationDate, size = 20 }) => {
+        if (status === 'unverified') return null;
+
+        const getVerificationConfig = () => {
+            switch (status) {
+                case 'verified':
+                    return {
+                        color: '#1DA1F2', // Blue
+                        icon: 'check',
+                        tooltip: `Verified ${verificationDate ? `on ${formatDate(verificationDate)}` : 'by admin'}`,
+                        className: 'verified'
+                    };
+                case 'pending':
+                    return {
+                        color: '#F59E0B', // Yellow/Orange
+                        icon: 'clock',
+                        tooltip: 'Verification pending - under admin review',
+                        className: 'pending'
+                    };
+                default:
+                    return null;
+            }
+        };
+
+        const config = getVerificationConfig();
+        if (!config) return null;
+
+        const formatDate = (dateString) => {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+        };
+
+        const renderIcon = () => {
+            if (config.icon === 'check') {
+                return (
+                    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="12" cy="12" r="10" fill={config.color} />
+                        <path
+                            d="M9 12l2 2 4-4"
+                            stroke="white"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                        />
+                    </svg>
+                );
+            } else if (config.icon === 'clock') {
+                return (
+                    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="12" cy="12" r="10" fill={config.color} />
+                        <path
+                            d="M12 6v6l4 2"
+                            stroke="white"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                        />
+                    </svg>
+                );
+            }
+        };
+
+        return (
+            <div
+                className={`${styles["verification-badge"]} ${styles[`verification-${config.className}`]}`}
+                title={config.tooltip}
+            >
+                {renderIcon()}
+            </div>
+        );
+    };
+
+// 5. Helper function to check verification eligibility
+    const checkVerificationEligibility = () => {
+        const hasRequiredDocs = formData.citizenshipPhoto && formData.avatar;
+        const hasCompleteProfile = formData.fullName && formData.email && formData.phoneNumber;
+        return hasRequiredDocs && hasCompleteProfile;
+    };
+
+// 6. Function to simulate requesting verification (frontend only)
+    const handleVerificationRequest = () => {
+        if (!checkVerificationEligibility()) {
+            setError('Please complete your profile and upload required documents before requesting verification.');
+            return;
+        }
+
+        // Simulate sending verification request
+        setFormData(prev => ({
+            ...prev,
+            verificationStatus: 'pending'
+        }));
+
+        setSuccessMessage('Verification request submitted! Your profile is now under review.');
+
+        // Store in localStorage for persistence (since no backend)
+        localStorage.setItem('userVerificationStatus', 'pending');
+        localStorage.setItem('verificationRequestDate', new Date().toISOString());
+    };
+
+// 7. Load verification status from localStorage on component mount
+    useEffect(() => {
+        const savedStatus = localStorage.getItem('userVerificationStatus');
+        const savedDate = localStorage.getItem('verificationRequestDate');
+
+        if (savedStatus) {
+            setFormData(prev => ({
+                ...prev,
+                verificationStatus: savedStatus,
+                verificationDate: savedDate
+            }));
+        }
+    }, []);
+
+
+    return (
+            <div
+                className={styles["verification-badge"]}
+                title={`Verified ${verificationDate ? `on ${formatDate(verificationDate)}` : 'by admin'}`}
+            >
+                <svg
+                    width={size}
+                    height={size}
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    className={styles["verification-icon"]}
+                >
+                    <circle cx="12" cy="12" r="10" fill="#1DA1F2" />
+                    <path
+                        d="M9 12l2 2 4-4"
+                        stroke="white"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                    />
+                </svg>
+            </div>
+        );
+    };
+
+//  Helper function to check verification eligibility
+    const checkVerificationEligibility = () => {
+        const hasRequiredDocs = formData.citizenshipPhoto && formData.avatar;
+        const hasCompleteProfile = formData.fullName && formData.email && formData.phoneNumber;
+        return hasRequiredDocs && hasCompleteProfile;
+    };
+
+//  Function to request verification (optional - for users to request verification)
+    const requestVerification = async () => {
+        try {
+            const response = await fetch('api/users/request-verification', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify({
+                    email: formData.email,
+                    message: 'User requesting profile verification'
+                }),
+            });
+
+            if (response.ok) {
+                setSuccessMessage('Verification request submitted successfully. Admin will review your profile.');
+            } else {
+                throw new Error('Failed to submit verification request');
+            }
+        } catch (error) {
+            setError('Failed to submit verification request. Please try again.');
+        }
+    };
+
+
     //debounced location search, waiting until the user pauses typing before sending the API request.
     const debouncedLocationSearch = useCallback(
         debounce(async (query) => {
@@ -408,16 +612,16 @@ const UserProfileForm = ({ userInfo, onUpdateProfile }) => {
     };
 
     return (
-        <div className="profile-content">
-            <div className="profile-form">
-                <div className="profile-header">
-                    <h1 className="profile-title">User Profile</h1>
-                    <p className="profile-subtitle">Manage your account settings and preferences.</p>
+        <div className={styles["profile-content"]}>
+            <div className={styles["profile-form"]}>
+                <div className={styles["profile-header"]}>
+                    <h1 className={styles["profile-title"]}>User Profile</h1>
+                    <p className={styles["profile-subtitle"]}>Manage your account settings and preferences.</p>
                 </div>
 
                 {/*Error Message */}
                 {error &&(
-                    <div className="error-message">
+                    <div className={styles["error-message"]}>
                         <span>{error}</span>
                         <button onClick= {() => setError(null)}>x</button>
                     </div>
@@ -425,67 +629,61 @@ const UserProfileForm = ({ userInfo, onUpdateProfile }) => {
 
                 {/*Success Message */}
                 {successMessage &&(
-                    <div className="success-message">
+                    <div className={styles["success-message"]}>
                         <span>{successMessage}</span>
                         <button onClick= {() => setSuccessMessage('')}>x</button>
                     </div>
                 )}
 
                 {/*Profile picture section */}
-                <div className="profile-picture-section">
-                    <div className="profile-picture-container">
-                        <div className="profile-picture">
-                            {formData.avatar? (
-                                <img src={formData.avatar} className="profile-image" alt="Profile Avatar" />
-                            ): (
-                                <div className="profile-placeholder">
-                                    {formData.fullName ? formData.fullName.charAt(0).toUpperCase()  : 'You'} {/*if fullname given then shows the first letter in Capital*/}
+                <div className={styles["profile-picture-section"]}>
+                    <div className={styles["profile-picture-container"]}>
+                        <div className={styles["profile-picture"]}>
+                            {formData.avatar ? (
+                                <img src={formData.avatar} className={styles["profile-image"]} alt="Profile Avatar" />
+                            ) : (
+                                <div className={styles["profile-placeholder"]}>
+                                    <label htmlFor="avatar-upload" className={styles["camera-placeholder"]}>
+                                        <Camera size={40} />
+                                        <input
+                                            type='file'
+                                            id="avatar-upload"
+                                            accept="image/*"
+                                            onChange={handleAvatarChange}
+                                            style={{ display: 'none' }}
+                                        />
+                                    </label>
                                 </div>
                             )}
-
-                            <div className="profile-picture-overlay">
-                                <label htmlFor="avatar-upload" className="camera-btn">
-                                    <Camera size={20} />
-                                    <input
-                                        type='file'
-                                        id= "avatar-upload"
-                                        accept="image/*"
-                                        onChange={handleAvatarChange}
-                                        style={{ display: 'none' }}
-                                    />
-                                </label>
-                            </div>
                         </div>
                     </div>
-                    <div className="profile-info">
-                        <h2 className="profile-name">{formData.fullName || 'Username'}</h2>
-                        <p className="profile-role">
-                            Client
-                        </p>
+                    <div className={styles["profile-info"]}>
+                        <h2 className={styles["profile-role"]}>Client</h2>
+                        <h2 className={styles["profile-name"]}>{formData.fullName || 'Username'}</h2>
                     </div>
                 </div>
 
                 {/*Account Information */}
-                <section className="form-section">
-                    <h3 className="section-title">Account Information</h3>
+                <section className={styles["form-section"]}>
+                    <h3 className={styles["section-title"]}>Account Information</h3>
 
-                    <div className="form-group">
-                        <label htmlFor="fullName" className="form-label">Full Name</label>
-                        <div className = "input-with-edit">
+                    <div className={styles["form-group"]}>
+                        <label htmlFor="fullName" className={styles["form-label"]}>Full Name</label>
+                        <div className={styles["input-with-edit"]}>
                             {isEditing.fullName ? (
                                 <input
                                     type="text"
-                                    className="form-input"
+                                    className={styles["form-input"]}
                                     value={formData.fullName}
                                     onChange={(e) => handleInputChange('fullName',e.target.value)}
                                     onBlur={() => toggleEdit('fullName')} //when the input loses focus (click outside), it calls toggleEdit('fullName') to exit edit mode.
                                     autoFocus
                                 />
                             ) : (
-                                <div className= "form-display">
+                                <div className={styles["form-display"]}>
                                     <span> {formData.fullName || 'Not Provided'}</span>
                                     <button
-                                        className="edit-btn"
+                                        className={styles["edit-btn"]}
                                         onClick={() => toggleEdit('fullName')}
                                     >
                                         <Edit3 size={16} />
@@ -495,23 +693,23 @@ const UserProfileForm = ({ userInfo, onUpdateProfile }) => {
                         </div>
                     </div>
 
-                    <div className="form-group">
-                        <label htmlFor="email" className="form-label">Email</label>
-                        <div className = "input-with-edit">
+                    <div className={styles["form-group"]}>
+                        <label htmlFor="email" className={styles["form-label"]}>Email</label>
+                        <div className={styles["input-with-edit"]}>
                             {isEditing.email ? (
                                 <input
                                     type="email"
-                                    className="form-input"
+                                    className={styles["form-input"]}
                                     value={formData.email}
                                     onChange={(e) => handleInputChange('email',e.target.value)}
                                     onBlur={() => toggleEdit('email')}
                                     autoFocus
                                 />
                             ) : (
-                                <div className= "form-display">
+                                <div className={styles["form-display"]}>
                                     <span> {formData.email || 'Not Provided'}</span>
                                     <button
-                                        className="edit-btn"
+                                        className={styles["edit-btn"]}
                                         onClick={() => toggleEdit('email')}
                                     >
                                         <Edit3 size={16} />
@@ -521,23 +719,23 @@ const UserProfileForm = ({ userInfo, onUpdateProfile }) => {
                         </div>
                     </div>
 
-                    <div className="form-group">
-                        <label htmlFor="phoneNumber" className="form-label">Phone Number</label>
-                        <div className = "input-with-edit">
+                    <div className={styles["form-group"]}>
+                        <label htmlFor="phoneNumber" className={styles["form-label"]}>Phone Number</label>
+                        <div className={styles["input-with-edit"]}>
                             {isEditing.phoneNumber ? (
                                 <input
                                     type="tel"
-                                    className="form-input"
+                                    className={styles["form-input"]}
                                     value={formData.phoneNumber}
                                     onChange={(e) => handleInputChange('phoneNumber',e.target.value)}
                                     onBlur={() => toggleEdit('phoneNumber')} //when the input loses focus (click outside), it calls toggleEdit('fullName') to exit edit mode.
                                     autoFocus
                                 />
                             ) : (
-                                <div className= "form-display">
+                                <div className={styles["form-display"]}>
                                     <span> {formData.phoneNumber || 'Not Provided'}</span>
                                     <button
-                                        className="edit-btn"
+                                        className={styles["edit-btn"]}
                                         onClick={() => toggleEdit('phoneNumber')}
                                     >
                                         <Edit3 size={16} />
@@ -547,15 +745,15 @@ const UserProfileForm = ({ userInfo, onUpdateProfile }) => {
                         </div>
                     </div>
 
-                    <div className="form-group">
-                        <label htmlFor="address" className="form-label">Address</label>
-                        <div className = "location-input-container">
-                            <div className="location-search-wrapper">
+                    <div className={styles["form-group"]}>
+                        <label htmlFor="address" className={styles["form-label"]}>Address</label>
+                        <div className={styles["location-input-container"]}>
+                            <div className={styles["location-search-wrapper"]}>
                                 {isEditing.address ? (
-                                    <div className="location-search">
+                                    <div className={styles["location-search"]}>
                                         <input
                                             type="text"
-                                            className="form-input"
+                                            className={styles["form-input"]}
                                             value={locationSearch}
                                             onChange={(e) => {
                                                 setLocationSearch(e.target.value);
@@ -572,7 +770,7 @@ const UserProfileForm = ({ userInfo, onUpdateProfile }) => {
                                             autoFocus
                                         />
                                         <button
-                                            className="current-location-btn"
+                                            className={styles["current-location-btn"]}
                                             onClick={handleGetCurrentLocation}
                                             disabled={isGettingCurrentLocation}
                                             type="button"
@@ -585,19 +783,19 @@ const UserProfileForm = ({ userInfo, onUpdateProfile }) => {
                                         </button>
 
                                         {showLocationSuggestions && locationSuggestions.length > 0 &&(
-                                            <div className="location-suggestions">
+                                            <div className={styles["location-suggestions"]}>
                                                 {locationSuggestions.map((location,index) => (
                                                     <div
                                                         key={index}
-                                                        className="location-suggestion"
+                                                        className={styles["location-suggestion"]}
                                                         onClick={() => handleLocationSelect(location)}
                                                     >
-                                                        <MapPin size={14} className="location-icon" />
-                                                        <div className="location-details">
-                                                            <div className="location-name">
+                                                        <MapPin size={14} className={styles["location-icon"]} />
+                                                        <div className={styles["location-details"]}>
+                                                            <div className={styles["location-name"]}>
                                                                 {location.city || location.state || 'Unknown'}
                                                             </div>
-                                                            <div className="location-address">
+                                                            <div className={styles["location-address"]}>
                                                                 {location.displayName}
                                                             </div>
                                                         </div>
@@ -607,10 +805,10 @@ const UserProfileForm = ({ userInfo, onUpdateProfile }) => {
                                         )}
                                     </div>
                                 ) : (
-                                    <div className="form-display">
+                                    <div className={styles["form-display"]}>
                                         <span>{formData.address || 'Not Provided'}</span>
                                         <button
-                                            className="edit-btn"
+                                            className={styles["edit-btn"]}
                                             onClick={() => {
                                                 setLocationSearch(formData.address);
                                                 toggleEdit('address');
@@ -626,39 +824,39 @@ const UserProfileForm = ({ userInfo, onUpdateProfile }) => {
                 </section>
 
                 {/* Verification Section */}
-                <section className="form-section">
-                    <h3 className="section-title">
+                <section className={styles["form-section"]}>
+                    <h3 className={styles["section-title"]}>
                         <Shield size={20} style={{marginRight: '0.5rem'}} />
                         Verification Documents
                     </h3>
-                    <p className="section-description">
+                    <p className={styles["section-description"]}>
                         Upload verification documents to increase trust and credibility with clients.
                     </p>
 
-                    <div className="verification-grid">
-                        <div className="verification-item">
-                            <label className="form-label">
+                    <div className={styles["verification-grid"]}>
+                        <div className={styles["verification-item"]}>
+                            <label className={styles["form-label"]}>
                                 <FileText size={16} style={{marginRight: '0.5rem'}} />
                                 User Verification (Citizenship Photo)
                             </label>
-                            <div className="file-upload-container">
-                                <div className="file-upload-area">
+                            <div className={styles["file-upload-container"]}>
+                                <div className={styles["file-upload-area"]}>
                                     {formData.citizenshipPhoto ? (
-                                        <div className="uploaded-image">
+                                        <div className={styles["uploaded-image"]}>
                                             <img
                                                 src={formData.citizenshipPhoto}
                                                 alt="Citizenship Document"
-                                                className="verification-image"
+                                                className={styles["verification-image"]}
                                             />
-                                            <div className="image-overlay">
-                                                <label htmlFor="citizenship-upload" className="change-image-btn">
+                                            <div className={styles["image-overlay"]}>
+                                                <label htmlFor="citizenship-upload" className={styles["change-image-btn"]}>
                                                     <Camera size={16} />
                                                     Change
                                                 </label>
                                             </div>
                                         </div>
                                     ) : (
-                                        <label htmlFor="citizenship-upload" className="upload-placeholder">
+                                        <label htmlFor="citizenship-upload" className={styles["upload-placeholder"]}>
                                             <Camera size={32} />
                                             <span>Upload Citizenship Photo</span>
                                             <small>JPG, PNG up to 5MB</small>
@@ -678,13 +876,13 @@ const UserProfileForm = ({ userInfo, onUpdateProfile }) => {
                 </section>
 
                 {/*Preferences */}
-                <section className = "form-section">
-                    <h3 className="section-title">Preferences</h3>
+                <section className={styles["form-section"]}>
+                    <h3 className={styles["section-title"]}>Preferences</h3>
 
-                    <div className="form-group">
-                        <label htmlFor="preference" className="form-label">Preferred Language</label>
+                    <div className={styles["form-group"]}>
+                        <label htmlFor="preference" className={styles["form-label"]}>Preferred Language</label>
                         <select
-                            className="form-select"
+                            className={styles["form-select"]}
                             value={ formData.preferredLanguage}
                             onChange={(e) => handleInputChange('preferredLanguage',e.target.value)}
                         >
@@ -694,11 +892,11 @@ const UserProfileForm = ({ userInfo, onUpdateProfile }) => {
                         </select>
                     </div>
 
-                    <div className="form-group">
-                        <label htmlFor="timezone" className="form-label">Time Zone</label>
-                        <div className="timezone-container">
+                    <div className={styles["form-group"]}>
+                        <label htmlFor="timezone" className={styles["form-label"]}>Time Zone</label>
+                        <div className={styles["timezone-container"]}>
                             <select
-                                className="form-select"
+                                className={styles["form-select"]}
                                 value={ formData.timezone }
                                 onChange={(e) => handleInputChange('timezone',e.target.value)}
                             >
@@ -707,7 +905,7 @@ const UserProfileForm = ({ userInfo, onUpdateProfile }) => {
                                 ))}
                             </select>
                             <button
-                                className="detect-timezone-btn"
+                                className={styles["detect-timezone-btn"]}
                                 onClick = {handleAutoDetectTimezone}
                                 type="button"
                             >
@@ -717,9 +915,9 @@ const UserProfileForm = ({ userInfo, onUpdateProfile }) => {
                     </div>
                 </section>
 
-                <div className="form-actions">
+                <div className={styles["form-actions"]}>
                     <button
-                        className="save-btn"
+                        className={styles["save-btn"]}
                         onClick={handleSave}
                         disabled={isUpdating}
                     >

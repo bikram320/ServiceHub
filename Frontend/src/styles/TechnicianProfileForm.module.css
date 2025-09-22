@@ -57,6 +57,10 @@
     margin-left: 1rem;
 }
 
+.profile-title{
+    color: #76af8c !important;
+}
+
 .profile-picture-section {
     display: flex;
     align-items: center;
@@ -141,8 +145,8 @@
 }
 
 .profile-role {
-    color: #0ea5e9;
-    font-size: 1rem;
+    color: #76af8c;
+    font-size: 1.25rem !important;
     font-weight: 500;
     margin: 0 0 0.25rem 0;
 }
@@ -165,7 +169,7 @@
 .section-title {
     font-size: 1.25rem;
     font-weight: 600;
-    color: #1f2937;
+    color: #76af8c;
     margin: 0 0 1.5rem 0;
     display: flex;
     align-items: center;
@@ -183,7 +187,7 @@
 }
 
 .form-label {
-    display: block;
+
     font-size: 0.875rem;
     font-weight: 500;
     color: #374151;
@@ -206,7 +210,7 @@
 }
 
 .form-input:focus, .form-select:focus {
-    border-color: #0ea5e9;
+    border-color: rgba(152, 195, 169, 0.78);
     box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
 }
 
@@ -273,7 +277,7 @@ textarea.form-input {
 }
 
 .verification-item:hover {
-    border-color: #0ea5e9;
+    border-color: rgba(152, 195, 169, 0.78);
     box-shadow: 0 2px 8px rgba(14, 165, 233, 0.1);
 }
 
@@ -293,7 +297,7 @@ textarea.form-input {
 }
 
 .file-upload-area:hover {
-    border-color: #0ea5e9;
+    border-color: rgba(152, 195, 169, 0.78);
     background: #f0f9ff;
 }
 
@@ -348,7 +352,7 @@ textarea.form-input {
 }
 
 .change-image-btn {
-    background: #0ea5e9;
+    background: rgba(152, 195, 169, 0.78);
     color: white;
     padding: 0.5rem 1rem;
     border-radius: 6px;
@@ -361,7 +365,7 @@ textarea.form-input {
 }
 
 .change-image-btn:hover {
-    background: #0284c7;
+    background: rgba(152, 195, 169, 0.78);
 }
 
 .location-input-container {

@@ -9,6 +9,14 @@ import {
     Star,
 } from "lucide-react";
 import {useNavigate} from "react-router-dom";
+import {
+    Plumbing,
+    FormatPaint,
+    ElectricalServices,
+    LinkedCamera,
+    Carpenter,
+} from "@mui/icons-material";
+
 import Header from "../../Components/layout/Header.jsx";
 import styles from "../../styles/LandingPage.module.css";
 import ElectricalHelp from "../../assets/ElectricalHelp.jpg";
@@ -30,11 +38,11 @@ function LandingPage() {
     const navigate = useNavigate();
 
     const services = [
-        { name: "Plumber", icon: Droplets, color: "blue" },
-        { name: "Painter", icon: Paintbrush, color: "purple" },
-        { name: "Electrician", icon: Zap, color: "yellow" },
-        { name: "Photographer", icon: Camera, color: "green" },
-        { name: "Carpenter", icon: Hammer, color: "orange" },
+        { name: "Plumber", icon: Plumbing, color: "blue" },
+        { name: "Painter", icon: FormatPaint, color: "purple" },
+        { name: "Electrician", icon: ElectricalServices, color: "yellow" },
+        { name: "Photographer", icon: LinkedCamera, color: "green" },
+        { name: "Carpenter", icon: Carpenter, color: "orange" },
     ];
 
     const PopularProjects = [
