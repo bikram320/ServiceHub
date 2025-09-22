@@ -469,22 +469,22 @@ const UserProfileForm = ({ userInfo, onUpdateProfile }) => {
 
     const languages = ['English', 'Nepali', 'Hindi'];
 
-    const handleVerificationFileChange = (event, fieldName) => {
-        const file = event.target.files[0];
-        if (file) {
-            // Store the actual file for backend upload
-            if (fieldName === 'citizenshipPhoto') {
-                handleInputChange('citizenshipPhotoFile', file);
-            }
-
-            // Create preview
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                handleInputChange(fieldName, e.target.result);
-            };
-            reader.readAsDataURL(file);
-        }
-    };
+    // `const handleVerificationFileChange = (event, fieldName) => {
+    //     const file = event.target.files[0];
+    //     if (file) {
+    //         // Store the actual file for backend upload
+    //         if (fieldName === 'citizenshipPhoto') {
+    //             handleInputChange('citizenshipPhotoFile', file);
+    //         }
+    //
+    //         // Create preview
+    //         const reader = new FileReader();
+    //         reader.onload = (e) => {
+    //             handleInputChange(fieldName, e.target.result);
+    //         };
+    //         reader.readAsDataURL(file);
+    //     }
+    // };`
 
     return (
         <div className={styles["profile-content"]}>

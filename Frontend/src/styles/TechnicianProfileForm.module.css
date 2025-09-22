@@ -499,6 +499,24 @@ textarea.form-input {
     padding: 2rem 0;
 }
 
+.form-select {
+    background-color: white;
+    border: 1px solid #ddd;
+    padding: 8px 12px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.form-select:hover {
+    border-color: #76af8c;
+    box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.1);
+}
+
+.form-select:focus {
+    border-color: #76af8c;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
+}
 .save-btn {
     background-color: #0ea5e9;
     color: white;
