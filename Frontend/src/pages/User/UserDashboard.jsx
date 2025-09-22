@@ -38,8 +38,8 @@ const UserDashboard = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    // You can get this from user context/auth or props
-    const userEmail = "bkbikram727@example.com"; // Replace with actual user email
+    // Get user email from localStorage
+    const userEmail = localStorage.getItem('userEmail');
 
     // API base URL - adjust this based on your setup
     const API_BASE_URL = "http://localhost:8080"; // Adjust port if different
@@ -61,7 +61,7 @@ const UserDashboard = () => {
         type: 'details' // 'details' or 'cancel'
     });
 
-    // API functions with credentials and proper error handling
+    // API functions with proper error handling
     const fetchCurrentServiceBookings = async () => {
         try {
             const url = `${API_BASE_URL}/users/get-current-service-booking?userEmail=${encodeURIComponent(userEmail)}`;
@@ -69,7 +69,7 @@ const UserDashboard = () => {
 
             const response = await fetch(url, {
                 method: 'GET',
-                credentials: 'include', // Include cookies/session for authentication
+                credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
@@ -83,18 +83,25 @@ const UserDashboard = () => {
             }
 
             if (response.status === 404) {
-                throw new Error('Current bookings endpoint not found. Please check the API URL.');
+                // Handle "Service Not Found" - return empty array instead of error
+                console.log('No current bookings found');
+                return [];
             }
 
             if (!response.ok) {
-                throw new Error(`Failed to fetch current bookings: ${response.status} ${response.statusText}`);
+                const errorData = await response.text();
+                throw new Error(`Failed to fetch current bookings: ${response.status} - ${errorData}`);
             }
 
             const data = await response.json();
             console.log('Current bookings data:', data);
-            return data;
+            return Array.isArray(data) ? data : [];
         } catch (error) {
             console.error('Error fetching current bookings:', error);
+            // If it's a "Service Not Found" error, return empty array
+            if (error.message.includes('Service Not Found') || error.message.includes('404')) {
+                return [];
+            }
             throw error;
         }
     };
@@ -106,7 +113,7 @@ const UserDashboard = () => {
 
             const response = await fetch(url, {
                 method: 'GET',
-                credentials: 'include', // Include cookies/session for authentication
+                credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
@@ -120,18 +127,25 @@ const UserDashboard = () => {
             }
 
             if (response.status === 404) {
-                throw new Error('Previous bookings endpoint not found. Please check the API URL.');
+                // Handle "Service Not Found" - return empty array instead of error
+                console.log('No previous bookings found');
+                return [];
             }
 
             if (!response.ok) {
-                throw new Error(`Failed to fetch previous bookings: ${response.status} ${response.statusText}`);
+                const errorData = await response.text();
+                throw new Error(`Failed to fetch previous bookings: ${response.status} - ${errorData}`);
             }
 
             const data = await response.json();
             console.log('Previous bookings data:', data);
-            return data;
+            return Array.isArray(data) ? data : [];
         } catch (error) {
             console.error('Error fetching previous bookings:', error);
+            // If it's a "Service Not Found" error, return empty array
+            if (error.message.includes('Service Not Found') || error.message.includes('404')) {
+                return [];
+            }
             throw error;
         }
     };
@@ -143,7 +157,7 @@ const UserDashboard = () => {
 
             const response = await fetch(url, {
                 method: 'GET',
-                credentials: 'include', // Include cookies/session for authentication
+                credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
@@ -156,12 +170,9 @@ const UserDashboard = () => {
                 throw new Error('Authentication required. Please log in again.');
             }
 
-            if (response.status === 404) {
-                throw new Error('Dashboard overview endpoint not found. Please check the API URL.');
-            }
-
             if (!response.ok) {
-                throw new Error(`Failed to fetch dashboard overview: ${response.status} ${response.statusText}`);
+                const errorData = await response.text();
+                throw new Error(`Failed to fetch dashboard overview: ${response.status} - ${errorData}`);
             }
 
             const data = await response.json();
@@ -173,21 +184,57 @@ const UserDashboard = () => {
         }
     };
 
+    const cancelServiceBooking = async (requestId) => {
+        try {
+            const url = `${API_BASE_URL}/users/cancel-pending-service-booking?userEmail=${encodeURIComponent(userEmail)}&requestId=${requestId}`;
+            console.log('Cancelling booking:', url);
+
+            const response = await fetch(url, {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                },
+            });
+
+            console.log('Cancel booking response status:', response.status);
+
+            if (response.status === 401) {
+                throw new Error('Authentication required. Please log in again.');
+            }
+
+            if (!response.ok) {
+                const errorData = await response.text();
+                throw new Error(`Failed to cancel booking: ${response.status} - ${errorData}`);
+            }
+
+            const result = await response.text();
+            console.log('Cancel booking result:', result);
+            return result;
+        } catch (error) {
+            console.error('Error cancelling booking:', error);
+            throw error;
+        }
+    };
+
     // Transform backend data to match frontend structure
     const transformCurrentBookingData = (backendData) => {
         if (!Array.isArray(backendData)) return [];
 
         return backendData.map((item, index) => ({
             id: index + 1,
-            service: item.serviceName,
-            provider: 'Service Provider', // Default since not in DTO
-            technician: item.technicianName,
+            requestId: item.requestId , // Add requestId for cancellation
+            service: item.serviceName || 'Unknown Service',
+            provider:item.technicianName || 'Unknown Technician',
+            technician: item.technicianName || 'Unknown Technician',
             date: formatDate(item.appointmentTime),
             time: formatTime(item.appointmentTime),
             location: item.technicianAddress || 'Location not specified',
             status: item.status?.toLowerCase() || 'pending',
             price: `₨${item.feeCharge?.toLocaleString() || '0'}`,
-            rating: 4.8 // Default since not in DTO
+            rating: 4.8, // Default since not in DTO
+            technicianEmail: item.technicianEmail
         }));
     };
 
@@ -196,9 +243,10 @@ const UserDashboard = () => {
 
         return backendData.map((item, index) => ({
             id: index + 100, // Different ID range for history
-            service: item.serviceName,
-            provider: 'Service Provider',
-            technician: item.technicianName,
+            requestId: item.id || index + 100,
+            service: item.serviceName || 'Unknown Service',
+            provider: item.technicianName || 'Unknown Technician',
+            technician: item.technicianName || 'Unknown Technician',
             date: formatDateFull(item.appointmentTime),
             time: formatTime(item.appointmentTime),
             location: item.technicianAddress || 'Location not specified',
@@ -206,7 +254,8 @@ const UserDashboard = () => {
             price: `₨${item.feeCharge?.toLocaleString() || '0'}`,
             rating: 4.8,
             yourRating: 5, // Default since not in DTO
-            review: 'Service completed successfully.'
+            review: 'Service completed successfully.',
+            technicianEmail: item.technicianEmail
         }));
     };
 
@@ -258,7 +307,14 @@ const UserDashboard = () => {
                 setLoading(true);
                 setError(null);
 
-                // Load data sequentially to handle individual failures better
+                // Check if user email is available
+                if (!userEmail) {
+                    setError('User email not found in localStorage. Please log in again.');
+                    setLoading(false);
+                    return;
+                }
+
+                // Load data with individual error handling
                 let currentBookings = [];
                 let previousBookings = [];
                 let overview = {
@@ -288,7 +344,13 @@ const UserDashboard = () => {
 
                 setUpcomingAppointments(transformCurrentBookingData(currentBookings));
                 setAppointmentHistory(transformPreviousBookingData(previousBookings));
-                setDashboardOverview(overview);
+
+                // Handle BigDecimal totalSpent from backend
+                const formattedOverview = {
+                    ...overview,
+                    totalSpent: overview.totalSpent ? parseFloat(overview.totalSpent) : 0
+                };
+                setDashboardOverview(formattedOverview);
 
             } catch (error) {
                 setError(error.message);
@@ -298,20 +360,15 @@ const UserDashboard = () => {
             }
         };
 
-        if (userEmail) {
-            loadData();
-        } else {
-            setError('User email not available. Please log in again.');
-            setLoading(false);
-        }
+        loadData();
     }, [userEmail]);
 
     // Helper functions
     const getStatusColor = (status) => {
         switch (status) {
-            case 'confirmed': return '#10b981';
             case 'pending': return '#f59e0b';
-            case 'completed': return '#6366f1';
+            case 'in_progress': return '#3b82f6';
+            case 'completed': return '#10b981';
             case 'cancelled': return '#ef4444';
             default: return '#6b7280';
         }
@@ -319,8 +376,8 @@ const UserDashboard = () => {
 
     const getStatusIcon = (status) => {
         switch (status) {
-            case 'confirmed': return <CheckCircle size={16} />;
             case 'pending': return <AlertCircle size={16} />;
+            case 'in_progress': return <Clock size={16} />;
             case 'completed': return <CheckCircle size={16} />;
             case 'cancelled': return <XCircle size={16} />;
             default: return <Clock size={16} />;
@@ -346,9 +403,6 @@ const UserDashboard = () => {
         const matchesFilter = filterStatus === 'all' || apt.status === filterStatus;
         return matchesSearch && matchesFilter;
     });
-
-    // Calculate total spent from API data
-    const totalSpent = dashboardOverview.totalSpent || 0;
 
     // Modal component
     const AppointmentModal = ({ isOpen, appointment, type, onClose, onConfirm }) => {
@@ -408,9 +462,9 @@ const UserDashboard = () => {
                                         className={styles['status-badge']}
                                         style={{ backgroundColor: getStatusColor(appointment.status) }}
                                     >
-                                    {getStatusIcon(appointment.status)}
+                                        {getStatusIcon(appointment.status)}
                                         {appointment.status}
-                                </span>
+                                    </span>
                                 </div>
                                 {appointment.rating && (
                                     <div className={styles['detail-row']}>
@@ -497,23 +551,37 @@ const UserDashboard = () => {
         }
     };
 
-    const handleConfirmCancel = () => {
+    const handleConfirmCancel = async () => {
         const appointmentToCancel = modalState.appointment;
 
-        // Remove from upcoming appointments
-        setUpcomingAppointments(prev => prev.filter(apt => apt.id !== appointmentToCancel.id));
+        try {
+            // Call the backend to cancel the appointment
+            await cancelServiceBooking(appointmentToCancel.requestId);
 
-        // Add to appointment history with cancelled status
-        setAppointmentHistory(prev => [...prev, {
-            ...appointmentToCancel,
-            status: 'cancelled',
-            cancellationReason: 'Cancelled by user'
-        }]);
+            // Remove from upcoming appointments
+            setUpcomingAppointments(prev => prev.filter(apt => apt.id !== appointmentToCancel.id));
 
-        console.log('Appointment cancelled:', appointmentToCancel.id);
+            // Add to appointment history with cancelled status
+            setAppointmentHistory(prev => [...prev, {
+                ...appointmentToCancel,
+                status: 'cancelled',
+                cancellationReason: 'Cancelled by user'
+            }]);
 
-        // Close modal
-        setModalState({ isOpen: false, appointment: null, type: 'details' });
+            // Update dashboard overview
+            setDashboardOverview(prev => ({
+                ...prev,
+                upcomingBookings: Math.max(0, prev.upcomingBookings - 1)
+            }));
+
+            console.log('Appointment cancelled successfully:', appointmentToCancel.id);
+
+            // Close modal
+            setModalState({ isOpen: false, appointment: null, type: 'details' });
+        } catch (error) {
+            console.error('Failed to cancel appointment:', error);
+            alert('Failed to cancel appointment. Please try again.');
+        }
     };
 
     const handleCloseModal = () => {
@@ -568,7 +636,7 @@ const UserDashboard = () => {
                         margin: '1rem 0'
                     }}>
                         <div style={{ color: '#dc2626', marginBottom: '1rem' }}>
-                            {error.includes('Authentication') ? (
+                            {error.includes('Authentication') || error.includes('log in') ? (
                                 <>
                                     <div style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>
                                         Authentication Required
@@ -598,7 +666,7 @@ const UserDashboard = () => {
                             >
                                 Retry
                             </button>
-                            {error.includes('Authentication') && (
+                            {(error.includes('Authentication') || error.includes('log in')) && (
                                 <button
                                     onClick={() => window.location.href = '/login'}
                                     style={{
@@ -671,8 +739,7 @@ const UserDashboard = () => {
                                 <BookOpen size={24} style={{ color: '#10b981' }} />
                             </div>
                             <div className={styles['user-stat-content']}>
-                                <div className={styles['user-stat-number']}>₨{totalSpent.toLocaleString()}</div>
-                                <div className={styles['user-stat-label']}>Total Spent</div>
+                                <div className={styles['user-stat-number']}>₨{dashboardOverview.totalSpent?.toLocaleString() || '0'}</div>                                <div className={styles['user-stat-label']}>Total Spent</div>
                             </div>
                         </div>
                     </div>

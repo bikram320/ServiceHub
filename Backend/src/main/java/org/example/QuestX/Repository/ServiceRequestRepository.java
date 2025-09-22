@@ -32,7 +32,8 @@ public interface ServiceRequestRepository extends JpaRepository<ServiceRequest, 
     Long countByUserAndStatuses(@Param("user") User user, @Param("statuses") List<ServiceStatus> statuses);
 
 
-    @Query("SELECT SUM(sr.feeCharged) FROM ServiceRequest sr WHERE sr.user = :user")
-    BigDecimal getTotalAmountSpentByUser(@Param("user") User user);}
+    @Query("SELECT SUM(sr.feeCharged) FROM ServiceRequest sr WHERE sr.user = :user AND sr.status = :status")
+    BigDecimal getTotalAmountSpentByUserAndStatus(User user, ServiceStatus status);
+}
 
 

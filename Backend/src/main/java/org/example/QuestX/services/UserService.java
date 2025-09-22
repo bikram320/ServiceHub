@@ -131,7 +131,7 @@ public class UserService {
         if (averageRatingGiven == null) averageRatingGiven = 0.0;
 
         // 4️⃣ Get total spent (handle null case safely)
-        BigDecimal totalSpent = serviceRequestRepository.getTotalAmountSpentByUser(user);
+        BigDecimal totalSpent = serviceRequestRepository.getTotalAmountSpentByUserAndStatus(user, ServiceStatus.COMPLETED);
         if (totalSpent == null) totalSpent = BigDecimal.valueOf(0.0);
 
         // 5️⃣ Build DTO
@@ -265,6 +265,7 @@ public class UserService {
                 .map( serviceRequest ->
                 {
                     ServiceAndTechnicianDetailsDto service = new ServiceAndTechnicianDetailsDto();
+                    service.setRequestId(serviceRequest.getId());
                     service.setTechnicianName(serviceRequest.getTechnician().getName());
                     service.setTechnicianAddress(serviceRequest.getTechnician().getAddress());
                     service.setServiceName(serviceRequest.getSkill().getName());
