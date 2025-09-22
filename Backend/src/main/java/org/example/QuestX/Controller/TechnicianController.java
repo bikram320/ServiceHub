@@ -40,6 +40,10 @@ public class TechnicianController {
         List<ServiceAndUserDetailsDto> currentRequest = technicianService.getCurrentRequest(email);
         return ResponseEntity.ok(currentRequest);
     }
+    @GetMapping("/dashboard-overview")
+    public ResponseEntity<?> getDashboardOverview(@RequestParam String email) {
+        return ResponseEntity.ok(technicianService.getTechnicianDashboardOverview(email));
+    }
     @GetMapping("/profile")
     public ResponseEntity<?> GetProfile(@RequestParam String email) {
         return ResponseEntity.ok(technicianService.getProfile(email));

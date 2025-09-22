@@ -49,6 +49,10 @@ public class ServiceRequest {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    @ColumnDefault("CURRENT_TIMESTAMP")
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
     @OneToOne(mappedBy = "request")
     private Payment payment;
 
