@@ -106,14 +106,18 @@ const UserProfileForm = ({ userInfo, onUpdateProfile }) => {
         return null;
     };
 
-    const getProfileImageUrl = (filename) => {
-        if (!filename) return null;
-        return `/upload/users/profile-image/${filename}`;
+    const getProfileImageUrl = (dbPath) => {
+        if (!dbPath) return null;
+
+        // Use the full path from database directly
+        const cleanPath = dbPath.startsWith('/') ? dbPath.substring(1) : dbPath;
+        return `http://localhost:8080/${cleanPath}`;
     };
 
     const getFileUrl = (filename) => {
         if (!filename) return null;
-        return `/upload/users/documents/${filename}`;
+        const cleanPath =filename.startsWith('/') ? filename.substring(1) : filename;
+        return `http://localhost:8080/${cleanPath}`;
     };
 
     // Fetch profile data from backend
@@ -148,8 +152,8 @@ const UserProfileForm = ({ userInfo, onUpdateProfile }) => {
                     address: data.address || '',
                     avatar: avatarUrl || null,
                     citizenshipPhoto: docUrl || null,
-                    verificationStatus: data.verificationStatus || determineVerificationStatus(data),
-                    verificationDate: data.verificationDate || null,
+                    verificationStatus: data.status ,
+                    verificationDate: data.verifiedAt || null,
                 }));
 
                 // 5️⃣ Optionally update localStorage

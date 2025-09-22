@@ -128,9 +128,12 @@ const TechnicianProfileForm = ({ userInfo, onUpdateProfile }) => {
         return null;
     };
 
-    const getProfileImageUrl = (filename) => {
-        if (!filename) return null;
-        return `/upload/technicians/profile-image/${filename}`;
+    const getProfileImageUrl = (dbPath) => {
+        if (!dbPath) return null;
+
+        // Use the full path from database directly
+        const cleanPath = dbPath.startsWith('/') ? dbPath.substring(1) : dbPath;
+        return `http://localhost:8080/${cleanPath}`;
     };
 
     const getFileUrl = (filename) => {
@@ -165,7 +168,7 @@ const TechnicianProfileForm = ({ userInfo, onUpdateProfile }) => {
 
                 setFormData(prev => ({
                     ...prev,
-                    fullName: data.username || '',
+                    fullName: data.technicianName || '',
                     email: data.email || '',
                     phoneNumber: data.phone || '',
                     address: data.address || '',

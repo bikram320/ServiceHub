@@ -20,6 +20,7 @@ public class UserController {
     @PostMapping("/update-profile")
     public ResponseEntity<?> UpdateProfileSetup(
             @RequestParam String email,
+            @RequestParam(required = false) String name,
             @RequestParam(required = false) String phone ,
             @RequestParam(required = false) String address,
             @RequestParam(required = false) Double latitude,
@@ -27,7 +28,7 @@ public class UserController {
             @RequestParam(required = false) MultipartFile profile_image,
             @RequestParam(required = false) MultipartFile valid_doc
     ) throws IOException {
-        userService.UserProfileSetup(email , phone, address, latitude, longitude, profile_image, valid_doc);
+        userService.UserProfileSetup(email , name, phone, address, latitude, longitude, profile_image, valid_doc);
         return ResponseEntity.ok("Profile Updated Successfully");
     }
 

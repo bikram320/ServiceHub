@@ -68,6 +68,9 @@ public class User implements JwtUser {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    @Column(name = "verified_at")
+    private LocalDateTime verifiedAt;
+
     @OneToMany(mappedBy = "user")
     private Set<Payment> payments = new LinkedHashSet<>();
 

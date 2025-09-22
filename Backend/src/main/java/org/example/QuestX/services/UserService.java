@@ -38,7 +38,7 @@ public class UserService {
 
     // Update profile service
     public void UserProfileSetup(
-            String email ,String phone , String address,
+            String email , String name ,String phone , String address,
             Double latitude, Double longitude,
             MultipartFile profileImage , MultipartFile validDoc
     ) throws IOException {
@@ -47,6 +47,9 @@ public class UserService {
                 () -> new UserNotFoundException("User Not Found")
                 ));
 
+        if(name!=null && !name.isEmpty()){
+            user.setName(name);
+        }
         if(phone!=null){
             user.setPhone(phone);
         }
