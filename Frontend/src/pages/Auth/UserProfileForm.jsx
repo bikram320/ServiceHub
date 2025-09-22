@@ -294,51 +294,8 @@ const UserProfileForm = ({ userInfo, onUpdateProfile }) => {
         }
     };
 
-    // 3. Mock function to determine verification status based on profile completeness
-    const determineVerificationStatus = (profileData) => {
-        const hasProfileImage = profileData.profileImagePath;
-        const hasDocuments = profileData.documentPath;
-        const hasCompleteInfo = profileData.username && profileData.phone && profileData.address;
-
-        // Mock logic - you can customize this based on your requirements
-        if (hasProfileImage && hasDocuments && hasCompleteInfo) {
-            // Simulate some users being verified, some pending
-            const randomStatus = Math.random();
-            if (randomStatus > 0.7) return 'verified';
-            if (randomStatus > 0.3) return 'pending';
-            return 'unverified';
-        }
-
-        return 'unverified';
-    };
-
-// 4. Verification Badge Component
-    const VerificationBadge = ({ status, verificationDate, size = 20 }) => {
-        if (status === 'unverified') return null;
-
-        const getVerificationConfig = () => {
-            switch (status) {
-                case 'verified':
-                    return {
-                        color: '#1DA1F2', // Blue
-                        icon: 'check',
-                        tooltip: `Verified ${verificationDate ? `on ${formatDate(verificationDate)}` : 'by admin'}`,
-                        className: 'verified'
-                    };
-                case 'pending':
-                    return {
-                        color: '#F59E0B', // Yellow/Orange
-                        icon: 'clock',
-                        tooltip: 'Verification pending - under admin review',
-                        className: 'pending'
-                    };
-                default:
-                    return null;
-            }
-        };
-
-        const config = getVerificationConfig();
-        if (!config) return null;
+    const VerificationBadge = ({ isVerified, verificationDate, size = 20 }) => {
+        if (!isVerified) return null;
 
         const formatDate = (dateString) => {
             if (!dateString) return '';
@@ -350,89 +307,7 @@ const UserProfileForm = ({ userInfo, onUpdateProfile }) => {
             });
         };
 
-        const renderIcon = () => {
-            if (config.icon === 'check') {
-                return (
-                    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="12" cy="12" r="10" fill={config.color} />
-                        <path
-                            d="M9 12l2 2 4-4"
-                            stroke="white"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                        />
-                    </svg>
-                );
-            } else if (config.icon === 'clock') {
-                return (
-                    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="12" cy="12" r="10" fill={config.color} />
-                        <path
-                            d="M12 6v6l4 2"
-                            stroke="white"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                        />
-                    </svg>
-                );
-            }
-        };
-
         return (
-            <div
-                className={`${styles["verification-badge"]} ${styles[`verification-${config.className}`]}`}
-                title={config.tooltip}
-            >
-                {renderIcon()}
-            </div>
-        );
-    };
-
-// 5. Helper function to check verification eligibility
-    const checkVerificationEligibility = () => {
-        const hasRequiredDocs = formData.citizenshipPhoto && formData.avatar;
-        const hasCompleteProfile = formData.fullName && formData.email && formData.phoneNumber;
-        return hasRequiredDocs && hasCompleteProfile;
-    };
-
-// 6. Function to simulate requesting verification (frontend only)
-    const handleVerificationRequest = () => {
-        if (!checkVerificationEligibility()) {
-            setError('Please complete your profile and upload required documents before requesting verification.');
-            return;
-        }
-
-        // Simulate sending verification request
-        setFormData(prev => ({
-            ...prev,
-            verificationStatus: 'pending'
-        }));
-
-        setSuccessMessage('Verification request submitted! Your profile is now under review.');
-
-        // Store in localStorage for persistence (since no backend)
-        localStorage.setItem('userVerificationStatus', 'pending');
-        localStorage.setItem('verificationRequestDate', new Date().toISOString());
-    };
-
-// 7. Load verification status from localStorage on component mount
-    useEffect(() => {
-        const savedStatus = localStorage.getItem('userVerificationStatus');
-        const savedDate = localStorage.getItem('verificationRequestDate');
-
-        if (savedStatus) {
-            setFormData(prev => ({
-                ...prev,
-                verificationStatus: savedStatus,
-                verificationDate: savedDate
-            }));
-        }
-    }, []);
-
-
-    return (
             <div
                 className={styles["verification-badge"]}
                 title={`Verified ${verificationDate ? `on ${formatDate(verificationDate)}` : 'by admin'}`}
