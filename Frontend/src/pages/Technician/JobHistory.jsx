@@ -33,6 +33,7 @@ import {
     Mail,
     ExternalLink
 } from 'lucide-react';
+import FilterAndSearch from "../../Components/common/FilterAndSearch.jsx";
 import styles from '../../styles/JobHistory.module.css';
 
 const JobHistory = () => {
@@ -47,202 +48,242 @@ const JobHistory = () => {
     const [showRepeatJobModal, setShowRepeatJobModal] = useState(false);
     const [repeatJobData, setRepeatJobData] = useState(null);
     const [exportFormat, setExportFormat] = useState('pdf');
+    const [jobHistory, setJobHistory] = useState([]);
+    const [paymentHistory, setPaymentHistory] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-    // Mock data for job history
-    const [jobHistory, setJobHistory] = useState([
-        {
-            id: 'JOB001',
-            serviceRequestId: 'SR001',
-            client: {
-                name: 'John Doe',
-                avatar: 'JD',
-                phone: '+977-9841234567',
-                email: 'john.doe@email.com',
-                rating: 4.5,
-                totalBookings: 12
-            },
-            service: {
-                type: 'Plumbing Repair',
-                category: 'plumbing',
-                description: 'Kitchen sink leakage repair and pipe replacement',
-                duration: '3 hours 15 minutes',
-                difficulty: 'medium'
-            },
-            location: {
-                address: 'Thamel, Ward 29, Kathmandu',
-                distance: '2.5 km'
-            },
-            pricing: {
-                quotedPrice: 2000,
-                finalPrice: 2200,
-                additionalCharges: 200,
-                paymentMethod: 'Cash'
-            },
-            timeline: {
-                requestDate: '2024-11-10',
-                scheduledDate: '2024-11-12',
-                startTime: '10:00 AM',
-                endTime: '1:15 PM',
-                completedDate: '2024-11-12'
-            },
-            status: 'completed',
-            rating: {
-                clientRating: 4.8,
-                clientReview: 'Excellent work! Very professional and punctual. Fixed the issue quickly.',
-                technicianNotes: 'Replaced faulty valve and tightened connections. Recommended annual maintenance.'
-            },
-            images: ['before.jpg', 'after.jpg', 'receipt.pdf'],
-            payments: {
-                status: 'paid',
-                paidDate: '2024-11-12',
-                method: 'Cash'
-            }
-        },
-        {
-            id: 'JOB002',
-            serviceRequestId: 'SR015',
-            client: {
-                name: 'Sarah Wilson',
-                avatar: 'SW',
-                phone: '+977-9851234567',
-                email: 'sarah.wilson@email.com',
-                rating: 4.8,
-                totalBookings: 8
-            },
-            service: {
-                type: 'Deep House Cleaning',
-                category: 'cleaning',
-                description: '2BHK apartment deep cleaning with kitchen and bathroom sanitization',
-                duration: '5 hours 30 minutes',
-                difficulty: 'easy'
-            },
-            location: {
-                address: 'Patan Dhoka, Lalitpur',
-                distance: '4.2 km'
-            },
-            pricing: {
-                quotedPrice: 3500,
-                finalPrice: 3500,
-                additionalCharges: 0,
-                paymentMethod: 'Digital Payment'
-            },
-            timeline: {
-                requestDate: '2024-11-08',
-                scheduledDate: '2024-11-09',
-                startTime: '9:00 AM',
-                endTime: '2:30 PM',
-                completedDate: '2024-11-09'
-            },
-            status: 'completed',
-            rating: {
-                clientRating: 5.0,
-                clientReview: 'Amazing service! House looks brand new. Will definitely book again.',
-                technicianNotes: 'Deep cleaned all areas, organized closets, sanitized surfaces. Client very satisfied.'
-            },
-            images: ['living-room-before.jpg', 'living-room-after.jpg', 'kitchen-after.jpg'],
-            payments: {
-                status: 'paid',
-                paidDate: '2024-11-09',
-                method: 'eSewa'
-            }
-        },
-        {
-            id: 'JOB003',
-            serviceRequestId: 'SR008',
-            client: {
-                name: 'Mike Johnson',
-                avatar: 'MJ',
-                phone: '+977-9861234567',
-                email: 'mike.johnson@email.com',
-                rating: 4.2,
-                totalBookings: 15
-            },
-            service: {
-                type: 'AC Installation',
-                category: 'electrical',
-                description: 'Split AC installation in bedroom with electrical wiring',
-                duration: '4 hours 45 minutes',
-                difficulty: 'hard'
-            },
-            location: {
-                address: 'Boudha, Kathmandu',
-                distance: '8.1 km'
-            },
-            pricing: {
-                quotedPrice: 6000,
-                finalPrice: 6500,
-                additionalCharges: 500,
-                paymentMethod: 'Bank Transfer'
-            },
-            timeline: {
-                requestDate: '2024-11-05',
-                scheduledDate: '2024-11-07',
-                startTime: '2:00 PM',
-                endTime: '6:45 PM',
-                completedDate: '2024-11-07'
-            },
-            status: 'completed',
-            rating: {
-                clientRating: 4.2,
-                clientReview: 'Good work but took longer than expected. AC works perfectly now.',
-                technicianNotes: 'Installation completed. Required additional wiring work due to old electrical setup.'
-            },
-            images: ['ac-installation.jpg', 'wiring-work.jpg'],
-            payments: {
-                status: 'paid',
-                paidDate: '2024-11-08',
-                method: 'Bank Transfer'
-            }
-        },
-        {
-            id: 'JOB004',
-            serviceRequestId: 'SR022',
-            client: {
-                name: 'Emma Brown',
-                avatar: 'EB',
-                phone: '+977-9871234567',
-                email: 'emma.brown@email.com',
-                rating: 4.9,
-                totalBookings: 3
-            },
-            service: {
-                type: 'Garden Maintenance',
-                category: 'gardening',
-                description: 'Monthly garden cleanup, pruning, and lawn maintenance',
-                duration: '2 hours 30 minutes',
-                difficulty: 'easy'
-            },
-            location: {
-                address: 'Bhaktapur Durbar Square Area',
-                distance: '12.3 km'
-            },
-            pricing: {
-                quotedPrice: 1500,
-                finalPrice: 1500,
-                additionalCharges: 0,
-                paymentMethod: 'Cash'
-            },
-            timeline: {
-                requestDate: '2024-11-01',
-                scheduledDate: '2024-11-03',
-                startTime: '7:00 AM',
-                endTime: '9:30 AM',
-                completedDate: '2024-11-03'
-            },
-            status: 'completed',
-            rating: {
-                clientRating: 4.7,
-                clientReview: 'Garden looks beautiful! Very knowledgeable about plants.',
-                technicianNotes: 'Pruned rose bushes, trimmed hedges, lawn mowing completed. Recommended seasonal fertilizer.'
-            },
-            images: ['garden-before.jpg', 'garden-after.jpg'],
-            payments: {
-                status: 'paid',
-                paidDate: '2024-11-03',
-                method: 'Cash'
-            }
+    // API Configuration
+    const API_BASE_URL = import.meta.env?.VITE_API_BASE_URL || 'http://localhost:8080';
+    const technicianEmail = 'tech@example.com'; // This should come from authenticated user context
+
+    // Get authorization token from cookies or localStorage
+    const getAuthToken = () => {
+        // Check for JWT in cookies first
+        const cookies = document.cookie.split(';');
+        const accessCookie = cookies.find(cookie => cookie.trim().startsWith('Access='));
+        if (accessCookie) {
+            return accessCookie.split('=')[1];
         }
-    ]);
+
+        // Fallback to localStorage if needed
+        return localStorage.getItem('authToken');
+    };
+
+    // API request helper
+    const apiRequest = async (endpoint, options = {}) => {
+        const token = getAuthToken();
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+                ...options.headers,
+            },
+            ...options,
+        };
+
+        try {
+            const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
+
+            if (!response.ok) {
+                if (response.status === 401) {
+                    throw new Error('Authentication failed. Please log in again.');
+                } else if (response.status === 403) {
+                    throw new Error('Access denied. You do not have permission to access this resource.');
+                } else if (response.status === 404) {
+                    throw new Error('Requested resource not found.');
+                } else if (response.status >= 500) {
+                    throw new Error('Server error. Please try again later.');
+                } else {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+            }
+
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.includes('application/json')) {
+                return await response.json();
+            }
+
+            return await response.text();
+        } catch (error) {
+            console.error('API request failed:', error);
+            throw error;
+        }
+    };
+
+    // Fetch previous service requests (job history)
+    const fetchJobHistory = async () => {
+        try {
+            const data = await apiRequest(
+                `/technician/get-previous-request?email=${encodeURIComponent(technicianEmail)}`
+            );
+
+            // Transform API data to match component structure
+            const transformedData = transformApiDataToJobs(data);
+            setJobHistory(transformedData);
+
+        } catch (error) {
+            console.error('Error fetching job history:', error);
+            throw error;
+        }
+    };
+
+    // Fetch payment history
+    const fetchPaymentHistory = async () => {
+        try {
+            // Fetch both received and pending payments
+            const [receivedPayments, pendingPayments] = await Promise.all([
+                apiRequest(`/technician/received-payments?email=${encodeURIComponent(technicianEmail)}`),
+                apiRequest(`/technician/pending-payments?email=${encodeURIComponent(technicianEmail)}`)
+            ]);
+
+            const allPayments = [
+                ...receivedPayments.map(p => ({ ...p, status: 'paid' })),
+                ...pendingPayments.map(p => ({ ...p, status: 'pending' }))
+            ];
+
+            setPaymentHistory(allPayments);
+
+        } catch (error) {
+            console.error('Error fetching payment history:', error);
+            throw error;
+        }
+    };
+
+    // Load all data
+    const loadAllData = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+
+            await Promise.all([
+                fetchJobHistory(),
+                fetchPaymentHistory()
+            ]);
+
+        } catch (error) {
+            console.error('Error loading data:', error);
+            setError(error.message || 'Failed to load job history. Please try again.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Transform API response to match component data structure
+    const transformApiDataToJobs = (apiData) => {
+        if (!Array.isArray(apiData)) {
+            console.warn('API returned non-array data:', apiData);
+            return [];
+        }
+
+        return apiData.map(item => ({
+            id: `JOB${item.id || Math.random().toString().substr(2, 6)}`,
+            serviceRequestId: `SR${item.serviceRequestId || item.id}`,
+            client: {
+                name: item.userName || 'Unknown Client',
+                avatar: (item.userName || 'UC').split(' ').map(n => n[0]).join('').substr(0, 2).toUpperCase(),
+                phone: item.userPhone || '+977-XXXXXXXXXX',
+                email: item.userEmail || 'N/A',
+                rating: item.userRating || 4.0,
+                totalBookings: item.userTotalBookings || 0
+            },
+            service: {
+                type: item.serviceType || 'General Service',
+                category: getCategoryFromServiceType(item.serviceType),
+                description: item.serviceDescription || 'No description provided',
+                duration: calculateDuration(item.startTime, item.endTime) || '2-3 hours',
+                difficulty: item.difficulty || 'medium'
+            },
+            location: {
+                address: item.serviceLocation || 'Location not specified',
+                distance: calculateDistance(item.latitude, item.longitude) || 'N/A'
+            },
+            pricing: {
+                quotedPrice: item.quotedPrice || 0,
+                finalPrice: item.finalPrice || item.quotedPrice || 0,
+                additionalCharges: (item.finalPrice || 0) - (item.quotedPrice || 0),
+                paymentMethod: item.paymentMethod || 'Cash'
+            },
+            timeline: {
+                requestDate: item.requestDate || item.createdAt?.split('T')[0],
+                scheduledDate: item.serviceDate || item.scheduledDate,
+                startTime: item.startTime || 'N/A',
+                endTime: item.endTime || 'N/A',
+                completedDate: item.completedDate || item.serviceDate
+            },
+            status: mapApiStatusToComponentStatus(item.status),
+            rating: {
+                clientRating: item.clientRating || null,
+                clientReview: item.clientReview || null,
+                technicianNotes: item.technicianNotes || null
+            },
+            images: item.attachments || [],
+            payments: {
+                status: getPaymentStatus(item.id, paymentHistory),
+                paidDate: item.paidDate,
+                method: item.paymentMethod || 'Cash'
+            }
+        }));
+    };
+
+    // Helper functions
+    const getCategoryFromServiceType = (serviceType) => {
+        const type = (serviceType || '').toLowerCase();
+        if (type.includes('plumb')) return 'plumbing';
+        if (type.includes('electric') || type.includes('ac')) return 'electrical';
+        if (type.includes('clean')) return 'cleaning';
+        if (type.includes('garden')) return 'gardening';
+        return 'general';
+    };
+
+    const calculateDistance = (lat, lng) => {
+        if (!lat || !lng) return 'N/A';
+        const kathmandu = { lat: 27.7172, lng: 85.3240 };
+        const R = 6371; // Earth's radius in km
+        const dLat = (lat - kathmandu.lat) * Math.PI / 180;
+        const dLng = (lng - kathmandu.lng) * Math.PI / 180;
+        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+            Math.cos(kathmandu.lat * Math.PI / 180) * Math.cos(lat * Math.PI / 180) *
+            Math.sin(dLng/2) * Math.sin(dLng/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        const distance = R * c;
+        return `${distance.toFixed(1)} km`;
+    };
+
+    const calculateDuration = (startTime, endTime) => {
+        if (!startTime || !endTime) return null;
+        try {
+            const start = new Date(`2000-01-01 ${startTime}`);
+            const end = new Date(`2000-01-01 ${endTime}`);
+            const diffMs = end - start;
+            const hours = Math.floor(diffMs / (1000 * 60 * 60));
+            const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+            return `${hours} hours ${minutes} minutes`;
+        } catch (error) {
+            return null;
+        }
+    };
+
+    const mapApiStatusToComponentStatus = (apiStatus) => {
+        const status = (apiStatus || '').toLowerCase();
+        switch (status) {
+            case 'completed': return 'completed';
+            case 'in_progress': case 'in-progress': return 'in-progress';
+            case 'cancelled': return 'cancelled';
+            case 'on_hold': case 'on-hold': return 'on-hold';
+            default: return 'completed';
+        }
+    };
+
+    const getPaymentStatus = (jobId, payments) => {
+        const payment = payments.find(p => p.requestId === jobId || p.jobId === jobId);
+        return payment?.status || 'pending';
+    };
+
+    // Load data on component mount
+    useEffect(() => {
+        loadAllData();
+    }, []);
 
     const getServiceIcon = (category) => {
         switch (category) {
@@ -426,38 +467,43 @@ const JobHistory = () => {
         setDateRange('all');
         setSelectedJobs([]);
 
-        alert('Job history refreshed successfully!');
+        // Reload data
+        loadAllData();
     };
 
-    const handleRepeatJob = (jobId) => {
+    const handleRepeatJob = async (jobId) => {
         const job = jobHistory.find(j => j.id === jobId);
         if (job && job.status === 'completed') {
-            setRepeatJobData({
-                ...job,
-                id: `JOB${String(jobHistory.length + 1).padStart(3, '0')}`,
-                timeline: {
-                    ...job.timeline,
-                    requestDate: new Date().toISOString().split('T')[0],
-                    scheduledDate: null,
-                    completedDate: null
-                },
-                status: 'pending',
-                rating: {
-                    clientRating: null,
-                    clientReview: null,
-                    technicianNotes: `Repeat job based on ${job.id}`
-                }
-            });
-            setShowRepeatJobModal(true);
-        }
-    };
+            try {
+                // Create repeat job request via API
+                const repeatJobRequest = {
+                    originalJobId: jobId,
+                    clientEmail: job.client.email,
+                    serviceType: job.service.type,
+                    serviceDescription: job.service.description,
+                    suggestedPrice: job.pricing.quotedPrice,
+                    serviceLocation: job.location.address,
+                    notes: `Repeat job based on ${jobId}`
+                };
 
-    const confirmRepeatJob = () => {
-        if (repeatJobData) {
-            setJobHistory(prev => [repeatJobData, ...prev]);
-            setShowRepeatJobModal(false);
-            setRepeatJobData(null);
-            alert(`New job request created: ${repeatJobData.id}`);
+                // Since there's no specific repeat job endpoint in the API docs,
+                // this would likely be implemented as a new service request creation
+                const response = await apiRequest('/service-request/create', {
+                    method: 'POST',
+                    body: JSON.stringify(repeatJobRequest)
+                });
+
+                alert(`New repeat job request created successfully! Request ID: ${response.id || 'N/A'}`);
+
+                // Refresh the job history to show the new request if it appears in the list
+                setTimeout(() => {
+                    loadAllData();
+                }, 1000);
+
+            } catch (error) {
+                console.error('Error creating repeat job:', error);
+                alert(`Failed to create repeat job: ${error.message}`);
+            }
         }
     };
 
@@ -477,11 +523,47 @@ const JobHistory = () => {
         .reduce((sum, job, _, array) => sum + job.rating.clientRating / array.length, 0);
 
     const filterOptions = [
-        { value: 'all', label: 'All Requests', count: jobHistory.length },
-        { value: 'new', label: 'New', count: jobHistory.filter(j => j.status === 'new').length || 1 },
-        { value: 'pending', label: 'Pending', count: jobHistory.filter(j => j.status === 'pending').length || 2 },
-        { value: 'urgent', label: 'Urgent', count: jobHistory.filter(j => j.status === 'urgent').length || 1 }
+        { value: 'all', label: 'All Jobs', count: jobHistory.length },
+        { value: 'completed', label: 'Completed', count: jobHistory.filter(j => j.status === 'completed').length },
+        { value: 'in-progress', label: 'In Progress', count: jobHistory.filter(j => j.status === 'in-progress').length },
+        { value: 'cancelled', label: 'Cancelled', count: jobHistory.filter(j => j.status === 'cancelled').length }
     ];
+
+    // Loading state
+    if (loading) {
+        return (
+            <div className={styles.profileContent}>
+                <div className={styles.profileForm}>
+                    <div className={styles.loadingState}>
+                        <RefreshCw size={48} className={styles.spin} />
+                        <p>Loading job history...</p>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    // Error state
+    if (error) {
+        return (
+            <div className={styles.profileContent}>
+                <div className={styles.profileForm}>
+                    <div className={styles.errorState}>
+                        <AlertCircle size={48} style={{ color: '#ef4444' }} />
+                        <h3>Error Loading Job History</h3>
+                        <p>{error}</p>
+                        <button
+                            className={`${styles.actionBtn} ${styles.primary}`}
+                            onClick={handleRefresh}
+                        >
+                            <RefreshCw size={16} />
+                            Try Again
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className={styles.profileContent}>
@@ -495,8 +577,8 @@ const JobHistory = () => {
                 <section className={styles.formSection}>
                     <div className={styles.statsGrid}>
                         <div className={styles.statCard}>
-                            <div className={styles.statIcon} style={{ backgroundColor: '#dbeafe' }}>
-                                <Activity size={24} style={{ color: '#3b82f6' }} />
+                            <div className={`${styles.statIcon} ${styles.blue}`}>
+                                <Activity size={24} />
                             </div>
                             <div className={styles.statContent}>
                                 <div className={styles.statNumber}>{totalJobs}</div>
@@ -506,19 +588,19 @@ const JobHistory = () => {
                         </div>
 
                         <div className={styles.statCard}>
-                            <div className={styles.statIcon} style={{ backgroundColor: '#d1fae5' }}>
-                                <CheckCircle size={24} style={{ color: '#10b981' }} />
+                            <div className={`${styles.statIcon} ${styles.green}`}>
+                                <CheckCircle size={24} />
                             </div>
                             <div className={styles.statContent}>
                                 <div className={styles.statNumber}>{completedJobs}</div>
                                 <div className={styles.statLabel}>Completed Jobs</div>
-                                <div className={`${styles.statChange} ${styles.positive}`}>{Math.round((completedJobs/totalJobs)*100)}% success rate</div>
+                                <div className={`${styles.statChange} ${styles.positive}`}>{Math.round((completedJobs/totalJobs)*100) || 0}% success rate</div>
                             </div>
                         </div>
 
                         <div className={styles.statCard}>
-                            <div className={styles.statIcon} style={{ backgroundColor: '#dcfce7' }}>
-                                <DollarSign size={24} style={{ color: '#16a34a' }} />
+                            <div className={`${styles.statIcon} ${styles.emerald}`}>
+                                <DollarSign size={24} />
                             </div>
                             <div className={styles.statContent}>
                                 <div className={styles.statNumber}>₨{totalEarnings.toLocaleString()}</div>
@@ -528,11 +610,11 @@ const JobHistory = () => {
                         </div>
 
                         <div className={styles.statCard}>
-                            <div className={styles.statIcon} style={{ backgroundColor: '#fef7cd' }}>
-                                <Star size={24} style={{ color: '#eab308' }} />
+                            <div className={`${styles.statIcon} ${styles.yellow}`}>
+                                <Star size={24} />
                             </div>
                             <div className={styles.statContent}>
-                                <div className={styles.statNumber}>{avgRating.toFixed(1)}</div>
+                                <div className={styles.statNumber}>{avgRating.toFixed(1) || 'N/A'}</div>
                                 <div className={styles.statLabel}>Average Rating</div>
                                 <div className={`${styles.statChange} ${styles.positive}`}>From client reviews</div>
                             </div>
@@ -541,90 +623,18 @@ const JobHistory = () => {
                 </section>
 
                 {/* Modern Filter Section */}
-                <section className={styles.formSection}>
-                    <div className={styles.filterSection}>
-                        <div className={styles.filterHeader}>
-                            <h3 className={styles.filterHeaderTitle}>
-                                <Filter size={20} />
-                                Filter & Search
-                            </h3>
-                            <div className={styles.filterHeaderActions}>
-                                <select
-                                    value={exportFormat}
-                                    onChange={(e) => setExportFormat(e.target.value)}
-                                    className={styles.sortSelect}
-                                >
-                                    <option value="json">JSON</option>
-                                    <option value="csv">CSV</option>
-                                </select>
-                                <button
-                                    onClick={() => handleExport(exportFormat)}
-                                    className={`${styles.actionBtn} ${styles.secondary}`}
-                                >
-                                    <Download size={16} />
-                                    Export
-                                </button>
-                                <button
-                                    onClick={handleRefresh}
-                                    className={`${styles.actionBtn} ${styles.secondary}`}
-                                >
-                                    <RefreshCw size={16} />
-                                    Refresh
-                                </button>
-                            </div>
-                        </div>
-
-                        <div className={styles.searchContainer}>
-                            <div className={styles.searchInputWrapper}>
-                                <Search size={20} className={styles.searchIcon} />
-                                <input
-                                    type="text"
-                                    placeholder="Search by client name, service type, or location..."
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    className={styles.searchInput}
-                                />
-                            </div>
-                        </div>
-
-                        <div className={styles.filterTabsAndSort}>
-                            <div className={styles.filterTabs}>
-                                {filterOptions.map((option) => (
-                                    <button
-                                        key={option.value}
-                                        className={`${styles.filterTab} ${selectedFilter === option.value ? styles.active : ''}`}
-                                        onClick={() => setSelectedFilter(option.value)}
-                                    >
-                                        {option.label}
-                                        <span className={styles.filterCount}>{option.count}</span>
-                                    </button>
-                                ))}
-                            </div>
-
-                            <div className={styles.sortControls}>
-                                <div>
-                                    <label>Sort by:</label>
-                                    <select
-                                        value={sortBy}
-                                        onChange={(e) => setSortBy(e.target.value)}
-                                        className={styles.sortSelect}
-                                    >
-                                        <option value="date">Date</option>
-                                        <option value="price">Price</option>
-                                        <option value="rating">Rating</option>
-                                        <option value="duration">Duration</option>
-                                    </select>
-                                    <button
-                                        className={styles.sortOrderBtn}
-                                        onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-                                    >
-                                        {sortOrder === 'asc' ? <SortAsc size={16} /> : <SortDesc size={16} />}
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
+                <FilterAndSearch
+                    searchTerm={searchTerm}
+                    onSearchChange={setSearchTerm}
+                    selectedFilter={selectedFilter}
+                    onFilterChange={setSelectedFilter}
+                    filterOptions={filterOptions}
+                    sortBy={sortBy}
+                    onSortByChange={setSortBy}
+                    sortOrder={sortOrder}
+                    onSortOrderChange={setSortOrder}
+                    onRefresh={handleRefresh}
+                />
 
                 {/* Job History List */}
                 <section className={styles.formSection}>
@@ -632,6 +642,22 @@ const JobHistory = () => {
                         <h3 className={styles.sectionTitle}>
                             Job Records ({sortedJobs.length})
                         </h3>
+                        <div className={styles.sectionActions}>
+                            <button
+                                className={`${styles.actionBtn} ${styles.secondary}`}
+                                onClick={() => handleExport('csv')}
+                            >
+                                <Download size={16} />
+                                Export CSV
+                            </button>
+                            <button
+                                className={`${styles.actionBtn} ${styles.secondary}`}
+                                onClick={() => handleExport('json')}
+                            >
+                                <Download size={16} />
+                                Export JSON
+                            </button>
+                        </div>
                     </div>
 
                     <div className={styles.jobsList}>
@@ -722,16 +748,6 @@ const JobHistory = () => {
                                             </div>
                                             {job.pricing.finalPrice && (
                                                 <div className={`${styles.priceItem} ${styles.final}`}>
-                                                    <span className={styles.priceLabel}>Final:</span>
-                                                    <span className={styles.priceAmount}>₨{job.pricing.finalPrice.toLocaleString()}</span>
-                                                </div>
-                                            )}
-                                            {job.pricing.additionalCharges !== 0 && (
-                                                <div className={`${styles.priceItem} ${styles.additional}`}>
-                                                    <span className={styles.priceLabel}>Additional:</span>
-                                                    <span className={`${styles.priceAmount} ${job.pricing.additionalCharges > 0 ? styles.positive : styles.negative}`}>
-                                                        {job.pricing.additionalCharges > 0 ? '+' : ''}₨{Math.abs(job.pricing.additionalCharges).toLocaleString()}
-                                                    </span>
                                                 </div>
                                             )}
                                         </div>
@@ -811,7 +827,7 @@ const JobHistory = () => {
                     {sortedJobs.length === 0 && (
                         <div className={styles.emptyState}>
                             <div className={styles.emptyIcon}>
-                                <Activity size={48} style={{ color: '#9ca3af' }} />
+                                <Activity size={48} />
                             </div>
                             <div className={styles.emptyMessage}>
                                 <h4>No jobs found</h4>
@@ -839,17 +855,41 @@ const JobHistory = () => {
                         </div>
 
                         <div className={styles.modalSection}>
+                            <h3 className={styles.modalSectionTitle}>Service Information</h3>
+                            <div className={styles.modalSectionContent}>
+                                <div className={styles.modalDetail}>
+                                    <strong>Service Type:</strong> {selectedJobDetails.service.type}
+                                </div>
+                                <div className={styles.modalDetail}>
+                                    <strong>Description:</strong> {selectedJobDetails.service.description}
+                                </div>
+                                <div className={styles.modalDetail}>
+                                    <strong>Duration:</strong> {selectedJobDetails.service.duration}
+                                </div>
+                                <div className={styles.modalDetail}>
+                                    <strong>Difficulty:</strong>
+                                    <span
+                                        className={styles.difficultyTag}
+                                        style={{ backgroundColor: getDifficultyColor(selectedJobDetails.service.difficulty) }}
+                                    >
+                                        {selectedJobDetails.service.difficulty.charAt(0).toUpperCase() + selectedJobDetails.service.difficulty.slice(1)}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className={styles.modalSection}>
                             <h3 className={styles.modalSectionTitle}>Client Information</h3>
                             <div className={styles.modalSectionContent}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+                                <div className={styles.modalClientInfo}>
                                     <div className={styles.clientAvatar}>
                                         {selectedJobDetails.client.avatar}
                                     </div>
                                     <div>
-                                        <h4 style={{ margin: '0 0 4px 0', fontWeight: '600' }}>
+                                        <h4 className={styles.clientNameModal}>
                                             {selectedJobDetails.client.name}
                                         </h4>
-                                        <div style={{ display: 'flex', gap: '16px', fontSize: '14px', color: '#6b7280' }}>
+                                        <div className={styles.clientContact}>
                                             <span>{selectedJobDetails.client.phone}</span>
                                             <span>{selectedJobDetails.client.email}</span>
                                         </div>
@@ -858,7 +898,101 @@ const JobHistory = () => {
                             </div>
                         </div>
 
-                        <div style={{ marginTop: '24px', display: 'flex', justifyContent: 'flex-end' }}>
+                        <div className={styles.modalSection}>
+                            <h3 className={styles.modalSectionTitle}>Timeline & Location</h3>
+                            <div className={styles.modalSectionContent}>
+                                <div className={styles.modalDetail}>
+                                    <strong>Request Date:</strong> {selectedJobDetails.timeline.requestDate}
+                                </div>
+                                <div className={styles.modalDetail}>
+                                    <strong>Scheduled Date:</strong> {selectedJobDetails.timeline.scheduledDate}
+                                </div>
+                                <div className={styles.modalDetail}>
+                                    <strong>Completed Date:</strong> {selectedJobDetails.timeline.completedDate}
+                                </div>
+                                <div className={styles.modalDetail}>
+                                    <strong>Location:</strong> {selectedJobDetails.location.address}
+                                </div>
+                                <div className={styles.modalDetail}>
+                                    <strong>Distance:</strong> {selectedJobDetails.location.distance}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className={styles.modalSection}>
+                            <h3 className={styles.modalSectionTitle}>Pricing & Payment</h3>
+                            <div className={styles.modalSectionContent}>
+                                <div className={styles.modalDetail}>
+                                    <strong>Quoted Price:</strong> ₨{selectedJobDetails.pricing.quotedPrice.toLocaleString()}
+                                </div>
+                                <div className={styles.modalDetail}>
+                                    <strong>Final Price:</strong> ₨{selectedJobDetails.pricing.finalPrice.toLocaleString()}
+                                </div>
+                                {selectedJobDetails.pricing.additionalCharges !== 0 && (
+                                    <div className={styles.modalDetail}>
+                                        <strong>Additional Charges:</strong>
+                                        <span className={selectedJobDetails.pricing.additionalCharges > 0 ? styles.positive : styles.negative}>
+                                            {selectedJobDetails.pricing.additionalCharges > 0 ? '+' : ''}₨{Math.abs(selectedJobDetails.pricing.additionalCharges).toLocaleString()}
+                                        </span>
+                                    </div>
+                                )}
+                                <div className={styles.modalDetail}>
+                                    <strong>Payment Method:</strong> {selectedJobDetails.pricing.paymentMethod}
+                                </div>
+                                <div className={styles.modalDetail}>
+                                    <strong>Payment Status:</strong>
+                                    <span
+                                        className={styles.paymentTag}
+                                        style={{ backgroundColor: getPaymentStatusColor(selectedJobDetails.payments.status) }}
+                                    >
+                                        {selectedJobDetails.payments.status.charAt(0).toUpperCase() + selectedJobDetails.payments.status.slice(1)}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {selectedJobDetails.rating.clientRating && (
+                            <div className={styles.modalSection}>
+                                <h3 className={styles.modalSectionTitle}>Client Feedback</h3>
+                                <div className={styles.modalSectionContent}>
+                                    <div className={styles.modalDetail}>
+                                        <strong>Rating:</strong>
+                                        <div className={styles.ratingDisplay}>
+                                            {[...Array(5)].map((_, i) => (
+                                                <Star
+                                                    key={i}
+                                                    size={16}
+                                                    fill={i < selectedJobDetails.rating.clientRating ? "#fbbf24" : "none"}
+                                                    color="#fbbf24"
+                                                />
+                                            ))}
+                                            <span className={styles.ratingValue}>{selectedJobDetails.rating.clientRating}</span>
+                                        </div>
+                                    </div>
+                                    {selectedJobDetails.rating.clientReview && (
+                                        <div className={styles.modalDetail}>
+                                            <strong>Review:</strong>
+                                            <p className={styles.reviewQuote}>
+                                                "{selectedJobDetails.rating.clientReview}"
+                                            </p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+
+                        {selectedJobDetails.rating.technicianNotes && (
+                            <div className={styles.modalSection}>
+                                <h3 className={styles.modalSectionTitle}>Technician Notes</h3>
+                                <div className={styles.modalSectionContent}>
+                                    <p className={styles.technicianNotesModal}>
+                                        {selectedJobDetails.rating.technicianNotes}
+                                    </p>
+                                </div>
+                            </div>
+                        )}
+
+                        <div className={styles.modalFooter}>
                             <button
                                 onClick={() => setShowJobDetails(false)}
                                 className={`${styles.actionBtn} ${styles.primary}`}
@@ -886,22 +1020,25 @@ const JobHistory = () => {
 
                         <div className={styles.modalSection}>
                             <div className={styles.modalSectionContent}>
-                                <p style={{ margin: '0 0 16px 0', color: '#6b7280' }}>
+                                <p className={styles.repeatJobDescription}>
                                     Create a new job request based on the previous job details.
                                 </p>
-                                <div style={{ marginBottom: '12px' }}>
+                                <div className={styles.modalDetail}>
                                     <strong>Service:</strong> {repeatJobData.service.type}
                                 </div>
-                                <div style={{ marginBottom: '12px' }}>
+                                <div className={styles.modalDetail}>
                                     <strong>Client:</strong> {repeatJobData.client.name}
                                 </div>
-                                <div style={{ marginBottom: '12px' }}>
+                                <div className={styles.modalDetail}>
+                                    <strong>Location:</strong> {repeatJobData.location.address}
+                                </div>
+                                <div className={styles.modalDetail}>
                                     <strong>Price:</strong> ₨{repeatJobData.pricing.quotedPrice.toLocaleString()}
                                 </div>
                             </div>
                         </div>
 
-                        <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '24px' }}>
+                        <div className={styles.modalFooter}>
                             <button
                                 onClick={() => setShowRepeatJobModal(false)}
                                 className={`${styles.actionBtn} ${styles.secondary}`}
@@ -909,7 +1046,7 @@ const JobHistory = () => {
                                 Cancel
                             </button>
                             <button
-                                onClick={confirmRepeatJob}
+                                onClick={() => handleRepeatJob(repeatJobData.id)}
                                 className={`${styles.actionBtn} ${styles.success}`}
                             >
                                 <RotateCcw size={16} />

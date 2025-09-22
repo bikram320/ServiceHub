@@ -1,6 +1,6 @@
 /* Main Container */
 .profileContent {
-    font-family: 'Arial, sans-serif';
+    font-family: 'Arial', sans-serif;
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
@@ -29,6 +29,23 @@
     color: #6b7280;
     font-size: 16px;
     margin: 0;
+}
+
+/* Development Mode Banner */
+.devModeBanner {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    border: 1px solid #f59e0b;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-top: 16px;
+}
+
+.devModeContent {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #92400e;
+    font-size: 14px;
 }
 
 /* Form Section */
@@ -72,6 +89,26 @@
     margin-bottom: 12px;
 }
 
+.statIcon.blue {
+    background-color: #dbeafe;
+    color: #1d4ed8;
+}
+
+.statIcon.green {
+    background-color: #d1fae5;
+    color: #059669;
+}
+
+.statIcon.emerald {
+    background-color: #dcfce7;
+    color: #047857;
+}
+
+.statIcon.yellow {
+    background-color: #fef7cd;
+    color: #d97706;
+}
+
 .statContent {
     display: flex;
     flex-direction: column;
@@ -112,6 +149,11 @@
     margin: 0;
     display: flex;
     align-items: center;
+    gap: 8px;
+}
+
+.sectionActions {
+    display: flex;
     gap: 8px;
 }
 
@@ -191,110 +233,40 @@
     color: #9ca3af;
 }
 
-/* Filter Tabs */
-.filterTabs {
+/* Loading and Error States */
+.loadingState, .errorState {
     display: flex;
-    gap: 8px;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-}
-
-.filterTab {
-    background-color: white;
-    color: #6b7280;
-    border: 2px solid #e5e7eb;
-    border-radius: 10px;
-    padding: 12px 20px;
-    cursor: pointer;
-    font-size: 16px;
-    font-weight: 500;
-    display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 8px;
-    transition: all 0.2s ease;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.filterTab:hover {
-    background-color: #f8fafc;
-    border-color: #cbd5e1;
-}
-
-.filterTab.active {
-    background-color: #3bbef6;
-    color: white;
-    border-color: #3bb5f6;
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-}
-
-.filterCount {
-    background-color: #e5e7eb;
-    color: #6b7280;
-    padding: 4px 8px;
-    border-radius: 12px;
-    font-size: 14px;
-    font-weight: 600;
-    min-width: 20px;
+    justify-content: center;
+    padding: 64px 24px;
     text-align: center;
 }
 
-.filterTab.active .filterCount {
-    background-color: rgba(255, 255, 255, 0.2);
-    color: white;
-}
-
-/* Sort Controls */
-.sortControls {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 16px;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.sortControls > div {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.sortControls label {
+.loadingState p, .errorState p {
+    margin-top: 16px;
+    color: #6b7280;
     font-size: 16px;
-    color: #374151;
-    font-weight: 500;
-    white-space: nowrap;
 }
 
-.sortSelect {
-    padding: 8px 12px;
-    border: 2px solid #e5e7eb;
-    border-radius: 8px;
-    font-size: 16px;
-    background: white;
-    color: #374151;
-    outline: none;
-    min-width: 120px;
+.errorState h3 {
+    margin: 16px 0 8px 0;
+    color: #1f2937;
+    font-size: 20px;
 }
 
-.sortSelect:focus {
-    border-color: #3b82f6;
+/* Spinner Animation */
+.spin {
+    animation: spin 1s linear infinite;
 }
 
-.sortOrderBtn {
-    background-color: white;
-    border: 2px solid #e5e7eb;
-    border-radius: 8px;
-    padding: 8px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-}
-
-.sortOrderBtn:hover {
-    background-color: #f8fafc;
-    border-color: #cbd5e1;
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 /* Action Buttons */
@@ -309,6 +281,7 @@
     font-size: 14px;
     font-weight: 500;
     transition: all 0.2s ease;
+    text-decoration: none;
 }
 
 .actionBtn.secondary {
@@ -371,12 +344,16 @@
     border-left-color: #10b981;
 }
 
-.jobCard.inProgress {
+.jobCard.inProgress, .jobCard.in-progress {
     border-left-color: #3b82f6;
 }
 
 .jobCard.cancelled {
     border-left-color: #ef4444;
+}
+
+.jobCard.onHold, .jobCard.on-hold {
+    border-left-color: #f59e0b;
 }
 
 .jobHeader {
@@ -401,6 +378,7 @@
 .statusBadges {
     display: flex;
     gap: 8px;
+    flex-wrap: wrap;
 }
 
 .statusBadge, .difficultyBadge, .paymentBadge {
@@ -409,6 +387,7 @@
     border-radius: 20px;
     font-size: 12px;
     font-weight: 500;
+    white-space: nowrap;
 }
 
 .jobDate {
@@ -417,6 +396,7 @@
     gap: 4px;
     color: #6b7280;
     font-size: 14px;
+    white-space: nowrap;
 }
 
 /* Job Body */
@@ -447,10 +427,12 @@
     padding: 8px;
     border-radius: 8px;
     color: #374151;
+    flex-shrink: 0;
 }
 
 .serviceDetails {
     flex: 1;
+    min-width: 0;
 }
 
 .serviceTitle {
@@ -465,6 +447,7 @@
     color: #6b7280;
     margin: 0;
     line-height: 1.4;
+    word-wrap: break-word;
 }
 
 .jobMeta {
@@ -479,6 +462,7 @@
     gap: 8px;
     font-size: 14px;
     color: #6b7280;
+    word-wrap: break-word;
 }
 
 /* Client Info */
@@ -504,10 +488,12 @@
     justify-content: center;
     font-size: 14px;
     font-weight: bold;
+    flex-shrink: 0;
 }
 
 .clientDetails {
     flex: 1;
+    min-width: 0;
 }
 
 .clientName {
@@ -515,6 +501,7 @@
     font-weight: 600;
     color: #1f2937;
     margin: 0 0 4px 0;
+    word-wrap: break-word;
 }
 
 .clientRating {
@@ -551,6 +538,7 @@
 .priceAmount {
     font-size: 14px;
     color: #374151;
+    font-weight: 500;
 }
 
 .priceItem.final .priceAmount {
@@ -602,6 +590,7 @@
     color: #374151;
     margin: 0;
     font-style: italic;
+    line-height: 1.4;
 }
 
 /* Technician Notes */
@@ -638,22 +627,27 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
 }
 
 .actionButtons {
     display: flex;
     gap: 8px;
+    flex-wrap: wrap;
 }
 
 .jobAttachments {
     display: flex;
     align-items: center;
     gap: 8px;
+    flex-wrap: wrap;
 }
 
 .attachmentsLabel {
     font-size: 12px;
     color: #6b7280;
+    white-space: nowrap;
 }
 
 .attachmentFile {
@@ -663,6 +657,11 @@
     border-radius: 4px;
     font-size: 12px;
     cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.attachmentFile:hover {
+    background-color: #e5e7eb;
 }
 
 /* Empty State */
@@ -678,6 +677,7 @@
     margin-bottom: 16px;
     display: flex;
     justify-content: center;
+    color: #9ca3af;
 }
 
 .emptyMessage h4 {
@@ -705,6 +705,7 @@
     align-items: center;
     justify-content: center;
     z-index: 1000;
+    padding: 20px;
 }
 
 .modalContent {
@@ -712,9 +713,10 @@
     border-radius: 12px;
     padding: 24px;
     max-width: 600px;
-    width: 90%;
+    width: 100%;
     max-height: 80vh;
-    overflow: auto;
+    overflow-y: auto;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
 .modalHeader {
@@ -722,6 +724,8 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
+    border-bottom: 1px solid #f3f4f6;
+    padding-bottom: 16px;
 }
 
 .modalTitle {
@@ -736,6 +740,12 @@
     border: none;
     cursor: pointer;
     padding: 4px;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+}
+
+.modalCloseBtn:hover {
+    background-color: #f3f4f6;
 }
 
 .modalSection {
@@ -746,17 +756,127 @@
     font-size: 18px;
     font-weight: 600;
     color: #1f2937;
-    margin-bottom: 12px;
+    margin: 0 0 12px 0;
 }
 
 .modalSectionContent {
     background-color: #f9fafb;
     padding: 16px;
     border-radius: 8px;
+    border: 1px solid #f3f4f6;
+}
+
+.modalDetail {
+    margin-bottom: 12px;
+    line-height: 1.5;
+}
+
+.modalDetail:last-child {
+    margin-bottom: 0;
+}
+
+.modalDetail strong {
+    color: #374151;
+    margin-right: 8px;
+}
+
+.modalClientInfo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.clientNameModal {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0 0 4px 0;
+}
+
+.clientContact {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.clientContact span {
+    font-size: 14px;
+    color: #6b7280;
+}
+
+.difficultyTag, .paymentTag {
+    display: inline-block;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+    margin-left: 8px;
+}
+
+.ratingDisplay {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.ratingValue {
+    font-weight: 600;
+    color: #1f2937;
+    margin-left: 4px;
+}
+
+.reviewQuote {
+    font-style: italic;
+    color: #374151;
+    margin: 8px 0 0 0;
+    padding: 12px;
+    background-color: #f3f4f6;
+    border-radius: 6px;
+    border-left: 3px solid #d1d5db;
+}
+
+.technicianNotesModal {
+    color: #374151;
+    margin: 0;
+    line-height: 1.5;
+}
+
+.modalFooter {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid #f3f4f6;
+}
+
+.repeatJobDescription {
+    color: #6b7280;
+    margin-bottom: 16px;
+    line-height: 1.5;
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
+    .profileContent {
+        padding: 12px;
+    }
+
+    .profileForm {
+        padding: 16px;
+    }
+
+    .statsGrid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .statCard {
+        padding: 16px;
+    }
+
     .jobBody {
         grid-template-columns: 1fr;
         gap: 16px;
@@ -770,6 +890,16 @@
 
     .jobPricing {
         text-align: left;
+    }
+
+    .sectionHeader {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    .sectionActions {
+        justify-content: flex-start;
     }
 
     .filterTabs {
@@ -786,5 +916,74 @@
     .filterHeaderActions {
         flex-direction: column;
         gap: 8px;
+    }
+
+    .jobActions {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    .actionButtons {
+        justify-content: center;
+    }
+
+    .modalContent {
+        margin: 0;
+        max-height: 90vh;
+        padding: 16px;
+    }
+
+    .modalHeader {
+        flex-direction: column;
+        gap: 12px;
+        text-align: center;
+    }
+
+    .modalFooter {
+        flex-direction: column;
+    }
+
+    .actionBtn {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .profileTitle {
+        font-size: 24px;
+    }
+
+    .statNumber {
+        font-size: 22px;
+    }
+
+    .jobCard {
+        padding: 16px;
+    }
+
+    .jobHeader {
+        flex-direction: column;
+        gap: 12px;
+        align-items: stretch;
+    }
+
+    .jobIdStatus {
+        flex-direction: column;
+        gap: 8px;
+        align-items: flex-start;
+    }
+
+    .statusBadges {
+        justify-content: flex-start;
+    }
+
+    .serviceHeader {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .serviceIcon {
+        align-self: flex-start;
     }
 }

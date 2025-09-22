@@ -17,11 +17,39 @@
 }
 
 .profile-header {
+    position: relative;
     padding: 2rem;
     border-bottom: 1px solid #e2e8f0;
     background: linear-gradient(135deg, #85d6ab 0%, #85d6ab 100%);
     color: white;
 }
+
+.refresh-btn {
+    background: #53bad8;
+    border: 2px solid #509ec3; /* Adds a subtle border */
+    border-radius: 22px;
+    color: white;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 8px 16px; /* Adds padding for a larger touch area */
+    position: absolute;
+    top: 20px; /* Adjusts the distance from the top */
+    right: 20px; /* Adjusts the distance from the right */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Adds a soft shadow */
+    transition: all 0.2s ease;
+}
+
+.refresh-btn:hover {
+    background: #00a0d4; /* Darkens the background on hover */
+    transform: translateY(-2px); /* Lifts the button slightly */
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15); /* Enhances shadow on hover */
+}
+
+.refresh-btn:active {
+    transform: translateY(0); /* Pushes the button down on click */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
 
 .profile-title {
     font-size: 2rem;

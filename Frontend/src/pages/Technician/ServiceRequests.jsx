@@ -25,6 +25,7 @@ import {
     SortAsc,
     SortDesc
 } from 'lucide-react';
+import FilterAndSearch from '../../Components/common/FilterAndSearch';
 import styles from '../../styles/ServiceRequests.module.css';
 
 const ServiceRequests = () => {
@@ -38,163 +39,451 @@ const ServiceRequests = () => {
     const [showDetailsModal, setShowDetailsModal] = useState(false);
     const [selectedRequest, setSelectedRequest] = useState(null);
     const [confirmAction, setConfirmAction] = useState(null);
+    const [serviceRequests, setServiceRequests] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [stats, setStats] = useState({
+        totalRequests: 0,
+        urgentResponses: 0,
+        responseRate: 85,
+        potentialEarnings: 0
+    });
 
-    // Mock data for service requests
-    const [serviceRequests, setServiceRequests] = useState([
-        {
-            id: 'SR001',
-            client: {
-                name: 'John Doe',
-                avatar: 'JD',
-                phone: '+977-9841234567',
-                email: 'john.doe@email.com',
-                rating: 4.5,
-                totalBookings: 12
-            },
-            service: {
-                type: 'Plumbing Repair',
-                category: 'plumbing',
-                description: 'Kitchen sink is leaking and needs immediate repair. Water is dripping continuously.',
-                urgency: 'high',
-                estimatedDuration: '2-3 hours',
-                preferredTime: 'Morning (9 AM - 12 PM)'
-            },
-            location: {
-                address: 'Thamel, Ward 29, Kathmandu',
-                distance: '2.5 km',
-                coordinates: { lat: 27.7172, lng: 85.3240 }
-            },
-            pricing: {
-                budget: '₨1,500 - ₨2,500',
-                suggestedPrice: 2000,
-                negotiable: true
-            },
-            timeline: {
-                requestedDate: '2024-11-16',
-                requestedTime: '10:00 AM',
-                postedTime: '2 hours ago',
-                responseDeadline: '6 hours'
-            },
-            status: 'pending',
-            priority: 'high',
-            attachments: ['kitchen-sink.jpg', 'water-damage.jpg']
-        },
-        {
-            id: 'SR002',
-            client: {
-                name: 'Sarah Wilson',
-                avatar: 'SW',
-                phone: '+977-9851234567',
-                email: 'sarah.wilson@email.com',
-                rating: 4.8,
-                totalBookings: 8
-            },
-            service: {
-                type: 'House Cleaning',
-                category: 'cleaning',
-                description: 'Deep cleaning required for 2BHK apartment before moving in. All rooms, kitchen, and bathrooms.',
-                urgency: 'medium',
-                estimatedDuration: '4-5 hours',
-                preferredTime: 'Afternoon (1 PM - 5 PM)'
-            },
-            location: {
-                address: 'Patan Dhoka, Lalitpur',
-                distance: '4.2 km',
-                coordinates: { lat: 27.6588, lng: 85.3247 }
-            },
-            pricing: {
-                budget: '₨3,000 - ₨4,000',
-                suggestedPrice: 3500,
-                negotiable: true
-            },
-            timeline: {
-                requestedDate: '2024-11-17',
-                requestedTime: '2:00 PM',
-                postedTime: '4 hours ago',
-                responseDeadline: '4 hours'
-            },
-            status: 'pending',
-            priority: 'medium',
-            attachments: ['apartment-layout.pdf']
-        },
-        {
-            id: 'SR003',
-            client: {
-                name: 'Mike Johnson',
-                avatar: 'MJ',
-                phone: '+977-9861234567',
-                email: 'mike.johnson@email.com',
-                rating: 4.2,
-                totalBookings: 15
-            },
-            service: {
-                type: 'AC Installation',
-                category: 'electrical',
-                description: 'Need installation of new split AC unit in bedroom. Includes mounting and electrical connections.',
-                urgency: 'low',
-                estimatedDuration: '3-4 hours',
-                preferredTime: 'Any time'
-            },
-            location: {
-                address: 'Boudha, Kathmandu',
-                distance: '8.1 km',
-                coordinates: { lat: 27.7211, lng: 85.3621 }
-            },
-            pricing: {
-                budget: '₨5,000 - ₨7,000',
-                suggestedPrice: 6000,
-                negotiable: false
-            },
-            timeline: {
-                requestedDate: '2024-11-18',
-                requestedTime: 'Flexible',
-                postedTime: '1 day ago',
-                responseDeadline: '2 hours'
-            },
-            status: 'urgent',
-            priority: 'low',
-            attachments: ['ac-model.jpg', 'room-dimensions.pdf']
-        },
-        {
-            id: 'SR004',
-            client: {
-                name: 'Emma Brown',
-                avatar: 'EB',
-                phone: '+977-9871234567',
-                email: 'emma.brown@email.com',
-                rating: 4.9,
-                totalBookings: 3
-            },
-            service: {
-                type: 'Garden Maintenance',
-                category: 'gardening',
-                description: 'Monthly garden maintenance including pruning, weeding, and lawn mowing for small garden.',
-                urgency: 'low',
-                estimatedDuration: '2-3 hours',
-                preferredTime: 'Morning (7 AM - 10 AM)'
-            },
-            location: {
-                address: 'Bhaktapur Durbar Square Area',
-                distance: '12.3 km',
-                coordinates: { lat: 27.6710, lng: 85.4298 }
-            },
-            pricing: {
-                budget: '₨1,200 - ₨1,800',
-                suggestedPrice: 1500,
-                negotiable: true
-            },
-            timeline: {
-                requestedDate: '2024-11-19',
-                requestedTime: '8:00 AM',
-                postedTime: '6 hours ago',
-                responseDeadline: '12 hours'
-            },
-            status: 'new',
-            priority: 'low',
-            attachments: ['garden-current.jpg']
+    // API Configuration
+    const API_BASE_URL = import.meta.env?.VITE_API_BASE_URL || 'http://localhost:8080';
+    const technicianEmail = 'tech@example.com'; // This should come from authenticated user context
+    const [isDevelopmentMode, setIsDevelopmentMode] = useState(false);
+
+    // Get authorization token from cookies or localStorage
+    const getAuthToken = () => {
+        // Check for JWT in cookies first
+        const cookies = document.cookie.split(';');
+        const accessCookie = cookies.find(cookie => cookie.trim().startsWith('Access='));
+        if (accessCookie) {
+            return accessCookie.split('=')[1];
         }
-    ]);
 
+        // Fallback to localStorage if needed
+        return localStorage.getItem('authToken');
+    };
+
+    // API request helper
+    const apiRequest = async (endpoint, options = {}) => {
+        const token = getAuthToken();
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+                ...options.headers,
+            },
+            ...options,
+        };
+
+        try {
+            const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.includes('application/json')) {
+                return await response.json();
+            }
+
+            return await response.text();
+        } catch (error) {
+            console.error('API request failed:', error);
+            throw error;
+        }
+    };
+
+    // Fetch current service requests
+    const fetchCurrentRequests = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+
+            const data = await apiRequest(
+                `/technician/get-current-request?email=${encodeURIComponent(technicianEmail)}`
+            );
+
+            // Transform API data to match component structure
+            const transformedData = transformApiDataToRequests(data);
+            setServiceRequests(transformedData);
+
+            // Update stats
+            updateStats(transformedData);
+
+        } catch (error) {
+            console.error('Error fetching requests:', error);
+
+            // Check if it's a connection error (backend not running)
+            if (error.message.includes('Failed to fetch') || error.message.includes('ERR_CONNECTION_REFUSED')) {
+                setIsDevelopmentMode(true);
+                // Use mock data for development
+                const mockData = getMockServiceRequests();
+                setServiceRequests(mockData);
+                updateStats(mockData);
+                setError('Backend server not available. Using mock data for development.');
+            } else {
+                setError('Failed to fetch service requests. Please try again.');
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Mock data for development when backend is not available
+    const getMockServiceRequests = () => {
+        return [
+            {
+                id: 'SR001',
+                client: {
+                    name: 'John Doe',
+                    avatar: 'JD',
+                    phone: '+977-9841234567',
+                    email: 'john.doe@email.com',
+                    rating: 4.5,
+                    totalBookings: 12
+                },
+                service: {
+                    type: 'Plumbing Repair',
+                    category: 'plumbing',
+                    description: 'Kitchen sink is leaking and needs immediate repair. Water is dripping continuously.',
+                    urgency: 'high',
+                    estimatedDuration: '2-3 hours',
+                    preferredTime: 'Morning (9 AM - 12 PM)'
+                },
+                location: {
+                    address: 'Thamel, Ward 29, Kathmandu',
+                    distance: '2.5 km',
+                    coordinates: { lat: 27.7172, lng: 85.3240 }
+                },
+                pricing: {
+                    budget: '₨1,500 - ₨2,500',
+                    suggestedPrice: 2000,
+                    negotiable: true
+                },
+                timeline: {
+                    requestedDate: '2024-11-16',
+                    requestedTime: '10:00 AM',
+                    postedTime: '2 hours ago',
+                    responseDeadline: '6 hours'
+                },
+                status: 'pending',
+                priority: 'high',
+                attachments: ['kitchen-sink.jpg', 'water-damage.jpg']
+            },
+            {
+                id: 'SR002',
+                client: {
+                    name: 'Sarah Wilson',
+                    avatar: 'SW',
+                    phone: '+977-9851234567',
+                    email: 'sarah.wilson@email.com',
+                    rating: 4.8,
+                    totalBookings: 8
+                },
+                service: {
+                    type: 'House Cleaning',
+                    category: 'cleaning',
+                    description: 'Deep cleaning required for 2BHK apartment before moving in. All rooms, kitchen, and bathrooms.',
+                    urgency: 'medium',
+                    estimatedDuration: '4-5 hours',
+                    preferredTime: 'Afternoon (1 PM - 5 PM)'
+                },
+                location: {
+                    address: 'Patan Dhoka, Lalitpur',
+                    distance: '4.2 km',
+                    coordinates: { lat: 27.6588, lng: 85.3247 }
+                },
+                pricing: {
+                    budget: '₨3,000 - ₨4,000',
+                    suggestedPrice: 3500,
+                    negotiable: true
+                },
+                timeline: {
+                    requestedDate: '2024-11-17',
+                    requestedTime: '2:00 PM',
+                    postedTime: '4 hours ago',
+                    responseDeadline: '4 hours'
+                },
+                status: 'pending',
+                priority: 'medium',
+                attachments: ['apartment-layout.pdf']
+            },
+            {
+                id: 'SR003',
+                client: {
+                    name: 'Mike Johnson',
+                    avatar: 'MJ',
+                    phone: '+977-9861234567',
+                    email: 'mike.johnson@email.com',
+                    rating: 4.2,
+                    totalBookings: 15
+                },
+                service: {
+                    type: 'AC Installation',
+                    category: 'electrical',
+                    description: 'Need installation of new split AC unit in bedroom. Includes mounting and electrical connections.',
+                    urgency: 'low',
+                    estimatedDuration: '3-4 hours',
+                    preferredTime: 'Any time'
+                },
+                location: {
+                    address: 'Boudha, Kathmandu',
+                    distance: '8.1 km',
+                    coordinates: { lat: 27.7211, lng: 85.3621 }
+                },
+                pricing: {
+                    budget: '₨5,000 - ₨7,000',
+                    suggestedPrice: 6000,
+                    negotiable: false
+                },
+                timeline: {
+                    requestedDate: '2024-11-18',
+                    requestedTime: 'Flexible',
+                    postedTime: '1 day ago',
+                    responseDeadline: '2 hours'
+                },
+                status: 'urgent',
+                priority: 'low',
+                attachments: ['ac-model.jpg', 'room-dimensions.pdf']
+            }
+        ];
+    };
+
+    // Transform API response to match component data structure
+    const transformApiDataToRequests = (apiData) => {
+        if (!Array.isArray(apiData)) return [];
+
+        return apiData.map(item => ({
+            id: `SR${item.id || Math.random().toString().substr(2, 6)}`,
+            client: {
+                name: item.userName || 'Unknown Client',
+                avatar: (item.userName || 'UC').split(' ').map(n => n[0]).join('').substr(0, 2).toUpperCase(),
+                phone: item.userPhone || '+977-XXXXXXXXXX',
+                email: item.userEmail || 'N/A',
+                rating: item.userRating || 4.0,
+                totalBookings: item.userTotalBookings || 0
+            },
+            service: {
+                type: item.serviceType || 'General Service',
+                category: getCategoryFromServiceType(item.serviceType),
+                description: item.serviceDescription || 'No description provided',
+                urgency: item.urgency || 'medium',
+                estimatedDuration: item.estimatedDuration || '2-3 hours',
+                preferredTime: item.preferredTime || 'Flexible'
+            },
+            location: {
+                address: item.serviceLocation || 'Location not specified',
+                distance: calculateDistance(item.latitude, item.longitude) || 'N/A',
+                coordinates: {
+                    lat: item.latitude || 27.7172,
+                    lng: item.longitude || 85.3240
+                }
+            },
+            pricing: {
+                budget: item.budgetRange || 'Budget not specified',
+                suggestedPrice: item.suggestedPrice || 0,
+                negotiable: item.negotiable !== false
+            },
+            timeline: {
+                requestedDate: item.serviceDate || new Date().toISOString().split('T')[0],
+                requestedTime: item.serviceTime || 'Flexible',
+                postedTime: formatTimeAgo(item.createdAt),
+                responseDeadline: calculateResponseDeadline(item.createdAt)
+            },
+            status: mapApiStatusToComponentStatus(item.status),
+            priority: item.priority || 'medium',
+            attachments: item.attachments || []
+        }));
+    };
+
+    // Helper functions
+    const getCategoryFromServiceType = (serviceType) => {
+        const type = (serviceType || '').toLowerCase();
+        if (type.includes('plumb')) return 'plumbing';
+        if (type.includes('electric') || type.includes('ac')) return 'electrical';
+        if (type.includes('clean')) return 'cleaning';
+        if (type.includes('garden')) return 'gardening';
+        return 'general';
+    };
+
+    const calculateDistance = (lat, lng) => {
+        // Simple distance calculation from Kathmandu center (27.7172, 85.3240)
+        if (!lat || !lng) return null;
+        const kathmandu = { lat: 27.7172, lng: 85.3240 };
+        const R = 6371; // Earth's radius in km
+        const dLat = (lat - kathmandu.lat) * Math.PI / 180;
+        const dLng = (lng - kathmandu.lng) * Math.PI / 180;
+        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+            Math.cos(kathmandu.lat * Math.PI / 180) * Math.cos(lat * Math.PI / 180) *
+            Math.sin(dLng/2) * Math.sin(dLng/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        const distance = R * c;
+        return `${distance.toFixed(1)} km`;
+    };
+
+    const formatTimeAgo = (dateString) => {
+        if (!dateString) return 'Just now';
+        const now = new Date();
+        const date = new Date(dateString);
+        const diff = now - date;
+        const hours = Math.floor(diff / (1000 * 60 * 60));
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+        if (days > 0) return `${days} day${days > 1 ? 's' : ''} ago`;
+        if (hours > 0) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+        return 'Just now';
+    };
+
+    const calculateResponseDeadline = (createdAt) => {
+        if (!createdAt) return '6 hours';
+        const created = new Date(createdAt);
+        const deadline = new Date(created.getTime() + 6 * 60 * 60 * 1000); // 6 hours later
+        const now = new Date();
+        const remaining = deadline - now;
+        const hours = Math.floor(remaining / (1000 * 60 * 60));
+
+        if (hours <= 0) return 'Overdue';
+        return `${hours} hour${hours > 1 ? 's' : ''}`;
+    };
+
+    const mapApiStatusToComponentStatus = (apiStatus) => {
+        const status = (apiStatus || '').toLowerCase();
+        switch (status) {
+            case 'pending': return 'pending';
+            case 'accepted': return 'responded';
+            case 'rejected': return 'declined';
+            case 'new': return 'new';
+            default: return 'pending';
+        }
+    };
+
+    const updateStats = (requests) => {
+        const totalRequests = requests.length;
+        const urgentRequests = requests.filter(r => r.timeline.responseDeadline === 'Overdue').length;
+        const potentialEarnings = requests.reduce((sum, r) => sum + (r.pricing.suggestedPrice || 0), 0);
+
+        setStats({
+            totalRequests,
+            urgentResponses: urgentRequests,
+            responseRate: 85, // This could be calculated based on historical data
+            potentialEarnings
+        });
+    };
+
+    // Accept service request
+    const handleAcceptRequest = async (requestId) => {
+        setProcessingRequests(prev => new Set(prev).add(requestId));
+
+        try {
+            if (isDevelopmentMode) {
+                // Simulate API delay for development
+                await new Promise(resolve => setTimeout(resolve, 1500));
+
+                // Update local state for development
+                setServiceRequests(prev =>
+                    prev.map(request =>
+                        request.id === requestId
+                            ? { ...request, status: 'responded' }
+                            : request
+                    )
+                );
+
+                alert(`Request ${requestId} has been accepted! (Development Mode)`);
+            } else {
+                const numericId = requestId.replace('SR', '');
+                await apiRequest(
+                    `/technician/accept-service-request?requestId=${numericId}`,
+                    { method: 'POST' }
+                );
+
+                // Update local state
+                setServiceRequests(prev =>
+                    prev.map(request =>
+                        request.id === requestId
+                            ? { ...request, status: 'responded' }
+                            : request
+                    )
+                );
+
+                alert(`Request ${requestId} has been accepted! You can now send a quote to the client.`);
+            }
+        } catch (error) {
+            alert('Failed to accept request. Please try again.');
+            console.error('Error accepting request:', error);
+        } finally {
+            setProcessingRequests(prev => {
+                const newSet = new Set(prev);
+                newSet.delete(requestId);
+                return newSet;
+            });
+        }
+    };
+
+    // Decline service request
+    const handleDeclineRequest = async (requestId) => {
+        setSelectedRequest(serviceRequests.find(r => r.id === requestId));
+        setConfirmAction(() => () => performDeclineRequest(requestId));
+        setShowConfirmModal(true);
+    };
+
+    const performDeclineRequest = async (requestId) => {
+        setProcessingRequests(prev => new Set(prev).add(requestId));
+
+        try {
+            if (isDevelopmentMode) {
+                // Simulate API delay for development
+                await new Promise(resolve => setTimeout(resolve, 1000));
+
+                // Remove from local state for development
+                setServiceRequests(prev =>
+                    prev.filter(request => request.id !== requestId)
+                );
+
+                alert('Request declined successfully. (Development Mode)');
+            } else {
+                const numericId = requestId.replace('SR', '');
+                await apiRequest(
+                    `/technician/reject-service-request?requestId=${numericId}`,
+                    { method: 'POST' }
+                );
+
+                // Remove from local state
+                setServiceRequests(prev =>
+                    prev.filter(request => request.id !== requestId)
+                );
+
+                alert('Request declined successfully.');
+            }
+        } catch (error) {
+            alert('Failed to decline request. Please try again.');
+            console.error('Error declining request:', error);
+        } finally {
+            setProcessingRequests(prev => {
+                const newSet = new Set(prev);
+                newSet.delete(requestId);
+                return newSet;
+            });
+        }
+    };
+
+    // Refresh data
+    const handleRefresh = () => {
+        setSearchTerm('');
+        setSelectedFilter('all');
+        fetchCurrentRequests();
+    };
+
+    // Load data on component mount
+    useEffect(() => {
+        fetchCurrentRequests();
+    }, []);
+
+    // Rest of your existing helper functions remain the same
     const getServiceIcon = (category) => {
         switch (category) {
             case 'plumbing': return <Wrench size={20} />;
@@ -234,6 +523,7 @@ const ServiceRequests = () => {
         }
     };
 
+    // Filtering and sorting logic
     const filteredRequests = serviceRequests.filter(request => {
         const matchesFilter = selectedFilter === 'all' || request.status === selectedFilter;
         const matchesSearch = request.client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -273,71 +563,10 @@ const ServiceRequests = () => {
         }
     });
 
-    const handleAcceptRequest = async (requestId) => {
-        setProcessingRequests(prev => new Set(prev).add(requestId));
-
-        try {
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 1500));
-
-            setServiceRequests(prev =>
-                prev.map(request =>
-                    request.id === requestId
-                        ? { ...request, status: 'responded' }
-                        : request
-                )
-            );
-
-            alert(`Request ${requestId} has been accepted! You can now send a quote to the client.`);
-        } catch (error) {
-            alert('Failed to accept request. Please try again.');
-        } finally {
-            setProcessingRequests(prev => {
-                const newSet = new Set(prev);
-                newSet.delete(requestId);
-                return newSet;
-            });
-        }
-    };
-
-    const handleDeclineRequest = async (requestId) => {
-        setSelectedRequest(serviceRequests.find(r => r.id === requestId));
-        setConfirmAction(() => () => performDeclineRequest(requestId));
-        setShowConfirmModal(true);
-    };
-
-    const performDeclineRequest = async (requestId) => {
-        setProcessingRequests(prev => new Set(prev).add(requestId));
-
-        try {
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 1000));
-
-            setServiceRequests(prev =>
-                prev.filter(request => request.id !== requestId)
-            );
-
-        } catch (error) {
-            alert('Failed to decline request. Please try again.');
-        } finally {
-            setProcessingRequests(prev => {
-                const newSet = new Set(prev);
-                newSet.delete(requestId);
-                return newSet;
-            });
-        }
-    };
-
     const handleViewDetails = (requestId) => {
         const request = serviceRequests.find(r => r.id === requestId);
         setSelectedRequest(request);
         setShowDetailsModal(true);
-    };
-
-    const handleRefresh = () => {
-        // Simulate data refresh
-        setSearchTerm('');
-        setSelectedFilter('all');
     };
 
     const handleConfirmAction = async () => {
@@ -362,12 +591,63 @@ const ServiceRequests = () => {
         { value: 'urgent', label: 'Urgent', count: serviceRequests.filter(r => r.status === 'urgent').length }
     ];
 
+    // Loading state
+    if (loading) {
+        return (
+            <div className={styles['profile-content']}>
+                <div className={styles['profile-form']}>
+                    <div className={styles['loading-state']}>
+                        <RefreshCw size={48} className={styles['spin']} />
+                        <p>Loading service requests...</p>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    // Error state
+    if (error) {
+        return (
+            <div className={styles['profile-content']}>
+                <div className={styles['profile-form']}>
+                    <div className={styles['error-state']}>
+                        <AlertCircle size={48} style={{ color: '#ef4444' }} />
+                        <h3>Error Loading Requests</h3>
+                        <p>{error}</p>
+                        <button
+                            className={`${styles['action-btn']} ${styles['primary']}`}
+                            onClick={handleRefresh}
+                        >
+                            <RefreshCw size={16} />
+                            Try Again
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className={styles['profile-content']}>
             <div className={styles['profile-form']}>
                 <div className={styles['profile-header']}>
                     <h1 className={styles['profile-title']}>Service Requests</h1>
                     <p className={styles['profile-subtitle']}>Manage and respond to incoming service requests from clients.</p>
+                    {isDevelopmentMode && (
+                        <div style={{
+                            backgroundColor: '#fef3c7',
+                            border: '1px solid #f59e0b',
+                            borderRadius: '8px',
+                            padding: '12px',
+                            marginTop: '8px',
+                            color: '#92400e'
+                        }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <AlertCircle size={16} />
+                                <strong>Development Mode:</strong> Backend server not available. Using mock data for demonstration.
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 {/* Summary Cards */}
@@ -378,9 +658,9 @@ const ServiceRequests = () => {
                                 <Clock size={24} style={{ color: '#3b82f6' }} />
                             </div>
                             <div className={styles['stat-content']}>
-                                <div className={styles['stat-number']}>{serviceRequests.length}</div>
+                                <div className={styles['stat-number']}>{stats.totalRequests}</div>
                                 <div className={styles['stat-label']}>Total Requests</div>
-                                <div className={`${styles['stat-change']} ${styles['positive']}`}>+3 today</div>
+                                <div className={`${styles['stat-change']} ${styles['positive']}`}>Updated now</div>
                             </div>
                         </div>
 
@@ -389,9 +669,11 @@ const ServiceRequests = () => {
                                 <AlertCircle size={24} style={{ color: '#f59e0b' }} />
                             </div>
                             <div className={styles['stat-content']}>
-                                <div className={styles['stat-number']}>{serviceRequests.filter(r => r.status === 'urgent').length}</div>
+                                <div className={styles['stat-number']}>{stats.urgentResponses}</div>
                                 <div className={styles['stat-label']}>Urgent Responses</div>
-                                <div className={`${styles['stat-change']} ${styles['negative']}`}>Response overdue</div>
+                                <div className={`${styles['stat-change']} ${stats.urgentResponses > 0 ? styles['negative'] : styles['positive']}`}>
+                                    {stats.urgentResponses > 0 ? 'Response overdue' : 'All current'}
+                                </div>
                             </div>
                         </div>
 
@@ -400,9 +682,9 @@ const ServiceRequests = () => {
                                 <CheckCircle size={24} style={{ color: '#10b981' }} />
                             </div>
                             <div className={styles['stat-content']}>
-                                <div className={styles['stat-number']}>85%</div>
+                                <div className={styles['stat-number']}>{stats.responseRate}%</div>
                                 <div className={styles['stat-label']}>Response Rate</div>
-                                <div className={`${styles['stat-change']} ${styles['positive']}`}>+5% this week</div>
+                                <div className={`${styles['stat-change']} ${styles['positive']}`}>Maintaining</div>
                             </div>
                         </div>
 
@@ -411,7 +693,7 @@ const ServiceRequests = () => {
                                 <DollarSign size={24} style={{ color: '#6366f1' }} />
                             </div>
                             <div className={styles['stat-content']}>
-                                <div className={styles['stat-number']}>₨12,500</div>
+                                <div className={styles['stat-number']}>₨{stats.potentialEarnings.toLocaleString()}</div>
                                 <div className={styles['stat-label']}>Potential Earnings</div>
                                 <div className={`${styles['stat-change']} ${styles['positive']}`}>From pending requests</div>
                             </div>
@@ -420,70 +702,18 @@ const ServiceRequests = () => {
                 </section>
 
                 {/* Filters and Controls */}
-                <section className={styles['form-section']}>
-                    <div className={styles['section-header']}>
-                        <h3 className={styles['section-title']}>
-                            <Filter size={20} style={{marginRight: '0.5rem'}} />
-                            Filter & Search
-                        </h3>
-                        <div className={styles['filter-controls']}>
-                            <button className={`${styles['action-btn']} ${styles['secondary']}`} onClick={handleRefresh}>
-                                <RefreshCw size={16} />
-                                Refresh
-                            </button>
-                        </div>
-                    </div>
-
-                    <div className={styles['filter-section']}>
-                        <div className={styles['search-container']}>
-                            <div className={styles['search-input-wrapper']}>
-                                <Search size={20} className={styles['search-icon']} />
-                                <input
-                                    type="text"
-                                    placeholder="Search by client name, service type, or location..."
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    className={styles['search-input']}
-                                />
-                            </div>
-                        </div>
-
-                        <div className={styles['filter-tabs-and-sort']}>
-                            <div className={styles['filter-tabs']}>
-                                {filterOptions.map((option) => (
-                                    <button
-                                        key={option.value}
-                                        className={`${styles['filter-tab']} ${selectedFilter === option.value ? styles['active'] : ''}`}
-                                        onClick={() => setSelectedFilter(option.value)}
-                                    >
-                                        {option.label}
-                                        <span className={styles['filter-count']}>{option.count}</span>
-                                    </button>
-                                ))}
-                            </div>
-
-                            <div className={styles['sort-controls']}>
-                                <label>Sort by:</label>
-                                <select
-                                    value={sortBy}
-                                    onChange={(e) => setSortBy(e.target.value)}
-                                    className={styles['sort-select']}
-                                >
-                                    <option value="date">Date</option>
-                                    <option value="price">Price</option>
-                                    <option value="distance">Distance</option>
-                                    <option value="priority">Priority</option>
-                                </select>
-                                <button
-                                    className={styles['sort-order-btn']}
-                                    onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-                                >
-                                    {sortOrder === 'asc' ? <SortAsc size={16} /> : <SortDesc size={16} />}
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </section>
+                <FilterAndSearch
+                    searchTerm={searchTerm}
+                    onSearchChange={setSearchTerm}
+                    selectedFilter={selectedFilter}
+                    onFilterChange={setSelectedFilter}
+                    filterOptions={filterOptions}
+                    sortBy={sortBy}
+                    onSortByChange={setSortBy}
+                    sortOrder={sortOrder}
+                    onSortOrderChange={setSortOrder}
+                    onRefresh={handleRefresh}
+                />
 
                 {/* Service Requests List */}
                 <section className={styles['form-section']}>
