@@ -6,16 +6,16 @@ const FindServices = () => {
     const services = [
         "Plumbing",
         "Electrician",
-        "Appliances Repair",
-        "Welder",
         "Painter",
+        "Movers",
         "Photographer",
         "Carpenter",
-        "Movers",
-        "Construction Worker",
          "Mechanic",
         "HVAC Repair",
-        "Cleaning Services"
+        "Cleaning Services",
+        "Pest Control",
+        "Interior Design",
+        "Locksmith"
     ];
 
     return (

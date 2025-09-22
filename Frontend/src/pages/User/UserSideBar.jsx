@@ -24,12 +24,6 @@ const UserSidebar = ({ activeTab, onTabChange, onLogout, userInfo = {} }) => {
             icon: LayoutDashboard,
             path: '/user/dashboard'
         },
-        // {
-        //     id: 'profile-form',
-        //     label: 'My Profile Form',
-        //     icon: Newspaper,
-        //     path: '/user/profile-form'
-        // },
         {
             id: 'profile',
             label: 'User Profile',
