@@ -155,10 +155,14 @@ public class UserService {
         return technicians.stream()
                 .map(tech -> {
                     GetTechnicianDataRequest dto = new GetTechnicianDataRequest();
+                    dto.setTechId(tech.getId());
                     dto.setImageFile(tech.getProfileImagePath());
                     dto.setTechnicianName(tech.getName());
                     dto.setTechnicianAddress(tech.getAddress());
                     dto.setTechnicianPhone(tech.getPhone());
+                    dto.setServiceName(String.valueOf(tech.getTechnicianSkills().stream()
+                            .map((TechnicianSkill t) -> t.getSkill().getName())
+                            .collect(Collectors.toList())));
                     dto.setTechnicianBio(tech.getBio());
                     return dto;
                 })

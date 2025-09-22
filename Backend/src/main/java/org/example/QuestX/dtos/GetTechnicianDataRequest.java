@@ -7,10 +7,12 @@ import java.math.BigDecimal;
 
 @Data
 public class GetTechnicianDataRequest {
+    long techId;
     String imageFile;
     String technicianName;
     String technicianAddress;
     String technicianPhone;
+    String serviceName;
     String technicianBio;
     BigDecimal feeCharge;
 }
