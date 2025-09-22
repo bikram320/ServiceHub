@@ -18,4 +18,6 @@ public interface FeedbackRepository extends JpaRepository<Feedback, Long> {
     @Query("SELECT AVG(f.rating) FROM Feedback f WHERE f.request.user = :user")
     Double getAverageRatingByUser(@Param("user") User user);
 
+    @Query("SELECT AVG(f.rating) FROM Feedback f WHERE f.request.technician.id = :technicianId")
+    Double getAverageRatingByTechnicianId(@Param("technicianId") Long technicianId);
 }

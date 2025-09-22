@@ -1,40 +1,3 @@
-// import React, { useState, useEffect } from 'react';
-// import {
-//     BarChart3,
-//     TrendingUp,
-//     Calendar,
-//     Clock,
-//     User,
-//     MapPin,
-//     Bell,
-//     Settings,
-//     Activity,
-//     DollarSign,
-//     CheckCircle,
-//     AlertCircle,
-//     Plus,
-//     Filter,
-//     Download,
-//     Eye,
-//     Star,
-//     MessageSquare
-// } from 'lucide-react';
-// import "../../styles/TechnicianDashboard.module.css";
-// // import "../../styles/UserDashboard.module.css";
-// import Header2 from "../../Components/layout/Header2.jsx";
-// import StatCard from '../../Components/Dashboard/StatCard';
-// import ActivityItem from '../../Components/Dashboard/ActivityItem';
-// import AppointmentCard from '../../Components/Dashboard/AppointmentCard';
-// import EmptyState from '../../Components/Dashboard/EmptyState.jsx';
-// import NotificationItem from '../../Components/Dashboard/NotificationItem';
-// import PendingApproval from '../../Components/Dashboard/PendingApproval';
-// import QuickActionButton from "../../Components/Dashboard/QuickActionButton.jsx";
-// import ServiceCard from "../../Components/Dashboard/ServiceCard.jsx";
-// import StarRating from '../../Components/Dashboard/StarRating';
-// import SectionHeader from "../../Components/Dashboard/SectionHeader.jsx";
-// import LiveServiceItem from "../../Components/Dashboard/LiveServices.jsx";
-// import ReportCard from "../../Components/Dashboard/ReportCard.jsx";
-
 
 import React, { useState, useEffect } from 'react';
 import {
@@ -69,12 +32,11 @@ const TechnicianDashboard = () => {
     const [previousRequests, setPreviousRequests] = useState([]);
     const [pendingPayments, setPendingPayments] = useState([]);
     const [receivedPayments, setReceivedPayments] = useState([]);
+    const [dashboardOverview, setDashboardOverview] = useState(null);
     const [notifications, setNotifications] = useState([]);
-    const [technicianProfile, setTechnicianProfile] = useState(null);
 
     // Get technician email from localStorage or context
     const getTechnicianEmail = () => {
-        // This should come from your auth context or localStorage
         return localStorage.getItem('technicianEmail') || 'tech@example.com';
     };
 
@@ -90,7 +52,7 @@ const TechnicianDashboard = () => {
                     'Authorization': token ? `Bearer ${token}` : '',
                     ...options.headers
                 },
-                credentials: 'include', // Include cookies
+                credentials: 'include',
                 ...options
             });
 
@@ -105,7 +67,17 @@ const TechnicianDashboard = () => {
         }
     };
 
-    // API functions
+    // API functions matching your backend endpoints
+    const fetchDashboardOverview = async () => {
+        try {
+            const email = getTechnicianEmail();
+            return await apiCall(`/technician/dashboard-overview?email=${encodeURIComponent(email)}`);
+        } catch (error) {
+            console.error('Failed to fetch dashboard overview:', error);
+            return null;
+        }
+    };
+
     const fetchCurrentRequests = async () => {
         try {
             const email = getTechnicianEmail();
@@ -148,15 +120,11 @@ const TechnicianDashboard = () => {
 
     const acceptServiceRequest = async (requestId) => {
         try {
-            await apiCall('/technician/accept-service-request', {
-                method: 'POST',
-                body: JSON.stringify({ requestId })
+            await apiCall(`/technician/accept-service-request?requestId=${requestId}`, {
+                method: 'POST'
             });
 
-            // Show success notification
             addNotification('success', 'Service request accepted successfully');
-
-            // Refresh data
             await refreshData();
         } catch (error) {
             console.error('Failed to accept service request:', error);
@@ -166,15 +134,11 @@ const TechnicianDashboard = () => {
 
     const rejectServiceRequest = async (requestId) => {
         try {
-            await apiCall('/technician/reject-service-request', {
-                method: 'POST',
-                body: JSON.stringify({ requestId })
+            await apiCall(`/technician/reject-service-request?requestId=${requestId}`, {
+                method: 'POST'
             });
 
-            // Show success notification
             addNotification('success', 'Service request rejected');
-
-            // Refresh data
             await refreshData();
         } catch (error) {
             console.error('Failed to reject service request:', error);
@@ -190,68 +154,91 @@ const TechnicianDashboard = () => {
             message,
             time: 'Just now'
         };
-        setNotifications(prev => [newNotification, ...prev.slice(0, 4)]); // Keep only 5 notifications
+        setNotifications(prev => [newNotification, ...prev.slice(0, 4)]);
     };
 
-    // Calculate metrics from real data
-    const calculateMetrics = () => {
-        const totalBookings = previousRequests.length + currentRequests.length;
-        const activeRequests = currentRequests.filter(req => req.status === 'PENDING' || req.status === 'ACCEPTED').length;
-        const completedServices = previousRequests.filter(req => req.status === 'COMPLETED').length;
+    // Format duration for display
+    const formatDuration = (duration) => {
+        if (!duration) return '0 mins';
 
-        // Calculate total earnings from received payments
-        const totalEarnings = receivedPayments.reduce((sum, payment) => sum + (payment.amount || 0), 0);
+        // Handle ISO 8601 duration format (PT0S, PT1H30M, etc.)
+        if (typeof duration === 'string' && duration.startsWith('PT')) {
+            if (duration === 'PT0S') return '0 mins';
 
-        // Calculate average rating from completed services with feedback
-        const ratedServices = previousRequests.filter(req => req.rating && req.rating > 0);
-        const averageRating = ratedServices.length > 0
-            ? (ratedServices.reduce((sum, req) => sum + req.rating, 0) / ratedServices.length).toFixed(1)
-            : '0.0';
+            // Parse ISO 8601 duration format
+            const hours = duration.match(/(\d+)H/);
+            const minutes = duration.match(/(\d+)M/);
+            const seconds = duration.match(/(\d+(?:\.\d+)?)S/);
 
-        // Calculate average response time (mock for now)
-        const responseTime = '12 mins'; // This would need to be calculated from actual response times
+            const h = hours ? parseInt(hours[1]) : 0;
+            const m = minutes ? parseInt(minutes[1]) : 0;
+            const s = seconds ? Math.floor(parseFloat(seconds[1])) : 0;
 
-        return {
-            totalBookings,
-            activeRequests,
-            completedServices,
-            earnings: totalEarnings,
-            rating: parseFloat(averageRating),
-            responseTime
-        };
+            // Convert everything to minutes for display
+            const totalMinutes = h * 60 + m + Math.floor(s / 60);
+
+            if (totalMinutes === 0) return '0 mins';
+            if (totalMinutes >= 60) {
+                const displayHours = Math.floor(totalMinutes / 60);
+                const displayMins = totalMinutes % 60;
+                return displayMins > 0 ? `${displayHours}h ${displayMins}m` : `${displayHours}h`;
+            }
+            return `${totalMinutes} mins`;
+        }
+
+        // Handle numeric duration (assuming seconds)
+        if (typeof duration === 'number') {
+            const hours = Math.floor(duration / 3600);
+            const minutes = Math.floor((duration % 3600) / 60);
+
+            if (hours > 0) {
+                return `${hours}h ${minutes}m`;
+            }
+            return `${minutes} mins`;
+        }
+
+        return duration.toString();
     };
 
-    // Transform API data for display
+    // Format currency
+    const formatCurrency = (amount) => {
+        if (!amount) return '₨0';
+        return `₨${parseFloat(amount).toLocaleString()}`;
+    };
+
+    // Transform current requests to upcoming appointments
     const transformRequestsToAppointments = (requests) => {
         return requests
-            .filter(req => req.status === 'PENDING' || req.status === 'ACCEPTED')
-            .slice(0, 3) // Show only first 3
+            .filter(req => req.status === 'PENDING' || req.status === 'IN_PROGRESS')
+            .slice(0, 3)
             .map(req => ({
-                id: req.id,
-                client: req.user?.name || 'Unknown Client',
-                service: req.serviceType || 'Service Request',
-                time: new Date(req.requestedDateTime).toLocaleString('en-US', {
+                id: req.requestId,
+                client: req.username || 'Unknown Client',
+                service: req.serviceName || 'Service Request',
+                time: req.appointmentTime ? new Date(req.appointmentTime).toLocaleString('en-US', {
                     weekday: 'short',
                     month: 'short',
                     day: 'numeric',
                     hour: 'numeric',
                     minute: '2-digit'
-                }),
-                location: req.location || 'Location not specified',
-                status: req.status
+                }) : 'Time TBD',
+                location: req.userAddress || 'Address not specified',
+                status: req.status,
+                phone: req.userPhone,
+                email: req.userEmail
             }));
     };
 
     const transformRequestsToActivities = (requests) => {
         const allRequests = [...currentRequests, ...previousRequests];
         return allRequests
-            .sort((a, b) => new Date(b.createdAt || b.requestedDateTime) - new Date(a.createdAt || a.requestedDateTime))
+            .sort((a, b) => new Date(b.appointmentTime || 0) - new Date(a.appointmentTime || 0))
             .slice(0, 4)
             .map(req => ({
-                id: req.id,
+                id: req.requestId,
                 action: getActivityAction(req.status),
-                client: req.user?.name || 'Unknown Client',
-                time: getRelativeTime(req.createdAt || req.requestedDateTime),
+                client: req.username || 'Unknown Client',
+                time: getRelativeTime(req.appointmentTime),
                 status: req.status?.toLowerCase()
             }));
     };
@@ -259,7 +246,7 @@ const TechnicianDashboard = () => {
     const getActivityAction = (status) => {
         switch (status) {
             case 'COMPLETED': return 'Service completed';
-            case 'ACCEPTED': return 'Service accepted';
+            case 'IN_PROGRESS': return 'Service in progress';
             case 'PENDING': return 'New booking received';
             case 'REJECTED': return 'Service declined';
             case 'CANCELLED': return 'Service cancelled';
@@ -290,25 +277,39 @@ const TechnicianDashboard = () => {
         setError(null);
 
         try {
-            const [current, previous, pending, received] = await Promise.all([
+            const [overview, current, previous, pending, received] = await Promise.all([
+                fetchDashboardOverview(),
                 fetchCurrentRequests(),
                 fetchPreviousRequests(),
                 fetchPendingPayments(),
                 fetchReceivedPayments()
             ]);
 
+            setDashboardOverview(overview);
             setCurrentRequests(current);
             setPreviousRequests(previous);
             setPendingPayments(pending);
             setReceivedPayments(received);
 
-            // Set initial notifications
-            if (notifications.length === 0) {
-                setNotifications([
-                    { id: 1, type: 'info', message: `${current.length} active service requests`, time: 'Now' },
-                    { id: 2, type: 'success', message: `${pending.length} pending payments`, time: 'Now' }
-                ]);
+            // Set initial notifications based on data
+            const newNotifications = [];
+            if (current.length > 0) {
+                newNotifications.push({
+                    id: 1,
+                    type: 'info',
+                    message: `${current.length} active service requests`,
+                    time: 'Now'
+                });
             }
+            if (pending.length > 0) {
+                newNotifications.push({
+                    id: 2,
+                    type: 'success',
+                    message: `${pending.length} pending payments`,
+                    time: 'Now'
+                });
+            }
+            setNotifications(newNotifications);
 
         } catch (error) {
             console.error('Failed to load dashboard data:', error);
@@ -330,8 +331,42 @@ const TechnicianDashboard = () => {
         loadDashboardData();
     }, []);
 
-    // Calculate current metrics
-    const metrics = calculateMetrics();
+    // Get metrics from dashboard overview or calculate from data
+    const getMetrics = () => {
+        if (dashboardOverview) {
+            return {
+                totalBookings: dashboardOverview.totalBookings || 0,
+                activeRequests: dashboardOverview.activeBookings || 0,
+                completedServices: dashboardOverview.completedBookings || 0,
+                earnings: dashboardOverview.totalEarnings || 0,
+                rating: dashboardOverview.averageRatingReceived || 0,
+                responseTime: formatDuration(dashboardOverview.averageResponseTime)
+            };
+        }
+
+        // Fallback calculation if overview is not available
+        const totalBookings = previousRequests.length + currentRequests.length;
+        const activeRequests = currentRequests.filter(req =>
+            req.status === 'PENDING' || req.status === 'IN_PROGRESS'
+        ).length;
+        const completedServices = previousRequests.filter(req =>
+            req.status === 'COMPLETED'
+        ).length;
+        const totalEarnings = receivedPayments.reduce((sum, payment) =>
+            sum + (parseFloat(payment.amount) || 0), 0
+        );
+
+        return {
+            totalBookings,
+            activeRequests,
+            completedServices,
+            earnings: totalEarnings,
+            rating: 0.0,
+            responseTime: '0 mins'
+        };
+    };
+
+    const metrics = getMetrics();
     const upcomingAppointments = transformRequestsToAppointments(currentRequests);
     const recentActivities = transformRequestsToActivities([...currentRequests, ...previousRequests]);
 
@@ -346,7 +381,7 @@ const TechnicianDashboard = () => {
         switch (status?.toLowerCase()) {
             case 'completed': return '#10b981';
             case 'pending': return '#f59e0b';
-            case 'accepted':
+            case 'in_progress':
             case 'in-progress': return '#3b82f6';
             case 'rejected':
             case 'cancelled': return '#ef4444';
@@ -452,7 +487,7 @@ const TechnicianDashboard = () => {
                                 <DollarSign size={24} style={{ color: '#16a34a' }} />
                             </div>
                             <div className={styles['stat-content']}>
-                                <div className={styles['stat-number']}>₨{metrics.earnings.toLocaleString()}</div>
+                                <div className={styles['stat-number']}>{formatCurrency(metrics.earnings)}</div>
                                 <div className={styles['stat-label']}>Total Earnings</div>
                                 <div className={`${styles['stat-change']} ${styles.positive}`}>Received</div>
                             </div>
@@ -463,7 +498,7 @@ const TechnicianDashboard = () => {
                                 <Star size={24} style={{ color: '#eab308' }} />
                             </div>
                             <div className={styles['stat-content']}>
-                                <div className={styles['stat-number']}>{metrics.rating || '0.0'}</div>
+                                <div className={styles['stat-number']}>{parseFloat(metrics.rating).toFixed(1)}</div>
                                 <div className={styles['stat-label']}>Average Rating</div>
                                 <div className={`${styles['stat-change']} ${styles.positive}`}>From reviews</div>
                             </div>
@@ -476,7 +511,7 @@ const TechnicianDashboard = () => {
                             <div className={styles['stat-content']}>
                                 <div className={styles['stat-number']}>{metrics.responseTime}</div>
                                 <div className={styles['stat-label']}>Avg Response Time</div>
-                                <div className={`${styles['stat-change']} ${styles.positive}`}>Estimated</div>
+                                <div className={`${styles['stat-change']} ${styles.positive}`}>Average</div>
                             </div>
                         </div>
                     </div>
@@ -527,6 +562,11 @@ const TechnicianDashboard = () => {
                                             <MapPin size={14} />
                                             {appointment.location}
                                         </div>
+                                        {appointment.phone && (
+                                            <div className={styles['appointment-contact']}>
+                                                <span>📞 {appointment.phone}</span>
+                                            </div>
+                                        )}
                                     </div>
                                     <div className={styles['appointment-actions']}>
                                         {appointment.status === 'PENDING' && (
@@ -545,8 +585,10 @@ const TechnicianDashboard = () => {
                                                 </button>
                                             </>
                                         )}
-                                        {appointment.status === 'ACCEPTED' && (
-                                            <span className={styles['status-badge']}>Accepted</span>
+                                        {appointment.status === 'IN_PROGRESS' && (
+                                            <span className={styles['status-badge']} style={{ backgroundColor: '#3b82f6' }}>
+                                                In Progress
+                                            </span>
                                         )}
                                     </div>
                                 </div>
@@ -675,175 +717,3 @@ const TechnicianDashboard = () => {
 };
 
 export default TechnicianDashboard;
-
-// const TechnicianDashboard = () => {
-//     const [selectedTimeRange, setSelectedTimeRange] = useState('week');
-//     const [notifications, setNotifications] = useState([
-//         { id: 1, type: 'success', message: 'Profile verification completed', time: '2 hours ago' },
-//         { id: 2, type: 'info', message: 'New service request received', time: '4 hours ago' },
-//         { id: 3, type: 'warning', message: 'Update your availability', time: '1 day ago' }
-//     ]);
-//
-//     const metrics = [
-//         { icon: Calendar, value: '24', label: 'Total Bookings', change: '+12% this month', color: '#3b82f6', bgColor: '#dbeafe' },
-//         { icon: Clock, value: '3', label: 'Active Requests', change: 'No change', color: '#f59e0b', bgColor: '#fef3c7' },
-//         { icon: CheckCircle, value: '21', label: 'Completed Services', change: '+8% this week', color: '#10b981', bgColor: '#d1fae5' },
-//         { icon: DollarSign, value: '₨2,850', label: 'Total Earnings', change: '+15% this month', color: '#16a34a', bgColor: '#dcfce7' },
-//         { icon: Star, value: '4.8', label: 'Average Rating', change: '+0.2 this month', color: '#eab308', bgColor: '#fef7cd' },
-//         { icon: Activity, value: '12 mins', label: 'Avg Response Time', change: '-3 mins this week', color: '#6366f1', bgColor: '#e0e7ff' }
-//     ];
-//
-//     const quickActions = [
-//         { icon: Plus, label: 'Add Service', action: () => console.log('Add service') },
-//         { icon: Calendar, label: 'Schedule', action: () => console.log('View schedule') },
-//         { icon: MessageSquare, label: 'Messages', action: () => console.log('View messages') },
-//         { icon: Settings, label: 'Settings', action: () => console.log('Open settings') }
-//     ];
-//
-//     const upcomingAppointments = [
-//         { id: 1, client: 'Alice Cooper', service: 'Home Cleaning', time: 'Today, 2:00 PM', location: 'Thamel, Kathmandu', date: 'Today', price: '₨2,500', status: 'confirmed' },
-//         { id: 2, client: 'Bob Smith', service: 'Plumbing Repair', time: 'Tomorrow, 10:00 AM', location: 'Patan, Lalitpur', date: 'Tomorrow', price: '₨1,800', status: 'pending' },
-//         { id: 3, client: 'Carol Davis', service: 'Garden Maintenance', time: 'Nov 18, 9:00 AM', location: 'Bhaktapur', date: 'Nov 18', price: '₨1,200', status: 'confirmed' }
-//     ];
-//
-//     const recentActivities = [
-//         { id: 1, action: 'Service completed', client: 'John Doe', time: '2 hours ago', status: 'completed' },
-//         { id: 2, action: 'New booking received', client: 'Sarah Wilson', time: '4 hours ago', status: 'pending' },
-//         { id: 3, action: 'Payment received', client: 'Mike Johnson', time: '1 day ago', status: 'completed' },
-//         { id: 4, action: 'Service request', client: 'Emma Brown', time: '2 days ago', status: 'in-progress' }
-//     ];
-//
-//     const handleNotificationClose = (notificationId) => {
-//         setNotifications(prev => prev.filter(n => n.id !== notificationId));
-//     };
-//
-//     const handleAppointmentAction = (action, appointmentId) => {
-//         console.log(`${action} appointment ${appointmentId}`);
-//     };
-//
-//     return (
-//         <div>
-//             <Header2 />
-//         <div className="profile-content">
-//             <div className="profile-form">
-//                 <div className="profile-header">
-//                     <h1 className="profile-title">Dashboard</h1>
-//                     <p className="profile-subtitle">Welcome back! Here's what's happening with your services.</p>
-//                 </div>
-//
-//                 {/* Metrics */}
-//                 <section className="form-section">
-//                     <SectionHeader title="Overview" icon={BarChart3} />
-//                     <div className="stats-grid">
-//                         {metrics.map((metric, index) => (
-//                             <StatCard key={index} {...metric} />
-//                         ))}
-//                     </div>
-//                 </section>
-//
-//                 {/* Quick Actions */}
-//                 <section className="form-section">
-//                     <h3 className="section-title">Quick Actions</h3>
-//                     <div className="quick-actions-grid">
-//                         {quickActions.map((action, index) => (
-//                             <QuickActionButton key={index} {...action} onClick={action.action} />
-//                         ))}
-//                     </div>
-//                 </section>
-//
-//                 {/* Upcoming Appointments */}
-//                 <section className="form-section">
-//                     <SectionHeader
-//                         title="Upcoming Appointments"
-//                         icon={Calendar}
-//                         actions={
-//                             <button className="add-btn">
-//                                 <Eye size={16} />
-//                                 View All
-//                             </button>
-//                         }
-//                     />
-//                     <div className="appointments-list">
-//                         {upcomingAppointments.map((appointment) => (
-//                             <AppointmentCard
-//                                 key={appointment.id}
-//                                 appointment={appointment}
-//                                 type="technician"
-//                                 onAction={handleAppointmentAction}
-//                             />
-//                         ))}
-//                     </div>
-//                 </section>
-//
-//                 {/* Recent Activity */}
-//                 <section className="form-section">
-//                     <SectionHeader
-//                         title="Recent Activity"
-//                         icon={Activity}
-//                         actions={
-//                             <select
-//                                 className="time-filter"
-//                                 value={selectedTimeRange}
-//                                 onChange={(e) => setSelectedTimeRange(e.target.value)}
-//                             >
-//                                 <option value="day">Today</option>
-//                                 <option value="week">This Week</option>
-//                                 <option value="month">This Month</option>
-//                             </select>
-//                         }
-//                     />
-//                     <div className="activity-list">
-//                         {recentActivities.map((activity) => (
-//                             <ActivityItem key={activity.id} activity={activity} />
-//                         ))}
-//                     </div>
-//                 </section>
-//
-//                 {/* Notifications */}
-//                 <section className="form-section">
-//                     <SectionHeader
-//                         title="Notifications"
-//                         icon={Bell}
-//                         actions={<button className="clear-all-btn">Clear All</button>}
-//                     />
-//                     <div className="notifications-list">
-//                         {notifications.map((notification) => (
-//                             <NotificationItem
-//                                 key={notification.id}
-//                                 notification={notification}
-//                                 onClose={handleNotificationClose}
-//                             />
-//                         ))}
-//                     </div>
-//                 </section>
-//
-//                 {/* Performance Chart Placeholder */}
-//                 <section className="form-section">
-//                     <SectionHeader
-//                         title="Performance Trends"
-//                         icon={TrendingUp}
-//                         actions={
-//                             <div className="chart-controls">
-//                                 <button className="chart-btn active">Bookings</button>
-//                                 <button className="chart-btn">Revenue</button>
-//                                 <button className="chart-btn">Rating</button>
-//                             </div>
-//                         }
-//                     />
-//                     <div className="chart-placeholder">
-//                         <div className="chart-icon">
-//                             <BarChart3 size={48} style={{ color: '#9ca3af' }} />
-//                         </div>
-//                         <div className="chart-message">
-//                             <h4>Performance Chart</h4>
-//                             <p>Your booking trends and performance metrics will be displayed here.</p>
-//                         </div>
-//                     </div>
-//                 </section>
-//             </div>
-//         </div>
-//         </div>
-//     );
-// };
-//
-// export default TechnicianDashboard;

@@ -32,7 +32,25 @@ public interface ServiceRequestRepository extends JpaRepository<ServiceRequest, 
     Long countByUserAndStatuses(@Param("user") User user, @Param("statuses") List<ServiceStatus> statuses);
 
 
-    @Query("SELECT SUM(sr.feeCharged) FROM ServiceRequest sr WHERE sr.user = :user")
-    BigDecimal getTotalAmountSpentByUser(@Param("user") User user);}
+    @Query("SELECT SUM(sr.feeCharged) FROM ServiceRequest sr WHERE sr.user = :user AND sr.status = :status")
+    BigDecimal getTotalAmountSpentByUserAndStatus(User user, ServiceStatus status);
+
+    @Query("SELECT COUNT(sr) FROM ServiceRequest sr WHERE sr.technician.id = :technicianId")
+    long countByTechnicianId(@Param("technicianId") Long technicianId);
+
+    @Query("SELECT COUNT(sr) FROM ServiceRequest sr WHERE sr.technician.id = :technicianId AND sr.status IN :statuses")
+    long countByTechnicianIdAndStatusIn(@Param("technicianId") Long technicianId, @Param("statuses") List<ServiceStatus> statuses);
+
+    @Query("SELECT COUNT(sr) FROM ServiceRequest sr WHERE sr.technician.id = :technicianId AND sr.status = :status")
+    long countByTechnicianIdAndStatus(@Param("technicianId") Long technicianId, @Param("status") ServiceStatus status);
+
+    @Query("SELECT SUM(sr.feeCharged) FROM ServiceRequest sr WHERE sr.technician.id = :technicianId AND sr.status = :status")
+    Double sumFeeChargeByTechnicianIdAndStatus(@Param("technicianId") Long technicianId, @Param("status") ServiceStatus status);
+
+    List<ServiceRequest> findByTechnicianIdAndUpdatedAtIsNotNull(Long technicianId);
+}
+
+
+
 
 

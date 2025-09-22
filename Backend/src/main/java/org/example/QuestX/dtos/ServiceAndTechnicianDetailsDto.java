@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 
 @Data
 public class ServiceAndTechnicianDetailsDto {
+    long requestId ;
     String technicianName;
     String technicianAddress;
     String technicianEmail;

@@ -3,13 +3,11 @@ package org.example.QuestX.services;
 import jakarta.mail.MessagingException;
 import lombok.AllArgsConstructor;
 import org.example.QuestX.Model.*;
+import org.example.QuestX.Repository.FeedbackRepository;
 import org.example.QuestX.Repository.PaymentRepository;
 import org.example.QuestX.Repository.ServiceRequestRepository;
 import org.example.QuestX.Repository.TechnicianRepository;
-import org.example.QuestX.dtos.PaymentDetailsDto;
-import org.example.QuestX.dtos.ServiceAndTechnicianDetailsDto;
-import org.example.QuestX.dtos.ServiceAndUserDetailsDto;
-import org.example.QuestX.dtos.TechnicianDto;
+import org.example.QuestX.dtos.*;
 import org.example.QuestX.exception.ServiceNotFoundException;
 import org.example.QuestX.exception.StatusInvalidException;
 import org.example.QuestX.exception.TechnicianNotFoundException;
@@ -19,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,6 +31,7 @@ public class TechnicianService {
     private final ServiceRequestRepository serviceRequestRepository;
     private final MailService mailService;
     private final PaymentRepository paymentRepository;
+    private final FeedbackRepository feedbackRepository;
 
     public void technicianProfileSetup(String email , String phone, String address, Double latitude,
                                        Double longitude, String bio, MultipartFile profileImage,
@@ -99,7 +99,7 @@ public class TechnicianService {
         technicianRepository.save(technician);
     }
 
-    public void acceptingUserServiceRequest(long requestId) throws MessagingException {
+   public void acceptingUserServiceRequest(long requestId) throws MessagingException {
 
         ServiceRequest serviceRequest = serviceRequestRepository.findById(requestId).orElseThrow(
                 () -> new ServiceNotFoundException("ServiceRequest  not found")
@@ -108,7 +108,7 @@ public class TechnicianService {
             throw new StatusInvalidException("You can't accept this ServiceRequest Anymore");
 
         serviceRequest.setStatus(ServiceStatus.IN_PROGRESS);
-        serviceRequestRepository.save(serviceRequest);
+         serviceRequestRepository.save(serviceRequest);
 
         //sending mail to user about their request status
         mailService.sendMailtoUserAboutRequest(serviceRequest.getUser().getEmail(),
@@ -151,6 +151,89 @@ public class TechnicianService {
         technicianDto.setIdentityPath(tech.getIdentityPath());
 
         return technicianDto;
+    }
+    public TechnicianDashboardDto getTechnicianDashboardOverview(String technicianEmail) {
+        // Get technician ID from email
+        Technician technician = technicianRepository.findByEmail(technicianEmail);
+        if (technician == null) {
+            throw new TechnicianNotFoundException("Technician not found");
+        }
+
+        Long technicianId = technician.getId();
+
+        // Calculate total bookings
+        long totalBookings = serviceRequestRepository.countByTechnicianId(technicianId);
+
+        // Calculate active bookings (pending or in-progress)
+        long activeBookings = serviceRequestRepository.countByTechnicianIdAndStatusIn(
+                technicianId,
+                Arrays.asList(ServiceStatus.PENDING, ServiceStatus.IN_PROGRESS)
+        );
+
+        // Calculate completed bookings
+        long completedBookings = serviceRequestRepository.countByTechnicianIdAndStatus(
+                technicianId,
+                ServiceStatus.COMPLETED
+        );
+
+        // Calculate total earnings
+        Double totalEarnings = serviceRequestRepository.sumFeeChargeByTechnicianIdAndStatus(
+                technicianId,
+                ServiceStatus.COMPLETED
+        );
+        if (totalEarnings == null) totalEarnings = 0.0;
+
+        // Calculate average rating received
+        Double averageRating = feedbackRepository.getAverageRatingByTechnicianId(technicianId);
+        if (averageRating == null) averageRating = 0.0;
+
+        // Calculate average response time
+        Duration averageResponseTime = calculateAverageResponseTime(technicianId);
+
+        return new TechnicianDashboardDto(
+                totalBookings,
+                activeBookings,
+                completedBookings,
+                totalEarnings,
+                averageRating,
+                averageResponseTime
+        );
+    }
+
+    private Duration calculateAverageResponseTime(Long technicianId) {
+        // Get all service requests where technician responded (updatedAt is not null)
+        List<ServiceRequest> respondedRequests = serviceRequestRepository
+                .findByTechnicianIdAndUpdatedAtIsNotNull(technicianId);
+
+        if (respondedRequests.isEmpty()) {
+            return Duration.ZERO;
+        }
+
+        long totalResponseTimeInSeconds = 0;
+        int validResponses = 0;
+
+        for (ServiceRequest request : respondedRequests) {
+            if (request.getCreatedAt() != null && request.getUpdatedAt() != null) {
+                // Calculate response time as difference between createdAt and updatedAt
+                Duration responseTime = Duration.between(
+                        request.getCreatedAt(),
+                        request.getUpdatedAt()
+                );
+
+                // Only consider positive response times (updatedAt after createdAt)
+                if (!responseTime.isNegative()) {
+                    totalResponseTimeInSeconds += responseTime.getSeconds();
+                    validResponses++;
+                }
+            }
+        }
+
+        if (validResponses == 0) {
+            return Duration.ZERO;
+        }
+
+        long averageSeconds = totalResponseTimeInSeconds / validResponses;
+        return Duration.ofSeconds(averageSeconds);
     }
 
 
