@@ -315,6 +315,19 @@ public class UserService {
                     service.setAppointmentTime(serviceRequest.getAppointmentTime());
                     service.setFeeCharge(serviceRequest.getFeeCharged());
                     service.setStatus(serviceRequest.getStatus());
+                    service.setUserAddress(serviceRequest.getUser().getAddress());
+                    service.setTechnicianRating(serviceRequest.getTechnician().getRating());
+
+                    Optional<Feedback> feedbackOpt = feedBackRepository.findByRequest_Id(serviceRequest.getId());
+                    if (feedbackOpt.isPresent()) {
+                        Feedback fd = feedbackOpt.get();
+                        service.setServiceRating(BigDecimal.valueOf(fd.getRating()));
+                        service.setUserReview(fd.getComments());
+                    } else {
+                        service.setServiceRating(null); // or default value
+                        service.setUserReview("No feedback yet");
+                    }
+
                     return service;
                 })
                 .collect(Collectors.toList());
@@ -338,11 +351,11 @@ public class UserService {
         serviceRequestRepository.save(serviceRequest);
     }
 
-    public void userFeedbackToTechnician(Float rating, Long requestId , long userId , String comments){
+    public void userFeedbackToTechnician(Float rating, Long requestId ,String userEmail , String comments){
         ServiceRequest service = serviceRequestRepository.findById(requestId).orElseThrow(
                 () -> new ServiceNotFoundException("Service Not Found")
         );
-        User user = userRepository.findById(userId).orElseThrow(
+        User user = userRepository.findByEmail(userEmail).orElseThrow(
                 () -> new UserNotFoundException("User Not Found")
         );
         if(!Objects.equals(user.getId(), service.getUser().getId())){
