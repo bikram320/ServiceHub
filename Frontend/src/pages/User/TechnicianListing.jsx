@@ -343,7 +343,6 @@
 //
 // export default TechnicianListing;
 // Updated TechnicianListing.jsx with proper JWT authentication
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Star, MapPin, Phone, Mail, Shield, Award, Clock, Search, Filter, Calendar } from 'lucide-react';
@@ -361,18 +360,20 @@ const TechnicianListing = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
-    // Get the base URL for your backend - adjust this to match your backend URL
-    const BASE_URL = 'http://localhost:8080';
+    // Image URL helper function
+    const getProfileImageUrl = (dbPath) => {
+        if (!dbPath) return null;
+        const cleanPath = dbPath.startsWith('/') ? dbPath.substring(1) : dbPath;
+        return `http://localhost:8080/${cleanPath}`;
+    };
 
-
-    // Fetch technicians from your backend with JWT authentication
+    // Fetch technicians from backend
     const fetchTechniciansBySkill = async (skill) => {
         try {
             setLoading(true);
             setError(null);
 
-
-            const response = await fetch(`api/users/get-technicians-based-on-skill?skill=${encodeURIComponent(skill)}`, {
+            const response = await fetch(`/api/users/get-technicians-based-on-skill?skill=${encodeURIComponent(skill)}`, {
                 method: 'GET',
                 credentials: 'include',
                 headers: {
@@ -382,14 +383,7 @@ const TechnicianListing = () => {
 
             if (!response.ok) {
                 if (response.status === 401) {
-                    // Token might be expired, try to refresh
-                    const refreshSuccess = await refreshAccessToken();
-                    if (refreshSuccess) {
-                        // Retry the original request with new token
-                        return await fetchTechniciansBySkill(skill);
-                    } else {
-                        throw new Error('Authentication expired. Please log in again.');
-                    }
+                    throw new Error('Please log in to view technicians.');
                 } else if (response.status === 403) {
                     throw new Error('Access denied. You do not have permission to view technicians.');
                 } else if (response.status === 404) {
@@ -407,7 +401,6 @@ const TechnicianListing = () => {
         } catch (error) {
             console.error('Error fetching technicians:', error);
 
-            // If it's a network error, provide a fallback
             if (error.name === 'TypeError' && error.message.includes('fetch')) {
                 throw new Error('Network error. Please check your connection and try again.');
             }
@@ -418,70 +411,26 @@ const TechnicianListing = () => {
         }
     };
 
-    // Fallback data for testing
-    const getFallbackData = () => {
-        return [
-            {
-                techId: 1,
-                technicianName: 'Sushil Gurung',
-                serviceName: 'Plumbing',
-                technicianPhone: '+977 9841234567',
-                technicianAddress: 'Kathmandu, Nepal',
-                technicianBio: 'Professional plumber with 5+ years experience',
-                imageFile: null,
-                feeCharge: '800'
-            },
-            {
-                techId: 2,
-                technicianName: 'Ramesh Pun',
-                serviceName: 'Plumbing',
-                technicianPhone: '+977 9851234567',
-                technicianAddress: 'Pokhara, Nepal',
-                technicianBio: 'Experienced in all plumbing services',
-                imageFile: null,
-                feeCharge: '750'
-            }
-        ];
-    };
-
-    // Load technicians when component mounts or when search changes
+    // Load technicians when component mounts
     useEffect(() => {
         const loadTechnicians = async () => {
             try {
-                // Check if user is authenticated
-                // const accessToken = getCookie('Access');
-                // if (!accessToken) {
-                //     setError('Please log in to view technicians.');
-                //     navigate('/LoginSignup'); // Redirect to login page
-                //     return;
-                // }
-
-                // Get search skill from navigation state (from SearchBar or HeroSection)
                 const searchSkill = location.state?.searchSkill;
 
                 if (searchSkill) {
                     setSearchTerm(searchSkill);
-
                     try {
                         const technicianData = await fetchTechniciansBySkill(searchSkill);
                         setTechnicians(technicianData);
                         setFilteredTechnicians(technicianData);
                     } catch (apiError) {
-                        // If API fails, show error but don't use fallback for production
                         console.warn('API failed:', apiError.message);
-                        setError(`${apiError.message}`);
+                        setError(apiError.message);
                         setTechnicians([]);
                         setFilteredTechnicians([]);
-
-                        // Only use fallback in development
-                        if (process.env.NODE_ENV === 'development') {
-                            const fallbackData = getFallbackData();
-                            setTechnicians(fallbackData);
-                            setFilteredTechnicians(fallbackData);
-                        }
                     }
                 } else {
-                    // If no search term, load default technicians (e.g., Plumbing)
+                    // Load default technicians (Plumbing)
                     try {
                         const defaultTechnicians = await fetchTechniciansBySkill('Plumbing');
                         setTechnicians(defaultTechnicians);
@@ -489,17 +438,10 @@ const TechnicianListing = () => {
                         setSearchTerm('Plumbing');
                     } catch (apiError) {
                         console.warn('API failed for default load:', apiError.message);
-                        setError(`${apiError.message}`);
+                        setError(apiError.message);
                         setTechnicians([]);
                         setFilteredTechnicians([]);
                         setSearchTerm('Plumbing');
-
-                        // Only use fallback in development
-                        if (process.env.NODE_ENV === 'development') {
-                            const fallbackData = getFallbackData();
-                            setTechnicians(fallbackData);
-                            setFilteredTechnicians(fallbackData);
-                        }
                     }
                 }
             } catch (error) {
@@ -513,7 +455,7 @@ const TechnicianListing = () => {
         loadTechnicians();
     }, [location.state, navigate]);
 
-    // Handle new search within the page
+    // Handle search within the page
     const handleSearch = async (newSearchTerm) => {
         if (newSearchTerm.trim()) {
             try {
@@ -521,6 +463,7 @@ const TechnicianListing = () => {
                 setTechnicians(technicianData);
                 setFilteredTechnicians(technicianData);
                 setSearchTerm(newSearchTerm);
+                setError(null);
             } catch (error) {
                 setError(error.message);
                 setTechnicians([]);
@@ -530,12 +473,18 @@ const TechnicianListing = () => {
     };
 
     // Navigation functions
-    const handleViewProfile = (technicianId) => {
-        navigate(`/technician-profile/${technicianId}`);
+    const handleViewProfile = (technician) => {
+        // Pass technician email to profile page
+        navigate('/TechnicianProfile', {
+            state: {
+                technicianEmail: technician.technicianEmail || technician.email,
+                technicianData: technician
+            }
+        });
     };
 
     const handleBookNow = (technician) => {
-        // Navigate to booking page with technician data
+        // Navigate to booking page with complete technician data
         navigate('/BookingDetail', {
             state: {
                 technician: {
@@ -546,7 +495,8 @@ const TechnicianListing = () => {
                     technicianAddress: technician.technicianAddress,
                     technicianBio: technician.technicianBio,
                     imageFile: technician.imageFile,
-                    feeCharge: technician.feeCharge
+                    feeCharge: technician.feeCharge,
+                    technicianEmail: technician.technicianEmail
                 }
             }
         });
@@ -556,7 +506,7 @@ const TechnicianListing = () => {
     useEffect(() => {
         let filtered = [...technicians];
 
-        // Apply local search filter (search within loaded technicians)
+        // Apply local search filter
         if (searchTerm && technicians.length > 0) {
             const localSearchTerm = searchTerm.toLowerCase();
             filtered = filtered.filter(tech =>
@@ -586,7 +536,7 @@ const TechnicianListing = () => {
         setFilteredTechnicians(filtered);
     }, [searchTerm, sortBy, technicians]);
 
-    // Render loading state
+    // Loading state
     if (loading) {
         return (
             <div className={styles.pageContainer}>
@@ -603,7 +553,6 @@ const TechnicianListing = () => {
 
     return (
         <div className={styles.pageContainer}>
-            {/* Header */}
             <Header />
 
             {/* Search and Filter Section */}
@@ -659,7 +608,7 @@ const TechnicianListing = () => {
                         <h3>⚠️ {error}</h3>
                         {error.includes('log in') && (
                             <button
-                                onClick={() => navigate('/login')}
+                                onClick={() => navigate('/LoginSignup')}
                                 className={styles.loginButton}
                             >
                                 Go to Login
@@ -678,7 +627,7 @@ const TechnicianListing = () => {
                                 <div className={styles.profileImage}>
                                     {technician.imageFile ? (
                                         <img
-                                            src={technician.imageFile}
+                                            src={getProfileImageUrl(technician.imageFile)}
                                             alt={technician.technicianName}
                                             className={styles.technicianImage}
                                             onError={(e) => {
@@ -740,7 +689,7 @@ const TechnicianListing = () => {
                                 </button>
                                 <button
                                     className={styles.profileBtn}
-                                    onClick={() => handleViewProfile(technician.techId)}
+                                    onClick={() => handleViewProfile(technician)}
                                 >
                                     View Profile
                                 </button>

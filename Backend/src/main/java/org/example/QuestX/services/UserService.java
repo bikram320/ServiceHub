@@ -21,6 +21,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static java.util.Locale.filter;
+
 @Data
 @AllArgsConstructor
 @Service
@@ -111,6 +113,25 @@ public class UserService {
         return userDto;
     }
 
+    public TechnicianProfileRequestDto getTechnicianProfile(String email){
+        Technician technician  = technicianRepository.findByEmail(email);
+        if (technician == null) {
+            throw new TechnicianNotFoundException("Technician Not Found");
+        }
+        TechnicianProfileRequestDto dto = new TechnicianProfileRequestDto();
+        dto.setTechnicianName(technician.getName());
+        dto.setTechnicianEmail(technician.getEmail());
+        dto.setTechnicianPhone(technician.getPhone());
+        dto.setTechnicianAddress(technician.getAddress());
+        dto.setProfileImagePath(technician.getProfileImagePath());
+        dto.setTechnicianBio(technician.getBio());
+        dto.setTechnicianRating(BigDecimal.valueOf(technician.getRating()));
+        dto.setServiceName(String.valueOf(technician.getTechnicianSkills().stream()
+                .map((TechnicianSkill t) -> t.getSkill().getName())
+                .collect(Collectors.toList())));
+        return dto;
+    }
+
     public UserDashboardOverviewDto getUserDashboardOverview(String email) {
         // 1️⃣ Find user by email
         User user = userRepository.findByEmail(email).orElseThrow(
@@ -163,6 +184,11 @@ public class UserService {
                     dto.setTechnicianName(tech.getName());
                     dto.setTechnicianAddress(tech.getAddress());
                     dto.setTechnicianPhone(tech.getPhone());
+                    dto.setFeeCharge(tech.getTechnicianSkills().stream()
+                            .filter(ts -> ts.getSkill().getName().equalsIgnoreCase(skill))
+                            .map(TechnicianSkill::getFee)
+                            .findFirst()
+                            .orElse(BigDecimal.ZERO));
                     dto.setServiceName(String.valueOf(tech.getTechnicianSkills().stream()
                             .map((TechnicianSkill t) -> t.getSkill().getName())
                             .collect(Collectors.toList())));

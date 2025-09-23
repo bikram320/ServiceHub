@@ -1,113 +1,483 @@
+// import React, { useState, useRef, useEffect } from 'react';
+// import { ArrowLeft, Calendar, Clock, MapPin, User, Phone, Mail, CreditCard, Shield, Star, CheckCircle } from 'lucide-react';
+// import "../../styles/BookingDetail.css";
+// import DateTimeSelector from "../../Components/layout/DateTimeSelector.jsx";
+// import {useNavigate} from "react-router-dom";
+//
+//
+// // Service Provider Card Component
+// const ServiceProviderCard = ({ provider }) => (
+//
+//     <div className="provider-card">
+//         <div className="provider-header">
+//             <img src={provider.avatar} alt={provider.name} className="provider-avatar" />
+//             <div className="provider-info">
+//                 <h3 className="provider-name">{provider.name}</h3>
+//                 <div className="provider-rating">
+//                     <Star className="star-icon" size={16} fill="currentColor" />
+//                     <span>{provider.rating}</span>
+//                     <span className="review-count">({provider.reviews} reviews)</span>
+//                 </div>
+//                 <p className="provider-experience">{provider.experience} years experience</p>
+//             </div>
+//             <div className="provider-badge">
+//                 <Shield size={16} />
+//                 <span>Verified</span>
+//             </div>
+//         </div>
+//         <div className="service-details">
+//             <h4 className="service-title">{provider.service}</h4>
+//             <p className="service-description">{provider.description}</p>
+//             <div className="service-price">
+//                 <span className="price-label">Starting from</span>
+//                 <span className="price-amount">${provider.price}/hr</span>
+//             </div>
+//         </div>
+//     </div>
+// );
+//
+// // Contact Form Component
+// const ContactForm = ({ formData, onFormChange }) => (
+//     <div className="contact-form">
+//         <h4 className="form-title">
+//             <User size={18} />
+//             Your Information
+//         </h4>
+//         <div className="form-grid">
+//             <div className="form-group">
+//                 <label htmlFor="fullName">Full Name *</label>
+//                 <input
+//                     id="fullName"
+//                     type="text"
+//                     value={formData.fullName}
+//                     onChange={(e) => onFormChange('fullName', e.target.value)}
+//                     placeholder="Enter your full name"
+//                     required
+//                 />
+//             </div>
+//
+//             <div className="form-group">
+//                 <label htmlFor="email">Email Address *</label>
+//                 <input
+//                     id="email"
+//                     type="email"
+//                     value={formData.email}
+//                     onChange={(e) => onFormChange('email', e.target.value)}
+//                     placeholder="Enter your email"
+//                     required
+//                 />
+//             </div>
+//
+//             <div className="form-group">
+//                 <label htmlFor="phone">Phone Number *</label>
+//                 <input
+//                     id="phone"
+//                     type="tel"
+//                     value={formData.phone}
+//                     onChange={(e) => onFormChange('phone', e.target.value)}
+//                     placeholder="Enter your phone number"
+//                     required
+//                 />
+//             </div>
+//
+//             <div className="form-group full-width">
+//                 <label htmlFor="address">Service Address *</label>
+//                 <input
+//                     id="address"
+//                     type="text"
+//                     value={formData.address}
+//                     onChange={(e) => onFormChange('address', e.target.value)}
+//                     placeholder="Enter the service location"
+//                     required
+//                 />
+//             </div>
+//
+//             <div className="form-group full-width">
+//                 <label htmlFor="description">Service Description</label>
+//                 <textarea
+//                     id="description"
+//                     value={formData.description}
+//                     onChange={(e) => onFormChange('description', e.target.value)}
+//                     placeholder="Describe what you need help with..."
+//                     rows={4}
+//                 />
+//             </div>
+//         </div>
+//     </div>
+// );
+//
+// // Booking Summary Component
+// const BookingSummary = ({ provider, selectedDate, selectedTime, formData }) => {
+//     const formatDate = (dateStr) => {
+//         const date = new Date(dateStr);
+//         return date.toLocaleDateString('en', {
+//             weekday: 'long',
+//             year: 'numeric',
+//             month: 'long',
+//             day: 'numeric'
+//         });
+//     };
+//
+//     const estimatedHours = 2;
+//     const serviceFee = provider.price * estimatedHours;
+//     const platformFee = 5;
+//     const total = serviceFee + platformFee;
+//
+//     return (
+//         <div className="booking-summary">
+//             <h4 className="summary-title">Booking Summary</h4>
+//
+//             <div className="summary-section">
+//                 <h5>Service Details</h5>
+//                 <div className="summary-item">
+//                     <span>Service:</span>
+//                     <span>{provider.service}</span>
+//                 </div>
+//                 <div className="summary-item">
+//                     <span>Provider:</span>
+//                     <span>{provider.name}</span>
+//                 </div>
+//             </div>
+//
+//             <div className="summary-section">
+//                 <h5>Schedule</h5>
+//                 <div className="summary-item">
+//                     <span>Date:</span>
+//                     <span>{selectedDate ? formatDate(selectedDate) : 'Not selected'}</span>
+//                 </div>
+//                 <div className="summary-item">
+//                     <span>Time:</span>
+//                     <span>{selectedTime || 'Not selected'}</span>
+//                 </div>
+//             </div>
+//
+//             <div className="summary-section">
+//                 <h5>Location</h5>
+//                 <div className="summary-item">
+//                     <span>Address:</span>
+//                     <span>{formData.address || 'Not provided'}</span>
+//                 </div>
+//             </div>
+//
+//             <div className="summary-section">
+//                 <h5>Cost Breakdown</h5>
+//                 <div className="summary-item">
+//                     <span>Service ({estimatedHours}h estimated):</span>
+//                     <span>${serviceFee}</span>
+//                 </div>
+//                 <div className="summary-item">
+//                     <span>Platform fee:</span>
+//                     <span>${platformFee}</span>
+//                 </div>
+//                 <div className="summary-item total">
+//                     <span>Total:</span>
+//                     <span>${total}</span>
+//                 </div>
+//             </div>
+//         </div>
+//     );
+// };
+//
+// // Main BookingDetail Component
+// const BookingDetail = () => {
+//     const navigate = useNavigate();
+//     // Mock provider data
+//     const provider = {
+//         id: 1,
+//         name: "John Smith",
+//         rating: 4.9,
+//         reviews: 127,
+//         experience: 8,
+//         service: "Plumbing Services",
+//         description: "Professional plumbing services including repairs, installations, and emergency fixes. Licensed and insured.",
+//         price: 75,
+//         avatar: ""
+//     };
+//
+//     const [selectedDate, setSelectedDate] = useState('');
+//     const [selectedTime, setSelectedTime] = useState('');
+//     const [formData, setFormData] = useState({
+//         fullName: '',
+//         email: '',
+//         phone: '',
+//         address: '',
+//         description: ''
+//     });
+//     const [isSubmitting, setIsSubmitting] = useState(false);
+//     const [showSuccess, setShowSuccess] = useState(false);
+//
+//     const handleFormChange = (field, value) => {
+//         setFormData(prev => ({
+//             ...prev,
+//             [field]: value
+//         }));
+//     };
+//
+//     const handleBooking = async (e) => {
+//         e.preventDefault();
+//
+//         if (!selectedDate || !selectedTime) {
+//             alert('Please select date and time');
+//             return;
+//         }
+//
+//         if (!formData.fullName || !formData.email || !formData.phone || !formData.address) {
+//             alert('Please fill in all required fields');
+//             return;
+//         }
+//
+//         setIsSubmitting(true);
+//
+//         // Simulate API call
+//         setTimeout(() => {
+//             setIsSubmitting(false);
+//             setShowSuccess(true);
+//             console.log('Booking submitted:', {
+//                 provider: provider.id,
+//                 date: selectedDate,
+//                 time: selectedTime,
+//                 customer: formData
+//             });
+//         }, 2000);
+//     };
+//
+//     const handleGoBack = () => {
+//         console.log('Navigate back to search results');
+//     };
+//
+//     if (showSuccess) {
+//         return (
+//             <div className="page-container">
+//                 <div className="container">
+//                     <div className="success-message">
+//                         <CheckCircle className="success-icon" size={64} />
+//                         <h2>Booking Confirmed!</h2>
+//                         <p>Your service has been booked successfully. You will receive a confirmation email shortly.</p>
+//                         <div className="success-actions">
+//                             <button className="btn-primary" onClick={() => setShowSuccess(false)}>
+//                                 Book Another Service
+//                             </button>
+//                             <button className="btn-secondary" onClick={() => console.log('View bookings')}>
+//                                 View My Bookings
+//                             </button>
+//                         </div>
+//                     </div>
+//                 </div>
+//             </div>
+//         );
+//     }
+//
+//     return (
+//         <div className="page-container">
+//             <div className="container">
+//                 <div className="booking-container">
+//                     {/* Back Button */}
+//                     <button className="back-button" onClick={() => navigate(-1)}> {/*Takes back to last page*/}
+//                         <ArrowLeft size={20} />
+//                         Back to Results
+//                     </button>
+//
+//                     <div className="booking-content">
+//                         {/* Left Column */}
+//                         <div className="booking-left">
+//                             <ServiceProviderCard provider={provider} />
+//
+//                             <DateTimeSelector
+//                                 selectedDate={selectedDate}
+//                                 selectedTime={selectedTime}
+//                                 onDateChange={setSelectedDate}
+//                                 onTimeChange={setSelectedTime}
+//                             />
+//
+//                             <ContactForm
+//                                 formData={formData}
+//                                 onFormChange={handleFormChange}
+//                             />
+//                         </div>
+//
+//                         {/* Right Column */}
+//                         <div className="booking-right">
+//                             <BookingSummary
+//                                 provider={provider}
+//                                 selectedDate={selectedDate}
+//                                 selectedTime={selectedTime}
+//                                 formData={formData}
+//                             />
+//
+//                             <button
+//                                 className="btn-book-now"
+//                                 onClick={handleBooking}
+//                                 disabled={isSubmitting}
+//                             >
+//                                 {isSubmitting ? (
+//                                     <>
+//                                         <div className="spinner"></div>
+//                                         Processing...
+//                                     </>
+//                                 ) : (
+//                                     <>
+//                                         <CreditCard size={20} />
+//                                         Book Now & Pay
+//                                     </>
+//                                 )}
+//                             </button>
+//
+//                             <div className="booking-guarantee">
+//                                 <Shield size={16} />
+//                                 <span>100% Satisfaction Guarantee</span>
+//                             </div>
+//                         </div>
+//                     </div>
+//                 </div>
+//             </div>
+//         </div>
+//     );
+// };
+//
+// export default BookingDetail;
+
 import React, { useState, useRef, useEffect } from 'react';
 import { ArrowLeft, Calendar, Clock, MapPin, User, Phone, Mail, CreditCard, Shield, Star, CheckCircle } from 'lucide-react';
 import "../../styles/BookingDetail.css";
 import DateTimeSelector from "../../Components/layout/DateTimeSelector.jsx";
-import {useNavigate} from "react-router-dom";
-
+import { useNavigate, useLocation } from "react-router-dom";
 
 // Service Provider Card Component
-const ServiceProviderCard = ({ provider }) => (
+const ServiceProviderCard = ({ provider }) => {
+    const getProfileImageUrl = (dbPath) => {
+        if (!dbPath) return null;
+        const cleanPath = dbPath.startsWith('/') ? dbPath.substring(1) : dbPath;
+        return `http://localhost:8080/${cleanPath}`;
+    };
 
-    <div className="provider-card">
-        <div className="provider-header">
-            <img src={provider.avatar} alt={provider.name} className="provider-avatar" />
-            <div className="provider-info">
-                <h3 className="provider-name">{provider.name}</h3>
-                <div className="provider-rating">
-                    <Star className="star-icon" size={16} fill="currentColor" />
-                    <span>{provider.rating}</span>
-                    <span className="review-count">({provider.reviews} reviews)</span>
+    return (
+        <div className="provider-card">
+            <div className="provider-header">
+                <div className="provider-avatar-container">
+                    {provider.imageFile ? (
+                        <img
+                            src={getProfileImageUrl(provider.imageFile)}
+                            alt={provider.technicianName}
+                            className="provider-avatar"
+                            onError={(e) => {
+                                e.target.style.display = 'none';
+                                e.target.nextSibling.style.display = 'flex';
+                            }}
+                        />
+                    ) : null}
+                    <div
+                        className="provider-avatar provider-avatar-placeholder"
+                        style={{ display: provider.imageFile ? 'none' : 'flex' }}
+                    >
+                        {provider.technicianName?.charAt(0).toUpperCase() || 'T'}
+                    </div>
                 </div>
-                <p className="provider-experience">{provider.experience} years experience</p>
+                <div className="provider-info">
+                    <h3 className="provider-name">{provider.technicianName}</h3>
+                    <div className="provider-rating">
+                        <Star className="star-icon" size={16} fill="currentColor" />
+                        <span>4.8</span>
+                        <span className="review-count">(127 reviews)</span>
+                    </div>
+                    <p className="provider-experience">Professional Technician</p>
+                </div>
+                <div className="provider-badge">
+                    <Shield size={16} />
+                    <span>Verified</span>
+                </div>
             </div>
-            <div className="provider-badge">
-                <Shield size={16} />
-                <span>Verified</span>
+            <div className="service-details">
+                <h4 className="service-title">{provider.serviceName?.replace(/[\[\]]/g, '') || 'Service'}</h4>
+                <p className="service-description">
+                    {provider.technicianBio || 'Professional technician ready to help with your service needs.'}
+                </p>
+                <div className="service-price">
+                    <span className="price-label">Service Fee</span>
+                    <span className="price-amount">Rs. {provider.feeCharge || '500'}</span>
+                </div>
             </div>
         </div>
-        <div className="service-details">
-            <h4 className="service-title">{provider.service}</h4>
-            <p className="service-description">{provider.description}</p>
-            <div className="service-price">
-                <span className="price-label">Starting from</span>
-                <span className="price-amount">${provider.price}/hr</span>
-            </div>
-        </div>
-    </div>
-);
+    );
+};
 
 // Contact Form Component
-const ContactForm = ({ formData, onFormChange }) => (
+const ContactForm = ({ formData, onFormChange, loading }) => (
     <div className="contact-form">
         <h4 className="form-title">
             <User size={18} />
             Your Information
         </h4>
-        <div className="form-grid">
-            <div className="form-group">
-                <label htmlFor="fullName">Full Name *</label>
-                <input
-                    id="fullName"
-                    type="text"
-                    value={formData.fullName}
-                    onChange={(e) => onFormChange('fullName', e.target.value)}
-                    placeholder="Enter your full name"
-                    required
-                />
+        {loading ? (
+            <div className="loading-form">
+                <p>Loading your information...</p>
             </div>
+        ) : (
+            <div className="form-grid">
+                <div className="form-group">
+                    <label htmlFor="fullName">Full Name *</label>
+                    <input
+                        id="fullName"
+                        type="text"
+                        value={formData.fullName}
+                        onChange={(e) => onFormChange('fullName', e.target.value)}
+                        placeholder="Enter your full name"
+                        required
+                    />
+                </div>
 
-            <div className="form-group">
-                <label htmlFor="email">Email Address *</label>
-                <input
-                    id="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => onFormChange('email', e.target.value)}
-                    placeholder="Enter your email"
-                    required
-                />
-            </div>
+                <div className="form-group">
+                    <label htmlFor="email">Email Address *</label>
+                    <input
+                        id="email"
+                        type="email"
+                        value={formData.email}
+                        onChange={(e) => onFormChange('email', e.target.value)}
+                        placeholder="Enter your email"
+                        required
+                    />
+                </div>
 
-            <div className="form-group">
-                <label htmlFor="phone">Phone Number *</label>
-                <input
-                    id="phone"
-                    type="tel"
-                    value={formData.phone}
-                    onChange={(e) => onFormChange('phone', e.target.value)}
-                    placeholder="Enter your phone number"
-                    required
-                />
-            </div>
+                <div className="form-group">
+                    <label htmlFor="phone">Phone Number *</label>
+                    <input
+                        id="phone"
+                        type="tel"
+                        value={formData.phone}
+                        onChange={(e) => onFormChange('phone', e.target.value)}
+                        placeholder="Enter your phone number"
+                        required
+                    />
+                </div>
 
-            <div className="form-group full-width">
-                <label htmlFor="address">Service Address *</label>
-                <input
-                    id="address"
-                    type="text"
-                    value={formData.address}
-                    onChange={(e) => onFormChange('address', e.target.value)}
-                    placeholder="Enter the service location"
-                    required
-                />
-            </div>
+                <div className="form-group full-width">
+                    <label htmlFor="address">Service Address *</label>
+                    <input
+                        id="address"
+                        type="text"
+                        value={formData.address}
+                        onChange={(e) => onFormChange('address', e.target.value)}
+                        placeholder="Enter the service location"
+                        required
+                    />
+                </div>
 
-            <div className="form-group full-width">
-                <label htmlFor="description">Service Description</label>
-                <textarea
-                    id="description"
-                    value={formData.description}
-                    onChange={(e) => onFormChange('description', e.target.value)}
-                    placeholder="Describe what you need help with..."
-                    rows={4}
-                />
+                <div className="form-group full-width">
+                    <label htmlFor="description">Service Description</label>
+                    <textarea
+                        id="description"
+                        value={formData.description}
+                        onChange={(e) => onFormChange('description', e.target.value)}
+                        placeholder="Describe what you need help with..."
+                        rows={4}
+                    />
+                </div>
             </div>
-        </div>
+        )}
     </div>
 );
 
 // Booking Summary Component
-const BookingSummary = ({ provider, selectedDate, selectedTime, formData }) => {
+const BookingSummary = ({ provider, selectedDate, selectedStartTime, selectedEndTime, formData }) => {
     const formatDate = (dateStr) => {
         const date = new Date(dateStr);
         return date.toLocaleDateString('en', {
@@ -118,9 +488,8 @@ const BookingSummary = ({ provider, selectedDate, selectedTime, formData }) => {
         });
     };
 
-    const estimatedHours = 2;
-    const serviceFee = provider.price * estimatedHours;
-    const platformFee = 5;
+    const serviceFee = parseFloat(provider.feeCharge) || 500;
+    const platformFee = 50;
     const total = serviceFee + platformFee;
 
     return (
@@ -131,11 +500,11 @@ const BookingSummary = ({ provider, selectedDate, selectedTime, formData }) => {
                 <h5>Service Details</h5>
                 <div className="summary-item">
                     <span>Service:</span>
-                    <span>{provider.service}</span>
+                    <span>{provider.serviceName?.replace(/[\[\]]/g, '') || 'Service'}</span>
                 </div>
                 <div className="summary-item">
                     <span>Provider:</span>
-                    <span>{provider.name}</span>
+                    <span>{provider.technicianName}</span>
                 </div>
             </div>
 
@@ -146,9 +515,15 @@ const BookingSummary = ({ provider, selectedDate, selectedTime, formData }) => {
                     <span>{selectedDate ? formatDate(selectedDate) : 'Not selected'}</span>
                 </div>
                 <div className="summary-item">
-                    <span>Time:</span>
-                    <span>{selectedTime || 'Not selected'}</span>
+                    <span>Start Time:</span>
+                    <span>{selectedStartTime || 'Not selected'}</span>
                 </div>
+                {selectedEndTime && (
+                    <div className="summary-item">
+                        <span>End Time:</span>
+                        <span>{selectedEndTime}</span>
+                    </div>
+                )}
             </div>
 
             <div className="summary-section">
@@ -162,16 +537,16 @@ const BookingSummary = ({ provider, selectedDate, selectedTime, formData }) => {
             <div className="summary-section">
                 <h5>Cost Breakdown</h5>
                 <div className="summary-item">
-                    <span>Service ({estimatedHours}h estimated):</span>
-                    <span>${serviceFee}</span>
+                    <span>Service Fee:</span>
+                    <span>Rs. {serviceFee}</span>
                 </div>
                 <div className="summary-item">
                     <span>Platform fee:</span>
-                    <span>${platformFee}</span>
+                    <span>Rs. {platformFee}</span>
                 </div>
                 <div className="summary-item total">
                     <span>Total:</span>
-                    <span>${total}</span>
+                    <span>Rs. {total}</span>
                 </div>
             </div>
         </div>
@@ -181,21 +556,27 @@ const BookingSummary = ({ provider, selectedDate, selectedTime, formData }) => {
 // Main BookingDetail Component
 const BookingDetail = () => {
     const navigate = useNavigate();
-    // Mock provider data
-    const provider = {
-        id: 1,
-        name: "John Smith",
-        rating: 4.9,
-        reviews: 127,
-        experience: 8,
-        service: "Plumbing Services",
-        description: "Professional plumbing services including repairs, installations, and emergency fixes. Licensed and insured.",
-        price: 75,
-        avatar: ""
+    const location = useLocation();
+
+    // Get technician data from navigation state
+    const technicianData = location.state?.technician;
+
+    // Default provider data or from navigation
+    const provider = technicianData || {
+        techId: 1,
+        technicianName: "Service Provider",
+        serviceName: "General Service",
+        technicianBio: "Professional technician ready to help with your service needs.",
+        feeCharge: "",
+        imageFile: null,
+        technicianPhone: "",
+        technicianAddress: "",
+        technicianEmail: ""
     };
 
     const [selectedDate, setSelectedDate] = useState('');
-    const [selectedTime, setSelectedTime] = useState('');
+    const [selectedStartTime, setSelectedStartTime] = useState('');
+    const [selectedEndTime, setSelectedEndTime] = useState('');
     const [formData, setFormData] = useState({
         fullName: '',
         email: '',
@@ -205,6 +586,61 @@ const BookingDetail = () => {
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
+    const [userDataLoading, setUserDataLoading] = useState(true);
+
+    // Helper function to get cookie value
+    const getCookieValue = (name) => {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+        return null;
+    };
+
+    // Fetch user profile data on component mount
+    useEffect(() => {
+        const fetchUserProfile = async () => {
+            try {
+                setUserDataLoading(true);
+
+                // Get user email from localStorage, sessionStorage, or cookie
+                const userEmail = localStorage.getItem('userEmail') ||
+                    sessionStorage.getItem('userEmail') ||
+                    getCookieValue('userEmail');
+
+                if (!userEmail) {
+                    setUserDataLoading(false);
+                    return;
+                }
+
+                const response = await fetch(`/api/users/profile?email=${encodeURIComponent(userEmail)}`, {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                if (response.ok) {
+                    const userData = await response.json();
+
+                    // Pre-fill form with user data
+                    setFormData(prev => ({
+                        ...prev,
+                        fullName: userData.username || '',
+                        email: userData.email || '',
+                        phone: userData.phone || '',
+                        address: userData.address || ''
+                    }));
+                }
+            } catch (error) {
+                console.error('Error fetching user profile:', error);
+            } finally {
+                setUserDataLoading(false);
+            }
+        };
+
+        fetchUserProfile();
+    }, []);
 
     const handleFormChange = (field, value) => {
         setFormData(prev => ({
@@ -216,8 +652,8 @@ const BookingDetail = () => {
     const handleBooking = async (e) => {
         e.preventDefault();
 
-        if (!selectedDate || !selectedTime) {
-            alert('Please select date and time');
+        if (!selectedDate || !selectedStartTime) {
+            alert('Please select date and start time');
             return;
         }
 
@@ -228,21 +664,44 @@ const BookingDetail = () => {
 
         setIsSubmitting(true);
 
-        // Simulate API call
-        setTimeout(() => {
-            setIsSubmitting(false);
-            setShowSuccess(true);
-            console.log('Booking submitted:', {
-                provider: provider.id,
-                date: selectedDate,
-                time: selectedTime,
-                customer: formData
-            });
-        }, 2000);
-    };
+        try {
+            const bookingData = {
+                technicianId: provider.techId,
+                technicianEmail: provider.technicianEmail,
+                customerName: formData.fullName,
+                customerEmail: formData.email,
+                customerPhone: formData.phone,
+                serviceAddress: formData.address,
+                serviceDescription: formData.description,
+                bookingDate: selectedDate,
+                bookingStartTime: selectedStartTime,
+                bookingEndTime: selectedEndTime,
+                serviceName: provider.serviceName,
+                serviceFee: parseFloat(provider.feeCharge)
+            };
 
-    const handleGoBack = () => {
-        console.log('Navigate back to search results');
+            // Replace this with your actual booking API endpoint
+            const response = await fetch('/api/bookings/create', {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(bookingData)
+            });
+
+            if (response.ok) {
+                setShowSuccess(true);
+                console.log('Booking submitted successfully');
+            } else {
+                throw new Error('Failed to create booking');
+            }
+        } catch (error) {
+            console.error('Booking error:', error);
+            alert('Failed to create booking. Please try again.');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     if (showSuccess) {
@@ -257,7 +716,7 @@ const BookingDetail = () => {
                             <button className="btn-primary" onClick={() => setShowSuccess(false)}>
                                 Book Another Service
                             </button>
-                            <button className="btn-secondary" onClick={() => console.log('View bookings')}>
+                            <button className="btn-secondary" onClick={() => navigate('/dashboard')}>
                                 View My Bookings
                             </button>
                         </div>
@@ -272,7 +731,7 @@ const BookingDetail = () => {
             <div className="container">
                 <div className="booking-container">
                     {/* Back Button */}
-                    <button className="back-button" onClick={() => navigate(-1)}> {/*Takes back to last page*/}
+                    <button className="back-button" onClick={() => navigate(-1)}>
                         <ArrowLeft size={20} />
                         Back to Results
                     </button>
@@ -284,14 +743,17 @@ const BookingDetail = () => {
 
                             <DateTimeSelector
                                 selectedDate={selectedDate}
-                                selectedTime={selectedTime}
+                                selectedStartTime={selectedStartTime}
+                                selectedEndTime={selectedEndTime}
                                 onDateChange={setSelectedDate}
-                                onTimeChange={setSelectedTime}
+                                onStartTimeChange={setSelectedStartTime}
+                                onEndTimeChange={setSelectedEndTime}
                             />
 
                             <ContactForm
                                 formData={formData}
                                 onFormChange={handleFormChange}
+                                loading={userDataLoading}
                             />
                         </div>
 
@@ -300,14 +762,15 @@ const BookingDetail = () => {
                             <BookingSummary
                                 provider={provider}
                                 selectedDate={selectedDate}
-                                selectedTime={selectedTime}
+                                selectedStartTime={selectedStartTime}
+                                selectedEndTime={selectedEndTime}
                                 formData={formData}
                             />
 
                             <button
                                 className="btn-book-now"
                                 onClick={handleBooking}
-                                disabled={isSubmitting}
+                                disabled={isSubmitting || userDataLoading}
                             >
                                 {isSubmitting ? (
                                     <>

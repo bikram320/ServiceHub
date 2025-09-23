@@ -37,6 +37,12 @@ public class UserController {
         return ResponseEntity.ok(userService.getProfile(email));
     }
 
+    @GetMapping("/get-technician-profile")
+    public ResponseEntity<?> getTechnicianProfile(@RequestParam String email) {
+        return ResponseEntity.ok(userService.getTechnicianProfile(email));
+    }
+
+
     @GetMapping("/dashboard-overview")
     public ResponseEntity<?> getDashboardOverview(@RequestParam String email) {
         return ResponseEntity.ok(userService.getUserDashboardOverview(email));
