@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 import styles from '../../styles/UserDashboard.module.css';
 
-const UserDashboard = () => {
+const UserDashboard = ({ sidebarCollapsed = false }) => {
     const [activeTab, setActiveTab] = useState('upcoming');
     const [searchTerm, setSearchTerm] = useState('');
     const [filterStatus, setFilterStatus] = useState('all');
@@ -604,14 +604,16 @@ const UserDashboard = () => {
     // Loading state
     if (loading) {
         return (
-            <div className={styles['profile-content']}>
-                <div className={styles['profile-form']}>
-                    <div className={styles['profile-header']}>
-                        <h1 className={styles['profile-title']}>My Services</h1>
-                        <p className={styles['profile-subtitle']}>Loading your service data...</p>
-                    </div>
-                    <div style={{ textAlign: 'center', padding: '2rem' }}>
-                        <div>Loading...</div>
+            <div className={`${styles['dashboard-wrapper']} ${sidebarCollapsed ? styles['sidebar-collapsed'] : ''}`}>
+                <div className={styles['profile-content']}>
+                    <div className={styles['profile-form']}>
+                        <div className={styles['profile-header']}>
+                            <h1 className={styles['profile-title']}>My Services</h1>
+                            <p className={styles['profile-subtitle']}>Loading your service data...</p>
+                        </div>
+                        <div style={{ textAlign: 'center', padding: '2rem' }}>
+                            <div>Loading...</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -621,66 +623,68 @@ const UserDashboard = () => {
     // Error state with better UX
     if (error) {
         return (
-            <div className={styles['profile-content']}>
-                <div className={styles['profile-form']}>
-                    <div className={styles['profile-header']}>
-                        <h1 className={styles['profile-title']}>My Services</h1>
-                        <p className={styles['profile-subtitle']}>Having trouble loading your data</p>
-                    </div>
-                    <div style={{
-                        textAlign: 'center',
-                        padding: '2rem',
-                        backgroundColor: '#fef2f2',
-                        border: '1px solid #fecaca',
-                        borderRadius: '8px',
-                        margin: '1rem 0'
-                    }}>
-                        <div style={{ color: '#dc2626', marginBottom: '1rem' }}>
-                            {error.includes('Authentication') || error.includes('log in') ? (
-                                <>
-                                    <div style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>
-                                        Authentication Required
-                                    </div>
-                                    <div>Please log in to view your services</div>
-                                </>
-                            ) : (
-                                <>
-                                    <div style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>
-                                        Unable to Load Data
-                                    </div>
-                                    <div>{error}</div>
-                                </>
-                            )}
+            <div className={`${styles['dashboard-wrapper']} ${sidebarCollapsed ? styles['sidebar-collapsed'] : ''}`}>
+                <div className={styles['profile-content']}>
+                    <div className={styles['profile-form']}>
+                        <div className={styles['profile-header']}>
+                            <h1 className={styles['profile-title']}>My Services</h1>
+                            <p className={styles['profile-subtitle']}>Having trouble loading your data</p>
                         </div>
-                        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-                            <button
-                                onClick={() => window.location.reload()}
-                                style={{
-                                    padding: '0.5rem 1rem',
-                                    backgroundColor: '#dc2626',
-                                    color: 'white',
-                                    border: 'none',
-                                    borderRadius: '4px',
-                                    cursor: 'pointer'
-                                }}
-                            >
-                                Retry
-                            </button>
-                            {(error.includes('Authentication') || error.includes('log in')) && (
+                        <div style={{
+                            textAlign: 'center',
+                            padding: '2rem',
+                            backgroundColor: '#fef2f2',
+                            border: '1px solid #fecaca',
+                            borderRadius: '8px',
+                            margin: '1rem 0'
+                        }}>
+                            <div style={{ color: '#dc2626', marginBottom: '1rem' }}>
+                                {error.includes('Authentication') || error.includes('log in') ? (
+                                    <>
+                                        <div style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>
+                                            Authentication Required
+                                        </div>
+                                        <div>Please log in to view your services</div>
+                                    </>
+                                ) : (
+                                    <>
+                                        <div style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>
+                                            Unable to Load Data
+                                        </div>
+                                        <div>{error}</div>
+                                    </>
+                                )}
+                            </div>
+                            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
                                 <button
-                                    onClick={() => window.location.href = '/login'}
+                                    onClick={() => window.location.reload()}
                                     style={{
                                         padding: '0.5rem 1rem',
-                                        backgroundColor: '#3b82f6',
+                                        backgroundColor: '#dc2626',
                                         color: 'white',
                                         border: 'none',
                                         borderRadius: '4px',
                                         cursor: 'pointer'
                                     }}
                                 >
-                                    Go to Login
+                                    Retry
                                 </button>
-                            )}
+                                {(error.includes('Authentication') || error.includes('log in')) && (
+                                    <button
+                                        onClick={() => window.location.href = '/login'}
+                                        style={{
+                                            padding: '0.5rem 1rem',
+                                            backgroundColor: '#3b82f6',
+                                            color: 'white',
+                                            border: 'none',
+                                            borderRadius: '4px',
+                                            cursor: 'pointer'
+                                        }}
+                                    >
+                                        Go to Login
+                                    </button>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -689,17 +693,18 @@ const UserDashboard = () => {
     }
 
     return (
-        <div className={styles['profile-content']}>
-            <div className={styles['profile-form']}>
-                <div className={styles['profile-header']}>
-                    <h1 className={styles['profile-title']}>My Services</h1>
-                    <p className={styles['profile-subtitle']}>Manage your service bookings and discover new services.</p>
-                </div>
+        <div className={`${styles['dashboard-wrapper']} ${sidebarCollapsed ? styles['sidebar-collapsed'] : ''}`}>
+            <div className={styles['profile-content']}>
+                <div className={styles['profile-form']}>
+                    <div className={styles['profile-header']}>
+                        <h1 className={styles['profile-title']}>My Services</h1>
+                        <p className={styles['profile-subtitle']}>Manage your service bookings and discover new services.</p>
+                    </div>
 
                 {/* Quick Stats */}
-                <section className={styles['form-section']}>
-                    <h3 className={styles['section-title']}>Overview</h3>
-                    <div className={styles['user-stats-grid']}>
+                    <section className={styles['form-section']}>
+                        <h3 className={styles['section-title']}>Overview</h3>
+                        <div className={styles['user-stats-grid']}>
                         <div className={styles['user-stat-card']}>
                             <div className={styles['user-stat-icon']} style={{ backgroundColor: '#dbeafe' }}>
                                 <Calendar size={24} style={{ color: '#3b82f6' }} />
@@ -970,7 +975,7 @@ const UserDashboard = () => {
                     </div>
                 </section>
             </div>
-
+            </div>
             <AppointmentModal
                 isOpen={modalState.isOpen}
                 appointment={modalState.appointment}

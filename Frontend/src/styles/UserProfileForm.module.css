@@ -1,4 +1,13 @@
 /* Profile Page Styles */
+.profile-wrapper {
+    margin-left: 280px; /* Width of expanded sidebar */
+    min-height: 100vh;
+    transition: margin-left 0.3s ease;
+    background-color: #f8f9fa;
+}
+.profile-wrapper.sidebar-collapsed {
+    margin-left: 80px; /* Width of collapsed sidebar */
+}
 .profile-page {
     height: 100%;
     margin: 0;
@@ -82,6 +91,15 @@
 }
 
 /* Modified profile info order */
+.profile-content {
+    flex: 1;
+    display: grid;
+    place-items: center;
+    padding: 2rem;
+    min-height: 100vh;
+    box-sizing: border-box;
+}
+
 .profile-info {
     display: flex !important;
     flex-direction: column !important;

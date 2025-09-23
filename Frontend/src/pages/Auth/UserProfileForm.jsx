@@ -13,7 +13,7 @@ import {
     COMMON_TIMEZONES
 } from "../../Components/utils/locationApi.js";
 
-const UserProfileForm = ({ userInfo, onUpdateProfile }) => {
+const UserProfileForm = ({ userInfo, onUpdateProfile, sidebarCollapsed = false }) => {
     const [formData, setFormData] = useState({
         fullName: '',
         email: '',
@@ -491,6 +491,7 @@ const UserProfileForm = ({ userInfo, onUpdateProfile }) => {
     // };`
 
     return (
+        <div className={`${styles["profile-wrapper"]} ${sidebarCollapsed ? styles["sidebar-collapsed"] : ''}`}>
         <div className={styles["profile-content"]}>
             <div className={styles["profile-form"]}>
                 <div className={styles["profile-header"]}>
@@ -811,6 +812,7 @@ const UserProfileForm = ({ userInfo, onUpdateProfile }) => {
                     </button>
                 </div>
             </div>
+        </div>
         </div>
     );
 };
