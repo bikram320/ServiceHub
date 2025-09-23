@@ -27,12 +27,12 @@ const TechnicianSidebar = ({ activeTab, onTabChange, onLogout, userInfo = {} }) 
             icon: LayoutDashboard,
             path: '/technician/dashboard'
         },
-        {
-            id: 'profile',
-            label: 'Technician Profile',
-            icon: User,
-            path: '/technician/profile'
-        },
+        // {
+        //     id: 'profile',
+        //     label: 'Technician Profile',
+        //     icon: User,
+        //     path: '/technician/profile'
+        // },
         {
             id: 'profile-form',
             label: 'Profile Form',
