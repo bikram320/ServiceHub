@@ -50,27 +50,61 @@ const ServiceRequests = () => {
     });
 
     // API Configuration
-    const API_BASE_URL = import.meta.env?.VITE_API_BASE_URL || 'http://localhost:8080';
-    const technicianEmail = 'tech@example.com'; // This should come from authenticated user context
+    const API_BASE_URL = 'http://localhost:8080';
+    const technicianEmail = 'debryune69@gmail.com'; // This should come from authenticated user context
     const [isDevelopmentMode, setIsDevelopmentMode] = useState(false);
 
-    // Get authorization token from cookies or localStorage
+    // Enhanced token retrieval with better error handling
     const getAuthToken = () => {
-        // Check for JWT in cookies first
-        const cookies = document.cookie.split(';');
-        const accessCookie = cookies.find(cookie => cookie.trim().startsWith('Access='));
-        if (accessCookie) {
-            return accessCookie.split('=')[1];
-        }
+        try {
+            // Check for JWT in cookies first (more secure)
+            const cookies = document.cookie.split(';');
+            const accessCookie = cookies.find(cookie => cookie.trim().startsWith('Access='));
+            if (accessCookie) {
+                const token = accessCookie.split('=')[1];
+                if (token && token !== 'undefined' && token !== 'null') {
+                    return token;
+                }
+            }
 
-        // Fallback to localStorage if needed
-        return localStorage.getItem('authToken');
+            // Check for Authorization cookie
+            const authCookie = cookies.find(cookie => cookie.trim().startsWith('Authorization='));
+            if (authCookie) {
+                const token = authCookie.split('=')[1];
+                if (token && token !== 'undefined' && token !== 'null') {
+                    return token;
+                }
+            }
+
+            // Fallback to localStorage
+            const localToken = localStorage.getItem('authToken') || localStorage.getItem('accessToken');
+            if (localToken && localToken !== 'undefined' && localToken !== 'null') {
+                return localToken;
+            }
+
+            // Check sessionStorage as well
+            const sessionToken = sessionStorage.getItem('authToken') || sessionStorage.getItem('accessToken');
+            if (sessionToken && sessionToken !== 'undefined' && sessionToken !== 'null') {
+                return sessionToken;
+            }
+
+            return null;
+        } catch (error) {
+            console.error('Error retrieving auth token:', error);
+            return null;
+        }
     };
 
-    // API request helper
+    // Enhanced API request helper with better error handling
     const apiRequest = async (endpoint, options = {}) => {
         const token = getAuthToken();
+
+        if (!token) {
+            throw new Error('No authentication token found. Please log in again.');
+        }
+
         const config = {
+            credentials:'true',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`,
@@ -81,6 +115,28 @@ const ServiceRequests = () => {
 
         try {
             const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
+
+            // Handle different HTTP status codes
+            if (response.status === 401) {
+                // Token might be expired or invalid
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('accessToken');
+                sessionStorage.removeItem('authToken');
+                sessionStorage.removeItem('accessToken');
+                throw new Error('Authentication failed. Please log in again.');
+            }
+
+            if (response.status === 403) {
+                throw new Error('Access forbidden. You don\'t have permission to perform this action.');
+            }
+
+            if (response.status === 404) {
+                throw new Error('Resource not found. The requested endpoint may not exist.');
+            }
+
+            if (response.status >= 500) {
+                throw new Error('Server error. Please try again later.');
+            }
 
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -98,14 +154,14 @@ const ServiceRequests = () => {
         }
     };
 
-    // Fetch current service requests
+    // Fetch current service requests with improved error handling
     const fetchCurrentRequests = async () => {
         try {
             setLoading(true);
             setError(null);
 
             const data = await apiRequest(
-                `/technician/get-current-request?email=${encodeURIComponent(technicianEmail)}`
+                `api/technician/get-current-request?email=${encodeURIComponent(technicianEmail)}`
             );
 
             // Transform API data to match component structure
@@ -118,8 +174,18 @@ const ServiceRequests = () => {
         } catch (error) {
             console.error('Error fetching requests:', error);
 
+            // Handle specific error types
+            if (error.message.includes('Authentication failed') || error.message.includes('No authentication token')) {
+                setError('Authentication required. Please log in to view service requests.');
+                // Optionally redirect to login page
+                // window.location.href = '/login';
+                return;
+            }
+
             // Check if it's a connection error (backend not running)
-            if (error.message.includes('Failed to fetch') || error.message.includes('ERR_CONNECTION_REFUSED')) {
+            if (error.message.includes('Failed to fetch') ||
+                error.message.includes('ERR_CONNECTION_REFUSED') ||
+                error.message.includes('NetworkError')) {
                 setIsDevelopmentMode(true);
                 // Use mock data for development
                 const mockData = getMockServiceRequests();
@@ -127,7 +193,7 @@ const ServiceRequests = () => {
                 updateStats(mockData);
                 setError('Backend server not available. Using mock data for development.');
             } else {
-                setError('Failed to fetch service requests. Please try again.');
+                setError(`Failed to fetch service requests: ${error.message}`);
             }
         } finally {
             setLoading(false);
@@ -247,7 +313,7 @@ const ServiceRequests = () => {
                     postedTime: '1 day ago',
                     responseDeadline: '2 hours'
                 },
-                status: 'urgent',
+                status: 'pending',
                 priority: 'low',
                 attachments: ['ac-model.jpg', 'room-dimensions.pdf']
             }
@@ -256,7 +322,10 @@ const ServiceRequests = () => {
 
     // Transform API response to match component data structure
     const transformApiDataToRequests = (apiData) => {
-        if (!Array.isArray(apiData)) return [];
+        if (!Array.isArray(apiData)) {
+            console.warn('API response is not an array:', apiData);
+            return [];
+        }
 
         return apiData.map(item => ({
             id: `SR${item.id || Math.random().toString().substr(2, 6)}`,
@@ -413,8 +482,16 @@ const ServiceRequests = () => {
                 alert(`Request ${requestId} has been accepted! You can now send a quote to the client.`);
             }
         } catch (error) {
-            alert('Failed to accept request. Please try again.');
             console.error('Error accepting request:', error);
+
+            // Show specific error message
+            if (error.message.includes('Authentication failed')) {
+                alert('Your session has expired. Please log in again.');
+            } else if (error.message.includes('Access forbidden')) {
+                alert('You don\'t have permission to accept this request.');
+            } else {
+                alert(`Failed to accept request: ${error.message}`);
+            }
         } finally {
             setProcessingRequests(prev => {
                 const newSet = new Set(prev);
@@ -424,9 +501,10 @@ const ServiceRequests = () => {
         }
     };
 
-    // Decline service request
-    const handleDeclineRequest = async (requestId) => {
-        setSelectedRequest(serviceRequests.find(r => r.id === requestId));
+    // Decline service request - Enhanced with better confirmation
+    const handleDeclineRequest = (requestId) => {
+        const request = serviceRequests.find(r => r.id === requestId);
+        setSelectedRequest(request);
         setConfirmAction(() => () => performDeclineRequest(requestId));
         setShowConfirmModal(true);
     };
@@ -457,11 +535,28 @@ const ServiceRequests = () => {
                     prev.filter(request => request.id !== requestId)
                 );
 
-                alert('Request declined successfully.');
+                alert('Request declined successfully. The client has been notified.');
             }
+
+            // Update stats after removal
+            const updatedRequests = serviceRequests.filter(request => request.id !== requestId);
+            updateStats(updatedRequests);
+
         } catch (error) {
-            alert('Failed to decline request. Please try again.');
             console.error('Error declining request:', error);
+
+            // Show specific error message
+            if (error.message.includes('Authentication failed')) {
+                alert('Your session has expired. Please log in again.');
+            } else if (error.message.includes('Access forbidden')) {
+                alert('You don\'t have permission to decline this request.');
+            } else if (error.message.includes('Resource not found')) {
+                alert('This request may have already been processed or no longer exists.');
+                // Remove from local state anyway since it doesn't exist on server
+                setServiceRequests(prev => prev.filter(request => request.id !== requestId));
+            } else {
+                alert(`Failed to decline request: ${error.message}`);
+            }
         } finally {
             setProcessingRequests(prev => {
                 const newSet = new Set(prev);
@@ -475,6 +570,7 @@ const ServiceRequests = () => {
     const handleRefresh = () => {
         setSearchTerm('');
         setSelectedFilter('all');
+        setError(null);
         fetchCurrentRequests();
     };
 
@@ -509,6 +605,7 @@ const ServiceRequests = () => {
             case 'pending': return '#f59e0b';
             case 'urgent': return '#ef4444';
             case 'responded': return '#10b981';
+            case 'declined': return '#ef4444';
             default: return '#6b7280';
         }
     };
@@ -519,6 +616,7 @@ const ServiceRequests = () => {
             case 'pending': return 'Awaiting Response';
             case 'urgent': return 'Response Overdue';
             case 'responded': return 'Response Sent';
+            case 'declined': return 'Declined';
             default: return 'Unknown';
         }
     };
@@ -588,7 +686,8 @@ const ServiceRequests = () => {
         { value: 'all', label: 'All Requests', count: serviceRequests.length },
         { value: 'new', label: 'New', count: serviceRequests.filter(r => r.status === 'new').length },
         { value: 'pending', label: 'Pending', count: serviceRequests.filter(r => r.status === 'pending').length },
-        { value: 'urgent', label: 'Urgent', count: serviceRequests.filter(r => r.status === 'urgent').length }
+        { value: 'urgent', label: 'Urgent', count: serviceRequests.filter(r => r.status === 'urgent').length },
+        { value: 'responded', label: 'Responded', count: serviceRequests.filter(r => r.status === 'responded').length }
     ];
 
     // Loading state
@@ -605,21 +704,20 @@ const ServiceRequests = () => {
         );
     }
 
-    // Error state
-    if (error) {
+    // Error state for authentication issues
+    if (error && error.includes('Authentication required')) {
         return (
             <div className={styles['profile-content']}>
                 <div className={styles['profile-form']}>
                     <div className={styles['error-state']}>
                         <AlertCircle size={48} style={{ color: '#ef4444' }} />
-                        <h3>Error Loading Requests</h3>
+                        <h3>Authentication Required</h3>
                         <p>{error}</p>
                         <button
                             className={`${styles['action-btn']} ${styles['primary']}`}
-                            onClick={handleRefresh}
+                            onClick={() => window.location.href = '/LoginSignup'}
                         >
-                            <RefreshCw size={16} />
-                            Try Again
+                            Go to Login
                         </button>
                     </div>
                 </div>
@@ -645,6 +743,21 @@ const ServiceRequests = () => {
                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                 <AlertCircle size={16} />
                                 <strong>Development Mode:</strong> Backend server not available. Using mock data for demonstration.
+                            </div>
+                        </div>
+                    )}
+                    {error && !isDevelopmentMode && (
+                        <div style={{
+                            backgroundColor: '#fef2f2',
+                            border: '1px solid #ef4444',
+                            borderRadius: '8px',
+                            padding: '12px',
+                            marginTop: '8px',
+                            color: '#dc2626'
+                        }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <AlertCircle size={16} />
+                                <strong>Error:</strong> {error}
                             </div>
                         </div>
                     )}
@@ -732,18 +845,18 @@ const ServiceRequests = () => {
                                         <div className={styles['request-id-status']}>
                                             <span className={styles['request-id']}>#{request.id}</span>
                                             <div className={styles['status-badges']}>
-                                                <span
-                                                    className={styles['status-badge']}
-                                                    style={{ backgroundColor: getStatusColor(request.status) }}
-                                                >
-                                                    {getStatusText(request.status)}
-                                                </span>
+                                            <span
+                                                className={styles['status-badge']}
+                                                style={{ backgroundColor: getStatusColor(request.status) }}
+                                            >
+                                                {getStatusText(request.status)}
+                                            </span>
                                                 <span
                                                     className={styles['priority-badge']}
                                                     style={{ backgroundColor: getPriorityColor(request.priority) }}
                                                 >
-                                                    {request.priority.charAt(0).toUpperCase() + request.priority.slice(1)} Priority
-                                                </span>
+                                                {request.priority.charAt(0).toUpperCase() + request.priority.slice(1)} Priority
+                                            </span>
                                             </div>
                                         </div>
                                         <div className={styles['request-time']}>
@@ -840,7 +953,7 @@ const ServiceRequests = () => {
                                             <button
                                                 className={`${styles['action-btn']} ${styles['secondary']} ${styles['decline']}`}
                                                 onClick={() => handleDeclineRequest(request.id)}
-                                                disabled={isProcessing}
+                                                disabled={isProcessing || request.status === 'declined' || request.status === 'responded'}
                                             >
                                                 {isProcessing ? <RefreshCw size={16} className={styles['spin']} /> : <XCircle size={16} />}
                                                 {isProcessing ? 'Processing...' : 'Decline'}
@@ -848,7 +961,7 @@ const ServiceRequests = () => {
                                             <button
                                                 className={`${styles['action-btn']} ${styles['primary']}`}
                                                 onClick={() => handleAcceptRequest(request.id)}
-                                                disabled={isProcessing}
+                                                disabled={isProcessing || request.status === 'declined' || request.status === 'responded'}
                                             >
                                                 {isProcessing ? <RefreshCw size={16} className={styles['spin']} /> : <CheckCircle size={16} />}
                                                 {isProcessing ? 'Processing...' : 'Accept & Quote'}
@@ -899,7 +1012,7 @@ const ServiceRequests = () => {
                                 <div className={styles['confirmation-message']}>
                                     <AlertCircle size={48} className={styles['warning-icon']} />
                                     <h4>Are you sure you want to decline this request?</h4>
-                                    <p>This action cannot be undone and the request will be permanently removed from your list.</p>
+                                    <p>This action cannot be undone and the request will be permanently removed from your list. The client will be notified of your decision.</p>
                                 </div>
                                 <div className={styles['request-summary']}>
                                     <div className={styles['summary-row']}>
@@ -971,8 +1084,8 @@ const ServiceRequests = () => {
                                         <div className={styles['details-row']}>
                                             <span className={styles['details-label']}>Priority:</span>
                                             <span className={`${styles['details-value']} ${styles['priority-badge']}`} style={{ backgroundColor: getPriorityColor(selectedRequest.priority) }}>
-                                                {selectedRequest.priority.charAt(0).toUpperCase() + selectedRequest.priority.slice(1)}
-                                            </span>
+                                            {selectedRequest.priority.charAt(0).toUpperCase() + selectedRequest.priority.slice(1)}
+                                        </span>
                                         </div>
                                     </div>
 
@@ -1031,17 +1144,17 @@ const ServiceRequests = () => {
                                         <div className={styles['details-row']}>
                                             <span className={styles['details-label']}>Suggested Price:</span>
                                             <span className={styles['details-value']} style={{ color: '#059669', fontWeight: 'bold' }}>
-                                                ₨{selectedRequest.pricing.suggestedPrice.toLocaleString()}
-                                            </span>
+                                            ₨{selectedRequest.pricing.suggestedPrice.toLocaleString()}
+                                        </span>
                                         </div>
                                         <div className={styles['details-row']}>
                                             <span className={styles['details-label']}>Negotiable:</span>
                                             <span className={styles['details-value']}>
-                                                {selectedRequest.pricing.negotiable ?
-                                                    <span className={styles['negotiable-yes']}>Yes</span> :
-                                                    <span className={styles['negotiable-no']}>No</span>
-                                                }
-                                            </span>
+                                            {selectedRequest.pricing.negotiable ?
+                                                <span className={styles['negotiable-yes']}>Yes</span> :
+                                                <span className={styles['negotiable-no']}>No</span>
+                                            }
+                                        </span>
                                         </div>
                                     </div>
 
@@ -1051,8 +1164,8 @@ const ServiceRequests = () => {
                                             <div className={styles['attachments-list']}>
                                                 {selectedRequest.attachments.map((file, index) => (
                                                     <span key={index} className={styles['attachment-file']}>
-                                                        {file}
-                                                    </span>
+                                                    {file}
+                                                </span>
                                                 ))}
                                             </div>
                                         </div>
@@ -1072,7 +1185,7 @@ const ServiceRequests = () => {
                                         setShowDetailsModal(false);
                                         handleAcceptRequest(selectedRequest.id);
                                     }}
-                                    disabled={processingRequests.has(selectedRequest.id)}
+                                    disabled={processingRequests.has(selectedRequest.id) || selectedRequest.status === 'declined' || selectedRequest.status === 'responded'}
                                 >
                                     <CheckCircle size={16} />
                                     Accept & Quote
