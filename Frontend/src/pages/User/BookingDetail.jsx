@@ -809,10 +809,10 @@ const BookingDetail = () => {
 
     return (
         <div className="page-container">
-            <div className="container">
+
                 <div className="booking-container">
                     {/* Back Button */}
-                    <button className="back-button" onClick={() => navigate(-1)}>
+                    <button className="back-button" onClick={() => navigate("/TechnicianProfile")}>
                         <ArrowLeft size={20} />
                         Back to Results
                     </button>
@@ -873,7 +873,7 @@ const BookingDetail = () => {
                         </div>
                     </div>
                 </div>
-            </div>
+
         </div>
     );
 };

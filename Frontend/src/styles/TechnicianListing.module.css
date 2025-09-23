@@ -20,9 +20,9 @@
 
 /* Search Section */
 .searchSection {
-    background: linear-gradient(135deg, #85d6ab 0%, #85d6ab 100%);
+    background: #d9efda;
     padding: 3rem 0;
-    color: white;
+    color: gray;
 }
 
 .searchHeader {

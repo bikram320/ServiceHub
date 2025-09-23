@@ -347,7 +347,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Star, MapPin, Phone, Mail, Shield, Award, Clock, Search, Filter, Calendar } from 'lucide-react';
 import styles from '../../styles/TechnicianListing.module.css';
-import Header from "../../Components/layout/Header.jsx";
+import BackHeader from "../../Components/layout/BackHeader.jsx";
 
 const TechnicianListing = () => {
     const navigate = useNavigate();
@@ -545,7 +545,7 @@ const TechnicianListing = () => {
     if (loading) {
         return (
             <div className={styles.pageContainer}>
-                <Header />
+                <BackHeader />
                 <div className={styles.container}>
                     <div className={styles.loading}>
                         <div className={styles.loadingSpinner}></div>
@@ -558,7 +558,7 @@ const TechnicianListing = () => {
 
     return (
         <div className={styles.pageContainer}>
-            <Header />
+            <BackHeader />
 
             {/* Search and Filter Section */}
             <div className={styles.searchSection}>

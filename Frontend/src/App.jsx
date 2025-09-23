@@ -54,9 +54,9 @@ function App() {
                <Route path="/TechnicianList/*" element={<TechnicianList />} />
                <Route path="/TechnicianProfile/*" element={<TechnicianProfile />} />
                <Route path="/BookingDetail/*" element={<BookingDetail />} />
-               <Route path="/FindServices" element={<FindServices />} />
-               <Route path="/Payment/Success" element={<PaymentSuccess/>}/>
-               <Route path-="/Payment/Failure" element={<PaymentFailure/>}/>
+               <Route path="/FindServices/*" element={<FindServices />} />
+               <Route path="/PaymentSuccess/*" element={<PaymentSuccess/>}/>
+               <Route path="/PaymentFailure/*" element={<PaymentFailure/>}/>
            </Routes>
        </Router>
        //  <Test />
