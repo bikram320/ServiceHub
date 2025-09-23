@@ -19,9 +19,11 @@ import {
     Clock,
     Ban,
     MoreVertical,
-    Download
+    Download,
+    TrendingUp,
+    TrendingDown
 } from 'lucide-react';
-import "../../styles/UserManagement.css";
+import styles from "../../styles/UserManagement.module.css";
 
 const UserManagement = () => {
     const [searchTerm, setSearchTerm] = useState('');
@@ -49,6 +51,8 @@ const UserManagement = () => {
             address: 'Thamel, Kathmandu',
             joinedServices: 0,
             totalSpent: 0,
+            paymentsMade: 0,
+            refundsReceived: 0,
             documents: ['citizenship_front.jpg', 'citizenship_back.jpg']
         },
         {
@@ -66,6 +70,8 @@ const UserManagement = () => {
             address: 'Patan, Lalitpur',
             completedJobs: 0,
             rating: 0,
+            paymentsMade: 0,
+            refundsReceived: 0,
             documents: ['citizenship_front.jpg', 'license.jpg', 'experience_cert.pdf']
         },
         {
@@ -82,6 +88,8 @@ const UserManagement = () => {
             address: 'Lakeside, Pokhara',
             joinedServices: 5,
             totalSpent: 12500,
+            paymentsMade: 15000,
+            refundsReceived: 2500,
             documents: ['citizenship_front.jpg']
         },
         {
@@ -99,6 +107,8 @@ const UserManagement = () => {
             address: 'Durbar Square, Bhaktapur',
             completedJobs: 23,
             rating: 4.8,
+            paymentsMade: 500,
+            refundsReceived: 0,
             documents: ['citizenship_front.jpg', 'license.jpg']
         },
         {
@@ -115,6 +125,8 @@ const UserManagement = () => {
             address: 'New Baneshwor, Kathmandu',
             joinedServices: 8,
             totalSpent: 8500,
+            paymentsMade: 9000,
+            refundsReceived: 500,
             documents: ['citizenship_front.jpg']
         }
     ]);
@@ -275,8 +287,8 @@ const UserManagement = () => {
         if (!show) return null;
 
         return (
-            <div className="modal-overlay" onClick={onClose}>
-                <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <div className={styles.modalOverlay} onClick={onClose}>
+                <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
                     {children}
                 </div>
             </div>
@@ -284,66 +296,66 @@ const UserManagement = () => {
     };
 
     return (
-        <div className="user-management">
-            <div className="user-management-container">
+        <div className={styles.userManagement}>
+            <div className={styles.userManagementContainer}>
                 {/* Header */}
-                <div className="page-header">
-                    <div className="page-header-top">
-                        <h1 className="page-title">
+                <div className={styles.pageHeader}>
+                    <div className={styles.pageHeaderTop}>
+                        <h1 className={styles.pageTitle}>
                             <Users size={28} />
                             User Management
                         </h1>
-                        <button className="export-btn">
+                        <button className={styles.exportBtn}>
                             <Download size={16} />
                             Export Users
                         </button>
                     </div>
-                    <p className="page-subtitle">Manage user accounts, approvals, and permissions</p>
+                    <p className={styles.pageSubtitle}>Manage user accounts, approvals, and permissions</p>
                 </div>
 
                 {/* Summary Cards */}
-                <div className="summary-cards">
-                    <div className="summary-card">
-                        <div className="summary-icon total">
+                <div className={styles.summaryCards}>
+                    <div className={styles.summaryCard}>
+                        <div className={`${styles.summaryIcon} ${styles.total}`}>
                             <Users size={24} />
                         </div>
                         <div>
-                            <div className="summary-value">{statusCounts.total || 0}</div>
-                            <div className="summary-label">Total Users</div>
+                            <div className={styles.summaryValue}>{statusCounts.total || 0}</div>
+                            <div className={styles.summaryLabel}>Total Users</div>
                         </div>
                     </div>
-                    <div className="summary-card">
-                        <div className="summary-icon active">
+                    <div className={styles.summaryCard}>
+                        <div className={`${styles.summaryIcon} ${styles.active}`}>
                             <CheckCircle size={24} />
                         </div>
                         <div>
-                            <div className="summary-value">{statusCounts.active || 0}</div>
-                            <div className="summary-label">Active Users</div>
+                            <div className={styles.summaryValue}>{statusCounts.active || 0}</div>
+                            <div className={styles.summaryLabel}>Active Users</div>
                         </div>
                     </div>
-                    <div className="summary-card">
-                        <div className="summary-icon pending">
+                    <div className={styles.summaryCard}>
+                        <div className={`${styles.summaryIcon} ${styles.pending}`}>
                             <Clock size={24} />
                         </div>
                         <div>
-                            <div className="summary-value">{statusCounts.pending || 0}</div>
-                            <div className="summary-label">Pending Approval</div>
+                            <div className={styles.summaryValue}>{statusCounts.pending || 0}</div>
+                            <div className={styles.summaryLabel}>Pending Approval</div>
                         </div>
                     </div>
-                    <div className="summary-card">
-                        <div className="summary-icon blocked">
+                    <div className={styles.summaryCard}>
+                        <div className={`${styles.summaryIcon} ${styles.blocked}`}>
                             <Ban size={24} />
                         </div>
                         <div>
-                            <div className="summary-value">{statusCounts.blocked || 0}</div>
-                            <div className="summary-label">Blocked Users</div>
+                            <div className={styles.summaryValue}>{statusCounts.blocked || 0}</div>
+                            <div className={styles.summaryLabel}>Blocked Users</div>
                         </div>
                     </div>
                 </div>
 
                 {/* Filters and Search */}
-                <div className="filters-section">
-                    <div className="search-box">
+                <div className={styles.filtersSection}>
+                    <div className={styles.searchBox}>
                         <Search size={20} />
                         <input
                             type="text"
@@ -353,11 +365,11 @@ const UserManagement = () => {
                         />
                     </div>
 
-                    <div className="filters">
+                    <div className={styles.filters}>
                         <select
                             value={statusFilter}
                             onChange={(e) => setStatusFilter(e.target.value)}
-                            className="filter-select"
+                            className={styles.filterSelect}
                         >
                             <option value="all">All Status</option>
                             <option value="active">Active</option>
@@ -368,7 +380,7 @@ const UserManagement = () => {
                         <select
                             value={dateFilter}
                             onChange={(e) => setDateFilter(e.target.value)}
-                            className="filter-select"
+                            className={styles.filterSelect}
                         >
                             <option value="all">All Time</option>
                             <option value="today">Today</option>
@@ -383,7 +395,7 @@ const UserManagement = () => {
                                 setSortBy(field);
                                 setSortOrder(order);
                             }}
-                            className="filter-select"
+                            className={styles.filterSelect}
                         >
                             <option value="name-asc">Name A-Z</option>
                             <option value="name-desc">Name Z-A</option>
@@ -394,13 +406,12 @@ const UserManagement = () => {
                 </div>
 
                 {/* Users Table */}
-                <div className="table-container">
-                    <table className="users-table">
+                <div className={styles.tableContainer}>
+                    <table className={styles.usersTable}>
                         <thead>
                         <tr>
                             <th>User</th>
-                            <th>Contact</th>
-                            <th>Type</th>
+                            <th>Payment</th>
                             <th>Registration</th>
                             <th>Status</th>
                             <th>Actions</th>
@@ -412,13 +423,13 @@ const UserManagement = () => {
                             return (
                                 <tr key={user.id}>
                                     <td>
-                                        <div className="user-info">
-                                            <div className="user-avatar">
+                                        <div className={styles.userInfo}>
+                                            <div className={styles.userAvatar}>
                                                 <User size={20} />
                                             </div>
                                             <div>
-                                                <div className="user-name">{user.name}</div>
-                                                <div className="user-location">
+                                                <div className={styles.userName}>{user.name}</div>
+                                                <div className={styles.userLocation}>
                                                     <MapPin size={12} />
                                                     {user.location}
                                                 </div>
@@ -426,41 +437,33 @@ const UserManagement = () => {
                                         </div>
                                     </td>
                                     <td>
-                                        <div className="contact-info">
-                                            <div className="contact-item">
-                                                <Mail size={12} />
-                                                {user.email}
+                                        <div className={styles.paymentInfo}>
+                                            <div className={styles.paymentItem}>
+                                                <TrendingDown size={12} color="#dc2626" />
+                                                <span className={styles.paymentMade}>₨{user.paymentsMade || 0}</span>
                                             </div>
-                                            <div className="contact-item">
-                                                <Phone size={12} />
-                                                {user.phone}
+                                            <div className={styles.paymentItem}>
+                                                <TrendingUp size={12} color="#10b981" />
+                                                <span className={styles.refundReceived}>₨{user.refundsReceived || 0}</span>
                                             </div>
                                         </div>
                                     </td>
                                     <td>
-                                        <div className="user-type">
-                                            {user.userType}
-                                            {user.specialization && (
-                                                <div className="specialization">{user.specialization}</div>
-                                            )}
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div className="date-info">
+                                        <div className={styles.dateInfo}>
                                             <Calendar size={12} />
                                             {new Date(user.registrationDate).toLocaleDateString()}
                                         </div>
                                     </td>
                                     <td>
-                                        <div className="status-badge" style={{ color: getStatusColor(user.status) }}>
+                                        <div className={styles.statusBadge} style={{ color: getStatusColor(user.status) }}>
                                             <StatusIcon size={14} />
                                             {user.status.charAt(0).toUpperCase() + user.status.slice(1)}
                                         </div>
                                     </td>
                                     <td>
-                                        <div className="action-buttons">
+                                        <div className={styles.actionButtons}>
                                             <button
-                                                className="action-btn view"
+                                                className={`${styles.actionBtn} ${styles.view}`}
                                                 onClick={() => handleUserAction(user, 'profile')}
                                                 title="View Profile"
                                             >
@@ -470,14 +473,14 @@ const UserManagement = () => {
                                             {user.status === 'pending' && (
                                                 <>
                                                     <button
-                                                        className="action-btn approve"
+                                                        className={`${styles.actionBtn} ${styles.approve}`}
                                                         onClick={() => handleUserAction(user, 'approve')}
                                                         title="Approve"
                                                     >
                                                         <Check size={16} />
                                                     </button>
                                                     <button
-                                                        className="action-btn reject"
+                                                        className={`${styles.actionBtn} ${styles.reject}`}
                                                         onClick={() => handleUserAction(user, 'reject')}
                                                         title="Reject"
                                                     >
@@ -488,7 +491,7 @@ const UserManagement = () => {
 
                                             {user.status === 'active' && (
                                                 <button
-                                                    className="action-btn block"
+                                                    className={`${styles.actionBtn} ${styles.block}`}
                                                     onClick={() => handleUserAction(user, 'block')}
                                                     title="Block User"
                                                 >
@@ -498,7 +501,7 @@ const UserManagement = () => {
 
                                             {user.status === 'blocked' && (
                                                 <button
-                                                    className="action-btn unblock"
+                                                    className={`${styles.actionBtn} ${styles.unblock}`}
                                                     onClick={() => handleUserAction(user, 'unblock')}
                                                     title="Unblock User"
                                                 >
@@ -507,7 +510,7 @@ const UserManagement = () => {
                                             )}
 
                                             <button
-                                                className="action-btn reset"
+                                                className={`${styles.actionBtn} ${styles.reset}`}
                                                 onClick={() => handleUserAction(user, 'reset')}
                                                 title="Reset Password"
                                             >
@@ -522,7 +525,7 @@ const UserManagement = () => {
                     </table>
 
                     {filteredUsers.length === 0 && (
-                        <div className="no-results">
+                        <div className={styles.noResults}>
                             <Users size={48} />
                             <h3>No users found</h3>
                             <p>Try adjusting your search criteria or filters</p>
@@ -535,73 +538,87 @@ const UserManagement = () => {
                     {selectedUser && (
                         <>
                             {modalType === 'profile' && (
-                                <div className="modal-body">
-                                    <div className="modal-header">
+                                <div className={styles.modalBody}>
+                                    <div className={styles.modalHeader}>
                                         <h3>User Profile</h3>
                                         <button onClick={() => setShowModal(false)}>
                                             <X size={20} />
                                         </button>
                                     </div>
-                                    <div className="profile-details">
-                                        <div className="profile-section">
+                                    <div className={styles.profileDetails}>
+                                        <div className={styles.profileSection}>
                                             <h4>Personal Information</h4>
-                                            <div className="profile-grid">
-                                                <div className="profile-item">
+                                            <div className={styles.profileGrid}>
+                                                <div className={styles.profileItem}>
                                                     <label>Name</label>
                                                     <span>{selectedUser.name}</span>
                                                 </div>
-                                                <div className="profile-item">
+                                                <div className={styles.profileItem}>
                                                     <label>Email</label>
                                                     <span>{selectedUser.email}</span>
                                                 </div>
-                                                <div className="profile-item">
+                                                <div className={styles.profileItem}>
                                                     <label>Phone</label>
                                                     <span>{selectedUser.phone}</span>
                                                 </div>
-                                                <div className="profile-item">
+                                                <div className={styles.profileItem}>
                                                     <label>Address</label>
                                                     <span>{selectedUser.address}</span>
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <div className="profile-section">
+                                        <div className={styles.profileSection}>
                                             <h4>Account Details</h4>
-                                            <div className="profile-grid">
-                                                <div className="profile-item">
+                                            <div className={styles.profileGrid}>
+                                                <div className={styles.profileItem}>
                                                     <label>User Type</label>
                                                     <span>{selectedUser.userType}</span>
                                                 </div>
-                                                <div className="profile-item">
+                                                <div className={styles.profileItem}>
                                                     <label>Registration Date</label>
                                                     <span>{new Date(selectedUser.registrationDate).toLocaleDateString()}</span>
                                                 </div>
-                                                <div className="profile-item">
+                                                <div className={styles.profileItem}>
                                                     <label>Status</label>
-                                                    <span className="status-badge" style={{ color: getStatusColor(selectedUser.status) }}>
+                                                    <span className={styles.statusBadge} style={{ color: getStatusColor(selectedUser.status) }}>
                                                         {selectedUser.status}
                                                     </span>
                                                 </div>
-                                                <div className="profile-item">
+                                                <div className={styles.profileItem}>
                                                     <label>Last Active</label>
                                                     <span>{new Date(selectedUser.lastActive).toLocaleDateString()}</span>
                                                 </div>
                                             </div>
                                         </div>
 
+                                        <div className={styles.profileSection}>
+                                            <h4>Payment Information</h4>
+                                            <div className={styles.profileGrid}>
+                                                <div className={styles.profileItem}>
+                                                    <label>Payments Made</label>
+                                                    <span>₨{selectedUser.paymentsMade || 0}</span>
+                                                </div>
+                                                <div className={styles.profileItem}>
+                                                    <label>Refunds Received</label>
+                                                    <span>₨{selectedUser.refundsReceived || 0}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
                                         {selectedUser.userType === 'Technician' && (
-                                            <div className="profile-section">
+                                            <div className={styles.profileSection}>
                                                 <h4>Technician Details</h4>
-                                                <div className="profile-grid">
-                                                    <div className="profile-item">
+                                                <div className={styles.profileGrid}>
+                                                    <div className={styles.profileItem}>
                                                         <label>Specialization</label>
                                                         <span>{selectedUser.specialization}</span>
                                                     </div>
-                                                    <div className="profile-item">
+                                                    <div className={styles.profileItem}>
                                                         <label>Completed Jobs</label>
                                                         <span>{selectedUser.completedJobs || 0}</span>
                                                     </div>
-                                                    <div className="profile-item">
+                                                    <div className={styles.profileItem}>
                                                         <label>Rating</label>
                                                         <span>{selectedUser.rating || 'N/A'}</span>
                                                     </div>
@@ -610,14 +627,14 @@ const UserManagement = () => {
                                         )}
 
                                         {selectedUser.userType === 'Customer' && (
-                                            <div className="profile-section">
+                                            <div className={styles.profileSection}>
                                                 <h4>Customer Stats</h4>
-                                                <div className="profile-grid">
-                                                    <div className="profile-item">
+                                                <div className={styles.profileGrid}>
+                                                    <div className={styles.profileItem}>
                                                         <label>Services Used</label>
                                                         <span>{selectedUser.joinedServices || 0}</span>
                                                     </div>
-                                                    <div className="profile-item">
+                                                    <div className={styles.profileItem}>
                                                         <label>Total Spent</label>
                                                         <span>₨{selectedUser.totalSpent || 0}</span>
                                                     </div>
@@ -625,13 +642,13 @@ const UserManagement = () => {
                                             </div>
                                         )}
 
-                                        <div className="profile-section">
+                                        <div className={styles.profileSection}>
                                             <h4>Documents</h4>
-                                            <div className="documents-list">
+                                            <div className={styles.documentsList}>
                                                 {selectedUser.documents?.map((doc, index) => (
-                                                    <div key={index} className="document-item">
+                                                    <div key={index} className={styles.documentItem}>
                                                         <span>{doc}</span>
-                                                        <button className="view-doc-btn">View</button>
+                                                        <button className={styles.viewDocBtn}>View</button>
                                                     </div>
                                                 ))}
                                             </div>
@@ -641,26 +658,26 @@ const UserManagement = () => {
                             )}
 
                             {modalType === 'approve' && (
-                                <div className="modal-body">
-                                    <div className="modal-header">
+                                <div className={styles.modalBody}>
+                                    <div className={styles.modalHeader}>
                                         <h3>Approve User</h3>
                                         <button onClick={() => setShowModal(false)}>
                                             <X size={20} />
                                         </button>
                                     </div>
-                                    <div className="confirmation-content">
+                                    <div className={styles.confirmationContent}>
                                         <CheckCircle size={48} color="#10b981" />
                                         <p>Are you sure you want to approve <strong>{selectedUser.name}</strong>?</p>
                                         <p>This will grant them access to the platform.</p>
-                                        <div className="modal-actions">
+                                        <div className={styles.modalActions}>
                                             <button
-                                                className="btn-secondary"
+                                                className={styles.btnSecondary}
                                                 onClick={() => setShowModal(false)}
                                             >
                                                 Cancel
                                             </button>
                                             <button
-                                                className="btn-approve"
+                                                className={styles.btnApprove}
                                                 onClick={() => handleApproveUser(selectedUser.id)}
                                             >
                                                 Approve User
@@ -671,26 +688,26 @@ const UserManagement = () => {
                             )}
 
                             {modalType === 'reject' && (
-                                <div className="modal-body">
-                                    <div className="modal-header">
+                                <div className={styles.modalBody}>
+                                    <div className={styles.modalHeader}>
                                         <h3>Reject User</h3>
                                         <button onClick={() => setShowModal(false)}>
                                             <X size={20} />
                                         </button>
                                     </div>
-                                    <div className="confirmation-content">
+                                    <div className={styles.confirmationContent}>
                                         <X size={48} color="#dc2626" />
                                         <p>Are you sure you want to reject <strong>{selectedUser.name}</strong>?</p>
                                         <p>This will permanently remove their registration from the system.</p>
-                                        <div className="modal-actions">
+                                        <div className={styles.modalActions}>
                                             <button
-                                                className="btn-secondary"
+                                                className={styles.btnSecondary}
                                                 onClick={() => setShowModal(false)}
                                             >
                                                 Cancel
                                             </button>
                                             <button
-                                                className="btn-reject"
+                                                className={styles.btnReject}
                                                 onClick={() => handleRejectUser(selectedUser.id)}
                                             >
                                                 Reject User
@@ -701,26 +718,26 @@ const UserManagement = () => {
                             )}
 
                             {modalType === 'block' && (
-                                <div className="modal-body">
-                                    <div className="modal-header">
+                                <div className={styles.modalBody}>
+                                    <div className={styles.modalHeader}>
                                         <h3>Block User</h3>
                                         <button onClick={() => setShowModal(false)}>
                                             <X size={20} />
                                         </button>
                                     </div>
-                                    <div className="confirmation-content">
+                                    <div className={styles.confirmationContent}>
                                         <Ban size={48} color="#dc2626" />
                                         <p>Are you sure you want to block <strong>{selectedUser.name}</strong>?</p>
                                         <p>This will prevent them from accessing the platform.</p>
-                                        <div className="modal-actions">
+                                        <div className={styles.modalActions}>
                                             <button
-                                                className="btn-secondary"
+                                                className={styles.btnSecondary}
                                                 onClick={() => setShowModal(false)}
                                             >
                                                 Cancel
                                             </button>
                                             <button
-                                                className="btn-block"
+                                                className={styles.btnBlock}
                                                 onClick={() => handleBlockUser(selectedUser.id)}
                                             >
                                                 Block User
@@ -731,26 +748,26 @@ const UserManagement = () => {
                             )}
 
                             {modalType === 'unblock' && (
-                                <div className="modal-body">
-                                    <div className="modal-header">
+                                <div className={styles.modalBody}>
+                                    <div className={styles.modalHeader}>
                                         <h3>Unblock User</h3>
                                         <button onClick={() => setShowModal(false)}>
                                             <X size={20} />
                                         </button>
                                     </div>
-                                    <div className="confirmation-content">
+                                    <div className={styles.confirmationContent}>
                                         <Shield size={48} color="#10b981" />
                                         <p>Are you sure you want to unblock <strong>{selectedUser.name}</strong>?</p>
                                         <p>This will restore their access to the platform.</p>
-                                        <div className="modal-actions">
+                                        <div className={styles.modalActions}>
                                             <button
-                                                className="btn-secondary"
+                                                className={styles.btnSecondary}
                                                 onClick={() => setShowModal(false)}
                                             >
                                                 Cancel
                                             </button>
                                             <button
-                                                className="btn-approve"
+                                                className={styles.btnApprove}
                                                 onClick={() => handleUnblockUser(selectedUser.id)}
                                             >
                                                 Unblock User
@@ -761,26 +778,26 @@ const UserManagement = () => {
                             )}
 
                             {modalType === 'reset' && (
-                                <div className="modal-body">
-                                    <div className="modal-header">
+                                <div className={styles.modalBody}>
+                                    <div className={styles.modalHeader}>
                                         <h3>Reset Password</h3>
                                         <button onClick={() => setShowModal(false)}>
                                             <X size={20} />
                                         </button>
                                     </div>
-                                    <div className="confirmation-content">
+                                    <div className={styles.confirmationContent}>
                                         <KeyRound size={48} color="#0ea5e9" />
                                         <p>Reset password for <strong>{selectedUser.name}</strong>?</p>
                                         <p>A password reset email will be sent to <strong>{selectedUser.email}</strong></p>
-                                        <div className="modal-actions">
+                                        <div className={styles.modalActions}>
                                             <button
-                                                className="btn-secondary"
+                                                className={styles.btnSecondary}
                                                 onClick={() => setShowModal(false)}
                                             >
                                                 Cancel
                                             </button>
                                             <button
-                                                className="btn-primary"
+                                                className={styles.btnPrimary}
                                                 onClick={() => handleResetPassword(selectedUser.id)}
                                             >
                                                 Send Reset Email

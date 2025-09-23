@@ -19,9 +19,11 @@ import {
     TrendingUp,
     RefreshCw
 } from 'lucide-react';
+import {useNavigate, useParams} from 'react-router-dom';
 import styles from '../../styles/TechnicianDashboard.module.css';
 
 const TechnicianDashboard = () => {
+    const navigate = useNavigate();
     const [selectedTimeRange, setSelectedTimeRange] = useState('week');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -517,18 +519,18 @@ const TechnicianDashboard = () => {
                     </div>
                 </section>
 
-                {/* Quick Actions */}
-                <section className={styles['form-section']}>
-                    <h3 className={styles['section-title']}>Quick Actions</h3>
-                    <div className={styles['quick-actions-grid']}>
-                        {quickActions.map((action, index) => (
-                            <button key={index} className={styles['quick-action-btn']} onClick={action.action}>
-                                <action.icon size={24} />
-                                <span>{action.label}</span>
-                            </button>
-                        ))}
-                    </div>
-                </section>
+                {/*/!* Quick Actions *!/*/}
+                {/*<section className={styles['form-section']}>*/}
+                {/*    <h3 className={styles['section-title']}>Quick Actions</h3>*/}
+                {/*    <div className={styles['quick-actions-grid']}>*/}
+                {/*        {quickActions.map((action, index) => (*/}
+                {/*            <button key={index} className={styles['quick-action-btn']} onClick={action.action}>*/}
+                {/*                <action.icon size={24} />*/}
+                {/*                <span>{action.label}</span>*/}
+                {/*            </button>*/}
+                {/*        ))}*/}
+                {/*    </div>*/}
+                {/*</section>*/}
 
                 {/* Upcoming Appointments */}
                 <section className={styles['form-section']}>
@@ -537,7 +539,7 @@ const TechnicianDashboard = () => {
                             <Calendar size={20} style={{marginRight: '0.5rem'}} />
                             Upcoming Appointments ({upcomingAppointments.length})
                         </h3>
-                        <button className={styles['add-btn']}>
+                        <button className={styles['add-btn']} onClick={() => navigate("/ServiceRequests")}>
                             <Eye size={16} />
                             View All
                         </button>
@@ -564,7 +566,7 @@ const TechnicianDashboard = () => {
                                         </div>
                                         {appointment.phone && (
                                             <div className={styles['appointment-contact']}>
-                                                <span>📞 {appointment.phone}</span>
+                                                <span> {appointment.phone}</span>
                                             </div>
                                         )}
                                     </div>

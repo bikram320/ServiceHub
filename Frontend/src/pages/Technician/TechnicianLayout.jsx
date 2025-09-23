@@ -12,6 +12,7 @@ const TechnicianLayout = () =>{
 
     const navigate = useNavigate()
     const [activeTab, setActiveTab] = useState('dashboard');
+    const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
     const [userInfo, setUserInfo] = useState({
         fullName: 'Alex Thompson',
         email: 'alex.thompson@techpro.com',
@@ -90,6 +91,8 @@ const TechnicianLayout = () =>{
                 onTabChange={handleTabChange}
                 onLogout={handleLogout}
                 userInfo={userInfo}
+                isCollapsed={sidebarCollapsed}
+                onToggleCollapse={setSidebarCollapsed}
             />
             <div className="technician-content">
                 {renderActiveComponent()}
@@ -99,3 +102,4 @@ const TechnicianLayout = () =>{
 };
 
 export default TechnicianLayout;
+
