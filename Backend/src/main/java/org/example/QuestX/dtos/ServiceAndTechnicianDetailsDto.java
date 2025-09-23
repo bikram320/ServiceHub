@@ -16,4 +16,8 @@ public class ServiceAndTechnicianDetailsDto {
     BigDecimal feeCharge;
     LocalDateTime appointmentTime;
     ServiceStatus status;
+    String userAddress;
+    Float technicianRating;
+    BigDecimal serviceRating;
+    String userReview;
 }

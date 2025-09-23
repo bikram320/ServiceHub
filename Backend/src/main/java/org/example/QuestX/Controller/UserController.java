@@ -84,10 +84,10 @@ public class UserController {
     public ResponseEntity<?> userFeedbackToTechnician(
             @RequestParam Float rating,
             @RequestParam long requestId,
-            @RequestParam long userId ,
+            @RequestParam String userEmail ,
             @RequestParam String comment
     ){
-        userService.userFeedbackToTechnician(rating , requestId, userId , comment);
+        userService.userFeedbackToTechnician(rating , requestId, userEmail , comment);
         return ResponseEntity.ok("Feedback Successfully Made");
     }
 

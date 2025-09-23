@@ -17,138 +17,11 @@ import styles from '../../styles/UserDashboard.module.css';
 
 const AppointmentHistory = ({ sidebarCollapsed = false }) => {
     const navigate = useNavigate();
-    // Mock data for appointment history
-    const mockAppointmentHistory = [
-        {
-            id: 101,
-            requestId: 'REQ101',
-            service: 'House Cleaning',
-            provider: 'CleanPro Services',
-            technician: 'Sarah Johnson',
-            date: 'Dec 15, 2024',
-            time: '2:00 PM - 4:00 PM',
-            location: '123 Main St, Kathmandu',
-            status: 'completed',
-            price: '₨1,500',
-            rating: 4.8,
-            yourRating: 5,
-            review: 'Excellent service! Very thorough cleaning.',
-            technicianEmail: 'sarah@cleanpro.com'
-        },
-        {
-            id: 102,
-            requestId: 'REQ102',
-            service: 'Plumbing Repair',
-            provider: 'FixIt Solutions',
-            technician: 'Mike Chen',
-            date: 'Dec 10, 2024',
-            time: '10:00 AM - 12:00 PM',
-            location: '456 Oak Ave, Lalitpur',
-            status: 'completed',
-            price: '₨2,200',
-            rating: 4.9,
-            yourRating: 4,
-            review: 'Fixed the issue quickly and professionally.',
-            technicianEmail: 'mike@fixit.com'
-        },
-        {
-            id: 103,
-            requestId: 'REQ103',
-            service: 'Car Wash',
-            provider: 'AutoShine',
-            technician: 'Ram Sharma',
-            date: 'Dec 8, 2024',
-            time: '11:00 AM - 1:00 PM',
-            location: '321 Valley St, Kathmandu',
-            status: 'cancelled',
-            price: '₨800',
-            rating: 4.6,
-            cancellationReason: 'Weather conditions - rescheduled',
-            technicianEmail: 'ram@autoshine.com'
-        },
-        {
-            id: 104,
-            requestId: 'REQ104',
-            service: 'Electrical Work',
-            provider: 'PowerTech',
-            technician: 'David Kumar',
-            date: 'Nov 28, 2024',
-            time: '3:00 PM - 5:00 PM',
-            location: '789 Pine Rd, Bhaktapur',
-            status: 'completed',
-            price: '₨1,800',
-            rating: 4.7,
-            yourRating: 5,
-            review: 'Great work on the electrical panel upgrade.',
-            technicianEmail: 'david@powertech.com'
-        },
-        {
-            id: 105,
-            requestId: 'REQ105',
-            service: 'Hair Cut',
-            provider: 'Style Studio',
-            technician: 'Lisa Tamang',
-            date: 'Nov 25, 2024',
-            time: '4:00 PM - 5:00 PM',
-            location: '654 Garden Lane, Patan',
-            status: 'completed',
-            price: '₨500',
-            rating: 4.9,
-            yourRating: 5,
-            review: 'Perfect haircut, exactly what I wanted!',
-            technicianEmail: 'lisa@stylestudio.com'
-        },
-        {
-            id: 106,
-            requestId: 'REQ106',
-            service: 'Massage Therapy',
-            provider: 'Wellness Center',
-            technician: 'Sita Rai',
-            date: 'Nov 20, 2024',
-            time: '6:00 PM - 7:00 PM',
-            location: '987 Spa Lane, Kathmandu',
-            status: 'completed',
-            price: '₨2,000',
-            rating: 4.8,
-            yourRating: 4,
-            review: 'Very relaxing and therapeutic session.',
-            technicianEmail: 'sita@wellness.com'
-        },
-        {
-            id: 107,
-            requestId: 'REQ107',
-            service: 'AC Repair',
-            provider: 'CoolTech',
-            technician: 'Raj Thapa',
-            date: 'Nov 15, 2024',
-            time: '1:00 PM - 3:00 PM',
-            location: '111 Cool Street, Lalitpur',
-            status: 'cancelled',
-            price: '₨1,200',
-            rating: 4.5,
-            cancellationReason: 'Customer cancelled - found alternative solution',
-            technicianEmail: 'raj@cooltech.com'
-        },
-        {
-            id: 108,
-            requestId: 'REQ108',
-            service: 'Gardening',
-            provider: 'Green Thumb',
-            technician: 'Maya Gurung',
-            date: 'Oct 30, 2024',
-            time: '9:00 AM - 11:00 AM',
-            location: '222 Green Ave, Bhaktapur',
-            status: 'completed',
-            price: '₨1,000',
-            rating: 4.6,
-            yourRating: 4,
-            review: 'Good work on the garden maintenance.',
-            technicianEmail: 'maya@greenthumb.com'
-        }
-    ];
 
-    const [appointmentHistory, setAppointmentHistory] = useState(mockAppointmentHistory);
-    const [filteredAppointments, setFilteredAppointments] = useState(mockAppointmentHistory);
+    const [appointmentHistory, setAppointmentHistory] = useState([]);
+    const [filteredAppointments, setFilteredAppointments] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     // Filter and Search states
     const [searchTerm, setSearchTerm] = useState('');
@@ -162,6 +35,97 @@ const AppointmentHistory = ({ sidebarCollapsed = false }) => {
         appointment: null,
         type: 'details'
     });
+
+    // Fetch appointment history from backend
+    const fetchAppointmentHistory = async () => {
+        try {
+            setLoading(true);
+            const userEmail = localStorage.getItem('userEmail');
+            if (!userEmail) {
+                navigate('/LoginSignup');
+                return;
+            }
+
+            const response = await fetch(`/api/users/get-previous-service-booking?userEmail=${userEmail}`, {
+                method: 'GET',
+                credentials: 'include',
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                const transformedData = data.map(item => transformBackendData(item));
+                setAppointmentHistory(transformedData);
+                setError(null);
+            } else if (response.status === 404) {
+                // No previous bookings found
+                setAppointmentHistory([]);
+                setError(null);
+            } else {
+                throw new Error('Failed to fetch appointment history');
+            }
+        } catch (error) {
+            console.error('Error fetching appointment history:', error);
+            setError('Failed to load appointment history');
+            setAppointmentHistory([]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Transform backend data to match frontend structure
+    const transformBackendData = (backendItem) => {
+        return {
+            id: backendItem.requestId,
+            requestId: `REQ${backendItem.requestId}`,
+            service: backendItem.serviceName,
+            provider: backendItem.technicianName, // Using technician name as provider
+            technician: backendItem.technicianName,
+            date: formatDate(backendItem.appointmentTime),
+            time: formatTime(backendItem.appointmentTime),
+            location: backendItem.userAddress || 'Address not provided',
+            status: backendItem.status.toLowerCase(),
+            price: `₨${backendItem.feeCharge}`,
+            rating: backendItem.technicianRating || 0,
+            yourRating: backendItem.serviceRating ? Number(backendItem.serviceRating) : null,
+            review: backendItem.userReview || null,
+            cancellationReason: backendItem.status === 'CANCELLED' ? 'Service was cancelled' : null,
+            technicianEmail: backendItem.technicianEmail,
+            hasFeedback: backendItem.serviceRating && backendItem.userReview
+        };
+    };
+
+    // Format date helper
+    const formatDate = (dateTimeString) => {
+        const date = new Date(dateTimeString);
+        return date.toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric'
+        });
+    };
+
+    // Format time helper
+    const formatTime = (dateTimeString) => {
+        const date = new Date(dateTimeString);
+        const startTime = date.toLocaleTimeString('en-US', {
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true
+        });
+        // Add 2 hours for end time (you can adjust this based on your business logic)
+        const endDate = new Date(date.getTime() + 2 * 60 * 60 * 1000);
+        const endTime = endDate.toLocaleTimeString('en-US', {
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true
+        });
+        return `${startTime} - ${endTime}`;
+    };
+
+    // Load data on component mount
+    useEffect(() => {
+        fetchAppointmentHistory();
+    }, []);
 
     // Filter options for appointment history
     const filterOptions = [
@@ -282,8 +246,39 @@ const AppointmentHistory = ({ sidebarCollapsed = false }) => {
         setSelectedFilter('all');
         setSortBy('date');
         setSortOrder('desc');
-        // In real app, this would refetch data from API
-        console.log('Refreshing appointment history...');
+        fetchAppointmentHistory();
+    };
+
+    // Submit feedback to backend
+    const submitFeedback = async (appointmentId, rating, comment) => {
+        try {
+            const userEmail = localStorage.getItem('userEmail');
+            const response = await fetch('/api/users/user-feedback', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                credentials: 'include',
+                body: new URLSearchParams({
+                    rating: rating,
+                    requestId: appointmentId,
+                    userEmail: userEmail,
+                    comment: comment
+                })
+            });
+
+            if (response.ok) {
+                // Refresh the appointment history to get updated data
+                fetchAppointmentHistory();
+                alert('Feedback submitted successfully!');
+            } else {
+                const errorText = await response.text();
+                throw new Error(errorText);
+            }
+        } catch (error) {
+            console.error('Error submitting feedback:', error);
+            alert('Failed to submit feedback: ' + error.message);
+        }
     };
 
     // Modal component
@@ -398,9 +393,35 @@ const AppointmentHistory = ({ sidebarCollapsed = false }) => {
         }
     };
 
+    const handleGiveFeedback = async (appointmentId) => {
+        const rating = prompt('Please rate the service (1-5 stars):');
+        if (!rating || rating < 1 || rating > 5) {
+            alert('Please provide a valid rating between 1 and 5.');
+            return;
+        }
+
+        const comment = prompt('Please provide your review:');
+        if (!comment) {
+            alert('Please provide a comment.');
+            return;
+        }
+
+        await submitFeedback(appointmentId, rating, comment);
+    };
+
     const handleCloseModal = () => {
         setModalState({ isOpen: false, appointment: null, type: 'details' });
     };
+
+    if (loading) {
+        return (
+            <div className={`${styles['dashboard-wrapper']} ${sidebarCollapsed ? styles['sidebar-collapsed'] : ''}`}>
+                <div className={styles['profile-content']}>
+                    <div className={styles['loading-spinner']}>Loading appointment history...</div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className={`${styles['dashboard-wrapper']} ${sidebarCollapsed ? styles['sidebar-collapsed'] : ''}`}>
@@ -410,6 +431,12 @@ const AppointmentHistory = ({ sidebarCollapsed = false }) => {
                         <h1 className={styles['profile-title']}>Appointment History</h1>
                         <p className={styles['profile-subtitle']}>View and manage your past service appointments.</p>
                     </div>
+
+                    {error && (
+                        <div className={styles['error-message']}>
+                            {error}
+                        </div>
+                    )}
 
                     {/* Quick Stats */}
                     <section className={styles['form-section']}>
@@ -569,10 +596,11 @@ const AppointmentHistory = ({ sidebarCollapsed = false }) => {
                                                     View Details
                                                 </button>
 
-                                                {appointment.status === 'completed' && (
+                                                {/* Only show Give Feedback button for completed services without existing feedback */}
+                                                {appointment.status === 'completed' && !appointment.hasFeedback && (
                                                     <button
                                                         className={`${styles['action-btn']} ${styles.feedback}`}
-                                                        onClick={() => navigate("/TechnicianProfile")}
+                                                        onClick={() => handleGiveFeedback(appointment.id)}
                                                     >
                                                         <Star size={16} />
                                                         Give Feedback

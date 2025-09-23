@@ -17,86 +17,17 @@ import {
     Scissors,
     Heart
 } from 'lucide-react';
+import { useNavigate } from "react-router-dom";
 import FilterAndSearch from "../../Components/common/FilterAndSearch.jsx";
 import styles from '../../styles/UserDashboard.module.css';
 
 const UpcomingAppointments = ({ sidebarCollapsed = false }) => {
-    // Mock data for upcoming appointments
-    const mockUpcomingAppointments = [
-        {
-            id: 1,
-            requestId: 'REQ001',
-            service: 'House Cleaning',
-            provider: 'CleanPro Services',
-            technician: 'Sarah Johnson',
-            date: 'Today',
-            time: '2:00 PM - 4:00 PM',
-            location: '123 Main St, Kathmandu',
-            status: 'pending',
-            price: '₨1,500',
-            rating: 4.8,
-            technicianEmail: 'sarah@cleanpro.com'
-        },
-        {
-            id: 2,
-            requestId: 'REQ002',
-            service: 'Plumbing Repair',
-            provider: 'FixIt Solutions',
-            technician: 'Mike Chen',
-            date: 'Tomorrow',
-            time: '10:00 AM - 12:00 PM',
-            location: '456 Oak Ave, Lalitpur',
-            status: 'pending',
-            price: '₨2,200',
-            rating: 4.9,
-            technicianEmail: 'mike@fixit.com'
-        },
-        {
-            id: 3,
-            requestId: 'REQ003',
-            service: 'Electrical Work',
-            provider: 'PowerTech',
-            technician: 'David Kumar',
-            date: 'Dec 28',
-            time: '3:00 PM - 5:00 PM',
-            location: '789 Pine Rd, Bhaktapur',
-            status: 'in_progress',
-            price: '₨1,800',
-            rating: 4.7,
-            technicianEmail: 'david@powertech.com'
-        },
-        {
-            id: 4,
-            requestId: 'REQ004',
-            service: 'Car Wash',
-            provider: 'AutoShine',
-            technician: 'Ram Sharma',
-            date: 'Dec 30',
-            time: '11:00 AM - 1:00 PM',
-            location: '321 Valley St, Kathmandu',
-            status: 'pending',
-            price: '₨800',
-            rating: 4.6,
-            technicianEmail: 'ram@autoshine.com'
-        },
-        {
-            id: 5,
-            requestId: 'REQ005',
-            service: 'Hair Cut',
-            provider: 'Style Studio',
-            technician: 'Lisa Tamang',
-            date: 'Jan 2',
-            time: '4:00 PM - 5:00 PM',
-            location: '654 Garden Lane, Patan',
-            status: 'in_progress',
-            price: '₨500',
-            rating: 4.9,
-            technicianEmail: 'lisa@stylestudio.com'
-        }
-    ];
+    const navigate = useNavigate();
 
-    const [upcomingAppointments, setUpcomingAppointments] = useState(mockUpcomingAppointments);
-    const [filteredAppointments, setFilteredAppointments] = useState(mockUpcomingAppointments);
+    const [upcomingAppointments, setUpcomingAppointments] = useState([]);
+    const [filteredAppointments, setFilteredAppointments] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     // Filter and Search states
     const [searchTerm, setSearchTerm] = useState('');
@@ -110,6 +41,108 @@ const UpcomingAppointments = ({ sidebarCollapsed = false }) => {
         appointment: null,
         type: 'details'
     });
+
+    // Fetch current service bookings from backend
+    const fetchCurrentServiceBookings = async () => {
+        try {
+            setLoading(true);
+            const userEmail = localStorage.getItem('userEmail');
+            if (!userEmail) {
+                navigate('/LoginSignup');
+                return;
+            }
+
+            const response = await fetch(`/api/users/get-current-service-booking?userEmail=${userEmail}`, {
+                method: 'GET',
+                credentials: 'include',
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                const transformedData = data.map(item => transformBackendData(item));
+                setUpcomingAppointments(transformedData);
+                setError(null);
+            } else if (response.status === 404) {
+                // No current bookings found
+                setUpcomingAppointments([]);
+                setError(null);
+            } else {
+                throw new Error('Failed to fetch upcoming appointments');
+            }
+        } catch (error) {
+            console.error('Error fetching upcoming appointments:', error);
+            setError('Failed to load upcoming appointments');
+            setUpcomingAppointments([]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Transform backend data to match frontend structure
+    const transformBackendData = (backendItem) => {
+        return {
+            id: backendItem.requestId,
+            requestId: `REQ${backendItem.requestId}`,
+            service: backendItem.serviceName,
+            provider: backendItem.technicianName, // Using technician name as provider
+            technician: backendItem.technicianName,
+            date: formatDate(backendItem.appointmentTime),
+            time: formatTime(backendItem.appointmentTime),
+            location: backendItem.userAddress || 'Address not provided',
+            status: backendItem.status.toLowerCase(),
+            price: `₨${backendItem.feeCharge}`,
+            rating: backendItem.technicianRating || 0,
+            technicianEmail: backendItem.technicianEmail
+        };
+    };
+
+    // Format date helper
+    const formatDate = (dateTimeString) => {
+        const date = new Date(dateTimeString);
+        const today = new Date();
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+
+        // Check if it's today
+        if (date.toDateString() === today.toDateString()) {
+            return 'Today';
+        }
+        // Check if it's tomorrow
+        else if (date.toDateString() === tomorrow.toDateString()) {
+            return 'Tomorrow';
+        }
+        // Otherwise return formatted date
+        else {
+            return date.toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric'
+            });
+        }
+    };
+
+    // Format time helper
+    const formatTime = (dateTimeString) => {
+        const date = new Date(dateTimeString);
+        const startTime = date.toLocaleTimeString('en-US', {
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true
+        });
+        // Add 2 hours for end time (you can adjust this based on your business logic)
+        const endDate = new Date(date.getTime() + 2 * 60 * 60 * 1000);
+        const endTime = endDate.toLocaleTimeString('en-US', {
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true
+        });
+        return `${startTime} - ${endTime}`;
+    };
+
+    // Load data on component mount
+    useEffect(() => {
+        fetchCurrentServiceBookings();
+    }, []);
 
     // Filter options for appointments
     const filterOptions = [
@@ -128,7 +161,7 @@ const UpcomingAppointments = ({ sidebarCollapsed = false }) => {
             label: 'In Progress',
             count: upcomingAppointments.filter(apt => apt.status === 'in_progress').length
         }
-        ];
+    ];
 
     // Sort options for appointments
     const sortOptions = [
@@ -158,10 +191,18 @@ const UpcomingAppointments = ({ sidebarCollapsed = false }) => {
 
             switch (sortBy) {
                 case 'date':
-                    // Simple date ordering - in real app would use proper date comparison
-                    const dateOrder = ['Today', 'Tomorrow'];
-                    aValue = dateOrder.indexOf(a.date) !== -1 ? dateOrder.indexOf(a.date) : 999;
-                    bValue = dateOrder.indexOf(b.date) !== -1 ? dateOrder.indexOf(b.date) : 999;
+                    // Convert date strings back to Date objects for proper comparison
+                    const getDateValue = (dateStr) => {
+                        if (dateStr === 'Today') return new Date();
+                        if (dateStr === 'Tomorrow') {
+                            const tomorrow = new Date();
+                            tomorrow.setDate(tomorrow.getDate() + 1);
+                            return tomorrow;
+                        }
+                        return new Date(dateStr);
+                    };
+                    aValue = getDateValue(a.date);
+                    bValue = getDateValue(b.date);
                     break;
                 case 'service':
                     aValue = a.service.toLowerCase();
@@ -223,8 +264,37 @@ const UpcomingAppointments = ({ sidebarCollapsed = false }) => {
         setSelectedFilter('all');
         setSortBy('date');
         setSortOrder('asc');
-        // In real app, this would refetch data from API
-        console.log('Refreshing appointments...');
+        fetchCurrentServiceBookings();
+    };
+
+    // Cancel appointment function
+    const cancelAppointment = async (appointmentId) => {
+        try {
+            const userEmail = localStorage.getItem('userEmail');
+            const response = await fetch('/api/users/cancel-pending-service-booking', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                credentials: 'include',
+                body: new URLSearchParams({
+                    userEmail: userEmail,
+                    requestId: appointmentId
+                })
+            });
+
+            if (response.ok) {
+                // Refresh the appointments list
+                fetchCurrentServiceBookings();
+                alert('Appointment cancelled successfully!');
+            } else {
+                const errorText = await response.text();
+                throw new Error(errorText);
+            }
+        } catch (error) {
+            console.error('Error cancelling appointment:', error);
+            alert('Failed to cancel appointment: ' + error.message);
+        }
     };
 
     // Modal component
@@ -232,7 +302,6 @@ const UpcomingAppointments = ({ sidebarCollapsed = false }) => {
         if (!isOpen || !appointment) return null;
 
         return (
-            <div className={`${styles['dashboard-wrapper']} ${sidebarCollapsed ? styles['sidebar-collapsed'] : ''}`}>
             <div className={styles['modal-overlay']} onClick={onClose}>
                 <div className={styles['modal-content']} onClick={(e) => e.stopPropagation()}>
                     <div className={styles['modal-header']}>
@@ -327,7 +396,6 @@ const UpcomingAppointments = ({ sidebarCollapsed = false }) => {
                     </div>
                 </div>
             </div>
-            </div>
         );
     };
 
@@ -354,17 +422,25 @@ const UpcomingAppointments = ({ sidebarCollapsed = false }) => {
         }
     };
 
-    const handleConfirmCancel = () => {
+    const handleConfirmCancel = async () => {
         const appointmentToCancel = modalState.appointment;
-        // Remove from upcoming appointments
-        setUpcomingAppointments(prev => prev.filter(apt => apt.id !== appointmentToCancel.id));
-        console.log('Appointment cancelled:', appointmentToCancel.id);
+        await cancelAppointment(appointmentToCancel.id);
         setModalState({ isOpen: false, appointment: null, type: 'details' });
     };
 
     const handleCloseModal = () => {
         setModalState({ isOpen: false, appointment: null, type: 'details' });
     };
+
+    if (loading) {
+        return (
+            <div className={`${styles['dashboard-wrapper']} ${sidebarCollapsed ? styles['sidebar-collapsed'] : ''}`}>
+                <div className={styles['profile-content']}>
+                    <div className={styles['loading-spinner']}>Loading upcoming appointments...</div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className={`${styles['dashboard-wrapper']} ${sidebarCollapsed ? styles['sidebar-collapsed'] : ''}`}>
@@ -374,6 +450,12 @@ const UpcomingAppointments = ({ sidebarCollapsed = false }) => {
                         <h1 className={styles['profile-title']}>Upcoming Appointments</h1>
                         <p className={styles['profile-subtitle']}>Manage your scheduled service appointments.</p>
                     </div>
+
+                    {error && (
+                        <div className={styles['error-message']}>
+                            {error}
+                        </div>
+                    )}
 
                     {/* Quick Stats */}
                     <section className={styles['form-section']}>
@@ -400,7 +482,6 @@ const UpcomingAppointments = ({ sidebarCollapsed = false }) => {
                                     <div className={styles['user-stat-label']}>Pending</div>
                                 </div>
                             </div>
-
 
                             <div className={styles['user-stat-card']}>
                                 <div className={styles['user-stat-icon']} style={{ backgroundColor: '#d1fae5' }}>
@@ -508,7 +589,7 @@ const UpcomingAppointments = ({ sidebarCollapsed = false }) => {
                                                     <Eye size={16} />
                                                     Details
                                                 </button>
-                                                {appointment.status !== 'in_progress' && (
+                                                {appointment.status === 'pending' && (
                                                     <button
                                                         className={`${styles['action-btn']} ${styles.danger}`}
                                                         onClick={() => handleCancelAppointment(appointment.id)}
