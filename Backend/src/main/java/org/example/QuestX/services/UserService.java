@@ -21,6 +21,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static java.util.Locale.filter;
+
 @Data
 @AllArgsConstructor
 @Service
@@ -111,6 +113,25 @@ public class UserService {
         return userDto;
     }
 
+    public TechnicianProfileRequestDto getTechnicianProfile(String email){
+        Technician technician  = technicianRepository.findByEmail(email);
+        if (technician == null) {
+            throw new TechnicianNotFoundException("Technician Not Found");
+        }
+        TechnicianProfileRequestDto dto = new TechnicianProfileRequestDto();
+        dto.setTechnicianName(technician.getName());
+        dto.setTechnicianEmail(technician.getEmail());
+        dto.setTechnicianPhone(technician.getPhone());
+        dto.setTechnicianAddress(technician.getAddress());
+        dto.setProfileImagePath(technician.getProfileImagePath());
+        dto.setTechnicianBio(technician.getBio());
+        dto.setTechnicianRating(BigDecimal.valueOf(technician.getRating()));
+        dto.setServiceName(String.valueOf(technician.getTechnicianSkills().stream()
+                .map((TechnicianSkill t) -> t.getSkill().getName())
+                .collect(Collectors.toList())));
+        return dto;
+    }
+
     public UserDashboardOverviewDto getUserDashboardOverview(String email) {
         // 1️⃣ Find user by email
         User user = userRepository.findByEmail(email).orElseThrow(
@@ -161,8 +182,14 @@ public class UserService {
                     dto.setTechId(tech.getId());
                     dto.setImageFile(tech.getProfileImagePath());
                     dto.setTechnicianName(tech.getName());
+                    dto.setTechnicianEmail(tech.getEmail());
                     dto.setTechnicianAddress(tech.getAddress());
                     dto.setTechnicianPhone(tech.getPhone());
+                    dto.setFeeCharge(tech.getTechnicianSkills().stream()
+                            .filter(ts -> ts.getSkill().getName().equalsIgnoreCase(skill))
+                            .map(TechnicianSkill::getFee)
+                            .findFirst()
+                            .orElse(BigDecimal.ZERO));
                     dto.setServiceName(String.valueOf(tech.getTechnicianSkills().stream()
                             .map((TechnicianSkill t) -> t.getSkill().getName())
                             .collect(Collectors.toList())));
@@ -172,18 +199,19 @@ public class UserService {
                 .toList();
     }
 
-    public void bookTechnicianForService(ServiceRequestDto request) throws MessagingException {
+    public Long bookTechnicianForService(ServiceRequestDto request) throws MessagingException {
         User user = userRepository.findByEmail(request.getUserEmail()).orElseThrow(
                 () -> new UserNotFoundException("User Not Found")
         );
         if(!user.getStatus().equals(Status.VERIFIED)){
-            throw new StatusInvalidException("You need to be  verified");
+            throw new StatusInvalidException("You need to be verified");
         }
-        Technician technician =
-                technicianRepository.findByEmailAndAvailable(request.getTechnicianEmail(),Boolean.TRUE);
+
+        Technician technician = technicianRepository.findByEmailAndAvailable(request.getTechnicianEmail(), Boolean.TRUE);
         if (technician == null) {
             throw new TechnicianNotFoundException("Technician Not Found");
         }
+
         Skill skill = skillRepository.findByName(request.getServiceName());
         if (skill == null) {
             throw new ServiceNotFoundException("Service Not Found");
@@ -196,38 +224,45 @@ public class UserService {
 
         LocalDateTime appointmentTime = request.getAppointmentTime();
 
+        // Validate appointment time is in the future
         if (appointmentTime.isBefore(LocalDateTime.now())) {
-            throw new InvalidDateTimeException("Appointment Time is Invalid");
+            throw new InvalidDateTimeException("Appointment Time must be in the future");
         }
 
+        // Validate working hours (9 AM to 5 PM)
         int hour = appointmentTime.getHour();
         if (hour < 9 || hour >= 17) {
             throw new InvalidDateTimeException("Appointment must be between 9 AM and 5 PM");
         }
 
+        // Lunch break validation (1 PM to 2 PM)
         if (hour == 13) {
             throw new InvalidDateTimeException("Technician is unavailable between 1 PM and 2 PM");
         }
 
+        // Ensure appointments start at the beginning of the hour
         if (appointmentTime.getMinute() != 0 || appointmentTime.getSecond() != 0) {
             throw new InvalidDateTimeException("Appointments must start at the beginning of the hour");
         }
+
+        // Check for technician conflicts (assuming 1-hour appointments)
         LocalDateTime appointmentEnd = appointmentTime.plusHours(1);
-        boolean technicianConflict = serviceRequestRepository.existsByTechnicianAndAppointmentTimeBetween(
-                technician, appointmentTime, appointmentEnd.minusSeconds(1)
+        boolean technicianConflict = serviceRequestRepository.existsByTechnicianAndAppointmentTimeBetweenAndStatusNot(
+                technician, appointmentTime, appointmentEnd.minusSeconds(1), ServiceStatus.CANCELLED
         );
         if (technicianConflict) {
             throw new InvalidDateTimeException("Technician is already booked for this time slot");
         }
 
-        boolean userConflict = serviceRequestRepository.existsByUserAndAppointmentTimeBetween(
-                user, appointmentTime,appointmentEnd.minusSeconds(1)
+        // Check for user conflicts
+        boolean userConflict = serviceRequestRepository.existsByUserAndAppointmentTimeBetweenAndStatusNot(
+                user, appointmentTime, appointmentEnd.minusSeconds(1), ServiceStatus.CANCELLED
         );
         if (userConflict) {
-            throw new InvalidDateTimeException("You already have booking for this time slot");
+            throw new InvalidDateTimeException("You already have a booking for this time slot");
         }
 
-        serviceRequest.setAppointmentTime(request.getAppointmentTime());
+        serviceRequest.setAppointmentTime(appointmentTime);
         serviceRequest.setDescription(request.getDescription());
         serviceRequest.setFeeCharged(request.getFeeCharge());
         serviceRequest.setStatus(ServiceStatus.PENDING);
@@ -235,8 +270,8 @@ public class UserService {
 
         serviceRequestRepository.save(serviceRequest);
 
-        mailService.sendMailToTechnicianAboutRequest(user.getName(),technician.getEmail());
-
+        mailService.sendMailToTechnicianAboutRequest(user.getName(), technician.getEmail());
+        return serviceRequest.getId();
     }
 
     public List<ServiceAndTechnicianDetailsDto> getCurrentServiceBooking(String email ){

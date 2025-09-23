@@ -178,6 +178,7 @@ const UserLayout = () => {
                 activeTab={activeTab}
                 onTabChange={handleTabChange}
                 onLogout={handleLogout}
+                userInfo={userInfo}  // Add this line - you were missing this prop!
                 isCollapsed={sidebarCollapsed}
                 onToggleCollapse={setSidebarCollapsed}
             />
