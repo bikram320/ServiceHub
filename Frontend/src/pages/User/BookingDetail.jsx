@@ -451,7 +451,6 @@ const BookingDetail = ({ sidebarCollapsed = false }) => {
 
     if (showSuccess) {
         return (
-<<<<<<< Updated upstream
             <div className="page-container">
 
                     <div className="success-message">
@@ -465,7 +464,6 @@ const BookingDetail = ({ sidebarCollapsed = false }) => {
                             <button className="btn-secondary" onClick={() => navigate('/dashboard')}>
                                 View My Bookings
                             </button>
-=======
             <div className={`booking-wrapper ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
                 <div className="page-container">
                     <div className="container">
@@ -481,16 +479,17 @@ const BookingDetail = ({ sidebarCollapsed = false }) => {
                                     View My Bookings
                                 </button>
                             </div>
->>>>>>> Stashed changes
+
                         </div>
                     </div>
-                
             </div>
-        );
+                </div>
+            </div>
+
+
     }
 
     return (
-<<<<<<< Updated upstream
         <div>
             <BackHeader />
         <div className="page-container">
@@ -566,9 +565,9 @@ const BookingDetail = ({ sidebarCollapsed = false }) => {
                         </div>
                     </div>
                 </div>
+            </div>
         </div>
         </div>
-    );
 };
 
 export default BookingDetail;

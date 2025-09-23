@@ -311,6 +311,22 @@
     color: white;
     transform: translateY(-1px);
 }
+.bookBtn{
+    flex: 1;
+    background: transparent;
+    color: #76af8c;
+    border: 2px solid #76af8c;
+    border-radius: 20px;
+    padding: 0.75rem 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.bookBtn:hover {
+    background-color: rgba(96, 210, 120, 0.78);
+    color: white;
+    transform: translateY(-1px);
+}
 
 /* No Results */
 .noResults {
