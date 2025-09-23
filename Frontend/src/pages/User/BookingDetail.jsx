@@ -338,6 +338,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ArrowLeft, Calendar, Clock, MapPin, User, Phone, Mail, CreditCard, Shield, Star, CheckCircle } from 'lucide-react';
 import "../../styles/BookingDetail.css";
+import BackHeader from "../../Components/layout/BackHeader.jsx";
 import DateTimeSelector from "../../Components/layout/DateTimeSelector.jsx";
 import { useNavigate, useLocation } from "react-router-dom";
 
@@ -808,14 +809,12 @@ const BookingDetail = () => {
     }
 
     return (
+        <div>
+            <BackHeader />
         <div className="page-container">
 
                 <div className="booking-container">
-                    {/* Back Button */}
-                    <button className="back-button" onClick={() => navigate("/TechnicianProfile")}>
-                        <ArrowLeft size={20} />
-                        Back to Results
-                    </button>
+
 
                     <div className="booking-content">
                         {/* Left Column */}
@@ -873,7 +872,7 @@ const BookingDetail = () => {
                         </div>
                     </div>
                 </div>
-
+        </div>
         </div>
     );
 };

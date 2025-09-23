@@ -20,7 +20,7 @@
     position: relative;
     padding: 2rem;
     border-bottom: 1px solid #e2e8f0;
-    background: linear-gradient(135deg, #85d6ab 0%, #85d6ab 100%);
+    background: #76af8c !important;
     color: white;
 }
 

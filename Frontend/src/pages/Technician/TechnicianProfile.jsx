@@ -104,6 +104,7 @@
 import React, { useState, useEffect } from 'react';
 import { Computer, Network, Settings, ChevronRight, ArrowLeft, Star, Shield, Phone, MapPin, Mail } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import BackHeader from "../../Components/layout/BackHeader.jsx";
 import RatingReviews from './RatingReviews';
 import '../../styles/TechnicianProfile.css';
 
@@ -255,17 +256,15 @@ const TechnicianProfile = ({ user }) => {
     // Loading state
     if (loading) {
         return (
+            <div>
+                <BackHeader />
             <div className="profile-container">
-                <nav className="breadcrumb">
-                    <button className="back-button" onClick={() => navigate(-1)}>
-                        <ArrowLeft size={20} />
-                        Back to Results
-                    </button>
-                </nav>
+
                 <div className="loading-container">
                     <div className="loading-spinner"></div>
                     <p>Loading technician profile...</p>
                 </div>
+            </div>
             </div>
         );
     }
@@ -273,13 +272,11 @@ const TechnicianProfile = ({ user }) => {
     // Error state
     if (error && !technician) {
         return (
+            <div>
+                <BackHeader />
+
             <div className="profile-container">
-                <nav className="breadcrumb">
-                    <button className="back-button" onClick={() => navigate(-1)}>
-                        <ArrowLeft size={20} />
-                        Back to Results
-                    </button>
-                </nav>
+
                 <div className="error-container">
                     <h3>⚠️ {error}</h3>
                     <p>Unable to load technician profile. Please try again later.</p>
@@ -292,6 +289,7 @@ const TechnicianProfile = ({ user }) => {
                         </button>
                     )}
                 </div>
+            </div>
             </div>
         );
     }

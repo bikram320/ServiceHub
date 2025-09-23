@@ -397,7 +397,7 @@ function HelpSupport() {
                             </p>
                             <div className={styles['emergency-contact']}>
                                 <Phone size={20} />
-                                <span>01-5970000</span>
+                                <span>9862447951</span>
                             </div>
                         </div>
                     </div>

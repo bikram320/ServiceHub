@@ -84,7 +84,7 @@
 .profile-header {
     padding: 2rem;
     border-bottom: 1px solid #e2e8f0;
-    background: linear-gradient(135deg, #85d6ab 0%, #85d6ab 100%);
+    background: #76af8c;
     color: white;
 }
 
@@ -341,7 +341,7 @@
 }
 
 .appointment-card:hover {
-    border-color: #e5e7eb;
+    border-color: #76af8c;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
