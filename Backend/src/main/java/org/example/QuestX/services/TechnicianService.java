@@ -3,10 +3,7 @@ package org.example.QuestX.services;
 import jakarta.mail.MessagingException;
 import lombok.AllArgsConstructor;
 import org.example.QuestX.Model.*;
-import org.example.QuestX.Repository.FeedbackRepository;
-import org.example.QuestX.Repository.PaymentRepository;
-import org.example.QuestX.Repository.ServiceRequestRepository;
-import org.example.QuestX.Repository.TechnicianRepository;
+import org.example.QuestX.Repository.*;
 import org.example.QuestX.dtos.*;
 import org.example.QuestX.exception.ServiceNotFoundException;
 import org.example.QuestX.exception.StatusInvalidException;
@@ -30,16 +27,30 @@ public class TechnicianService {
     private final LocationService locationService;
     private final ServiceRequestRepository serviceRequestRepository;
     private final MailService mailService;
-    private final PaymentRepository paymentRepository;
+    private final SkillRepository skillRepository;
     private final FeedbackRepository feedbackRepository;
+    private final TechnicianSkillRepository technicianSkillRepository;
 
     public void technicianProfileSetup(String email , String phone, String address, Double latitude,
                                        Double longitude, String bio, MultipartFile profileImage,
+                                       String serviceType , Double feeCharged,
                                        MultipartFile identityDoc, MultipartFile validDoc) throws IOException {
         Technician technician = technicianRepository.findByEmail(email);
         if(technician == null){
             throw new TechnicianNotFoundException("Technician not found");
         }
+
+        Skill skill = skillRepository.findByName(serviceType);
+        if(skill == null){
+            Skill skill1 = new Skill();
+            skill1.setName(serviceType);
+            skill = skillRepository.save(skill1);
+        }
+            TechnicianSkill technicianSkill = new TechnicianSkill();
+            technicianSkill.setTechnician(technician);
+            technicianSkill.setSkill(skill);
+            technicianSkill.setFeeCharged(BigDecimal.valueOf(feeCharged));
+
 
         if(phone!=null){
             technician.setPhone(phone);
@@ -97,6 +108,7 @@ public class TechnicianService {
         }
         technician.setStatus(Status.PENDING);
         technicianRepository.save(technician);
+        technicianSkillRepository.save(technicianSkill);
     }
 
    public void acceptingUserServiceRequest(long requestId) throws MessagingException {
@@ -146,9 +158,18 @@ public class TechnicianService {
         technicianDto.setEmail(tech.getEmail());
         technicianDto.setPhone(tech.getPhone());
         technicianDto.setAddress(tech.getAddress());
+        technicianDto.setStatus(tech.getStatus());
         technicianDto.setProfileImagePath(tech.getProfileImagePath());
         technicianDto.setDocumentPath(tech.getValidDocumentPath());
         technicianDto.setIdentityPath(tech.getIdentityPath());
+        technicianDto.setBio(tech.getBio());
+        technicianDto.setServiceType(tech.getTechnicianSkills().stream()
+                .map(ts -> ts.getSkill().getName())
+                .collect(Collectors.joining(", ")));
+        technicianDto.setFeeCharged(tech.getTechnicianSkills().stream()
+                .map(ts -> ts.getFeeCharged().doubleValue())
+                .findFirst()
+                .orElse(0.0));
 
         return technicianDto;
     }

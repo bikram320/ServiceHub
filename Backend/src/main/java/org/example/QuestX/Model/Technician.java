@@ -97,7 +97,7 @@ public class Technician implements JwtUser{
     @OneToMany(mappedBy = "technician")
     private Set<ServiceRequest> serviceRequests = new LinkedHashSet<>();
 
-    @OneToMany(mappedBy = "tech")
+    @OneToMany(mappedBy = "technician")
     private Set<TechnicianSkill> technicianSkills = new LinkedHashSet<>();
 
 }

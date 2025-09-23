@@ -2,7 +2,6 @@ package org.example.QuestX.Controller;
 
 import jakarta.mail.MessagingException;
 import lombok.AllArgsConstructor;
-import org.example.QuestX.Model.Technician;
 import org.example.QuestX.dtos.PaymentDetailsDto;
 import org.example.QuestX.dtos.ServiceAndUserDetailsDto;
 import org.example.QuestX.services.TechnicianService;
@@ -28,11 +27,13 @@ public class TechnicianController {
             @RequestParam(required = false) Double latitude,
             @RequestParam(required = false) Double longitude,
             @RequestParam(required = false) String bio,
+            @RequestParam(required = false) String serviceType,
+            @RequestParam(required = false) Double feeCharged,
             @RequestParam(required = false) MultipartFile profile_image,
             @RequestParam(required = false) MultipartFile identity_doc,
             @RequestParam(required = false) MultipartFile valid_doc
             ) throws IOException {
-        technicianService.technicianProfileSetup(email,phone,address,latitude,longitude,bio,profile_image,identity_doc,valid_doc);
+        technicianService.technicianProfileSetup(email,phone,address,latitude,longitude,bio ,profile_image, serviceType , feeCharged,identity_doc,valid_doc);
         return ResponseEntity.ok("Technician Profile Updated");
     }
     @GetMapping("/get-current-request")

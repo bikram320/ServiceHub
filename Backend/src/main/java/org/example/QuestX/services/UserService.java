@@ -187,7 +187,7 @@ public class UserService {
                     dto.setTechnicianPhone(tech.getPhone());
                     dto.setFeeCharge(tech.getTechnicianSkills().stream()
                             .filter(ts -> ts.getSkill().getName().equalsIgnoreCase(skill))
-                            .map(TechnicianSkill::getFee)
+                            .map(TechnicianSkill::getFeeCharged)
                             .findFirst()
                             .orElse(BigDecimal.ZERO));
                     dto.setServiceName(String.valueOf(tech.getTechnicianSkills().stream()

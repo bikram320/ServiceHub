@@ -20,7 +20,7 @@ public class TechnicianSkill {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "tech_id", nullable = false)
-    private Technician tech;
+    private Technician technician;
 
     @MapsId("skillId")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -29,6 +29,6 @@ public class TechnicianSkill {
     private Skill skill;
 
     @Column(name = "fee", nullable = false, precision = 10, scale = 2)
-    private BigDecimal fee;
+    private BigDecimal feeCharged;
 
 }
