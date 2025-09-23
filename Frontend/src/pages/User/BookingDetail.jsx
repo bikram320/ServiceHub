@@ -150,7 +150,7 @@ const BookingSummary = ({ provider, selectedDate, selectedStartTime, selectedEnd
             day: 'numeric'
         });
     };
-
+    
     const serviceFee = parseFloat(provider.feeCharge) || 500;
     const platformFee = 50;
     const total = serviceFee + platformFee;
