@@ -6,10 +6,14 @@ import UserProfileForm from '../Auth/UserProfileForm';
 import FindServices from './FindServices';
 import BookingDetail from './BookingDetail';
 import { useNavigate } from "react-router-dom";
+import AppointmentHistory from './AppointmentHistory';
+import UpcomingAppointments from './UpcomingAppointments';
 
 const UserLayout = () => {
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('dashboard');
+    const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
     const [userInfo, setUserInfo] = useState({
         fullName: '',
         email: '',
@@ -45,7 +49,7 @@ const UserLayout = () => {
             if (!email) {
                 console.error('No email found in localStorage');
                 // Redirect to login if no email found
-                navigate('/login');
+                navigate('/UserLayout');
                 return;
             }
 
@@ -139,20 +143,23 @@ const UserLayout = () => {
     const renderActiveComponent = () => {
         switch (activeTab) {
             case 'dashboard':
-                return <UserDashboard userInfo={userInfo} />;
+                return <UserDashboard userInfo={userInfo} sidebarCollapsed={sidebarCollapsed} />;
             case 'profile':
                 return (
                     <UserProfileForm
                         userInfo={userInfo}
+                        sidebarCollapsed={sidebarCollapsed}
                         onUpdateProfile={handleUpdateProfile}
                     />
                 );
             case 'find-services':
                 return <FindServices />;
-            case 'booking-details':
-                return <BookingDetail />;
+           case 'upcoming-appointments':
+               return <UpcomingAppointments />;
+           case 'appointment-history':
+                return <AppointmentHistory />;
             default:
-                return <UserDashboard userInfo={userInfo} />;
+                return <UserDashboard userInfo={userInfo} sidebarCollapsed={sidebarCollapsed} />;
         }
     };
 
@@ -171,8 +178,10 @@ const UserLayout = () => {
                 activeTab={activeTab}
                 onTabChange={handleTabChange}
                 onLogout={handleLogout}
-                userInfo={userInfo}
+                isCollapsed={sidebarCollapsed}
+                onToggleCollapse={setSidebarCollapsed}
             />
+
             <div className="user-content">
                 {renderActiveComponent()}
             </div>

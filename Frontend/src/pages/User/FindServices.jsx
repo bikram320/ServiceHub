@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import '../../styles/FindServices.css';
 import HeroSection from "../../Components/questX/HeroSection.jsx";
 
-const FindServices = () => {
+const FindServices = ({ sidebarCollapsed = false }) => {
     const services = [
         "Plumbing",
         "Electrician",
@@ -10,7 +10,7 @@ const FindServices = () => {
         "Movers",
         "Photographer",
         "Carpenter",
-         "Mechanic",
+        "Mechanic",
         "HVAC Repair",
         "Cleaning Services",
         "Pest Control",
@@ -19,9 +19,13 @@ const FindServices = () => {
     ];
 
     return (
-        <div className="page-container">
-            <div className="container">
-                <HeroSection services={services} />
+        <div className={`findservices-wrapper ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
+            <div className="page-container">
+
+                    <div className="findservices-container">
+                        <HeroSection services={services} />
+
+                </div>
             </div>
         </div>
     );

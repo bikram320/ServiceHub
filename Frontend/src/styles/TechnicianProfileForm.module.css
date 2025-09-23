@@ -1,21 +1,37 @@
 /* TechnicianProfileForm.module.css */
-
-.profile-content {
+.profile-wrapper {
+    margin-left: 280px; /* Width of expanded sidebar */
     min-height: 100vh;
+    transition: margin-left 0.3s ease;
     background-color: #f8f9fa;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    padding: 2rem 1rem;
 }
+
+/* When sidebar is collapsed */
+.profile-wrapper.sidebar-collapsed {
+    margin-left: 80px; /* Width of collapsed sidebar */
+}
+
+/* Update existing profile-content to work with sidebar layout */
+.profile-content {
+    flex: 1;
+    display: grid;
+    place-items: center;
+    padding: 2rem;
+    min-height: 100vh;
+    box-sizing: border-box;
+}
+
+
 
 .profile-form {
     width: 100%;
-    max-width: 50rem;
+    max-width: 50rem; /* Keep your existing max-width */
+    height: auto;
+    margin: 0 auto; /* Center the form */
     padding: 2rem 3rem;
     background: white;
     border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .profile-header {
@@ -67,9 +83,11 @@
     gap: 1.5rem;
     margin-bottom: 3rem;
     padding: 2rem;
-    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    background: white;
     border-radius: 12px;
-    border: 2px solid #e0f2fe;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .profile-picture-container {
@@ -159,11 +177,13 @@
 }
 
 .form-section {
-    background: #fafafa;
+    background: white;
     border-radius: 12px;
     padding: 2rem;
     margin-bottom: 2rem;
-    border: 1px solid #e5e7eb;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .section-title {
@@ -497,6 +517,7 @@ textarea.form-input {
     display: flex;
     justify-content: flex-end;
     padding: 2rem 0;
+    width: 100%;
 }
 
 .form-select {
@@ -535,13 +556,32 @@ textarea.form-input {
     box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
 }
 
+@media (max-width: 1024px) {
+    .profile-wrapper {
+        margin-left: 0; /* Remove margin on tablet/mobile */
+    }
+
+    .profile-wrapper.sidebar-collapsed {
+        margin-left: 0;
+    }
+
+    .profile-content {
+        padding: 1rem;
+    }
+
+    .profile-form {
+        padding: 1.5rem 2rem;
+        max-width: none; /* Remove max-width constraint on smaller screens */
+    }
+}
+
 @media (max-width: 768px) {
     .profile-content {
         padding: 1rem;
     }
 
     .profile-form {
-        padding: 1.5rem;
+        padding: 1rem;
     }
 
     .profile-picture-section {
@@ -574,6 +614,21 @@ textarea.form-input {
 }
 
 @media (max-width: 480px) {
+    .profile-form {
+        padding: 1rem 0.5rem;
+    }
+
+    .form-section {
+        padding: 1.5rem;
+    }
+
+    .profile-picture-section {
+        padding: 1.5rem;
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+    }
+
     .profile-picture {
         width: 100px;
         height: 100px;
