@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Map;
 
 @AllArgsConstructor
 @RestController
@@ -56,9 +57,10 @@ public class UserController {
 
     @PostMapping("/book-technician-for-service")
     public ResponseEntity<?> bookTechnicianForService(@RequestBody ServiceRequestDto request)
-    throws MessagingException {
-        userService.bookTechnicianForService(request);
-        return ResponseEntity.ok("Technician Booked Successfully");
+            throws MessagingException {
+        Long serviceRequestId = userService.bookTechnicianForService(request);
+        return ResponseEntity.ok(Map.of("message", "Technician Booked Successfully",
+                "serviceRequestId", serviceRequestId));
     }
     @GetMapping("/get-current-service-booking")
     public ResponseEntity<?> getCurrentServiceBooking(@RequestParam String userEmail) {

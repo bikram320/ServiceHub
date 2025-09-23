@@ -10,6 +10,7 @@ public class GetTechnicianDataRequest {
     long techId;
     String imageFile;
     String technicianName;
+    String technicianEmail;
     String technicianAddress;
     String technicianPhone;
     String serviceName;

@@ -484,6 +484,11 @@ const TechnicianListing = () => {
     };
 
     const handleBookNow = (technician) => {
+
+        // Debug: Log the technician data before navigation
+        console.log('Original technician data in handleBookNow:', technician);
+        console.log('Technician email specifically:', technician.technicianEmail);
+
         // Navigate to booking page with complete technician data
         navigate('/BookingDetail', {
             state: {

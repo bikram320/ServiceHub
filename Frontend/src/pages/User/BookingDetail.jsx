@@ -335,7 +335,6 @@
 // };
 //
 // export default BookingDetail;
-
 import React, { useState, useRef, useEffect } from 'react';
 import { ArrowLeft, Calendar, Clock, MapPin, User, Phone, Mail, CreditCard, Shield, Star, CheckCircle } from 'lucide-react';
 import "../../styles/BookingDetail.css";
@@ -557,17 +556,30 @@ const BookingSummary = ({ provider, selectedDate, selectedStartTime, selectedEnd
 const BookingDetail = () => {
     const navigate = useNavigate();
     const location = useLocation();
-
-    // Get technician data from navigation state
     const technicianData = location.state?.technician;
 
+    // Debug: Log the technician data to see what fields are available
+    console.log('Technician data received:', technicianData);
+
     // Default provider data or from navigation
-    const provider = technicianData || {
+    const provider = technicianData ? {
+        techId: technicianData.techId || technicianData.id,
+        technicianName: technicianData.technicianName || technicianData.name,
+        serviceName: technicianData.serviceName || technicianData.service,
+        technicianBio: technicianData.technicianBio || technicianData.bio,
+        feeCharge: technicianData.feeCharge || technicianData.fee || "500",
+        imageFile: technicianData.imageFile || technicianData.image,
+        technicianPhone: technicianData.technicianPhone || technicianData.phone,
+        technicianAddress: technicianData.technicianAddress || technicianData.address,
+        // Try different possible email field names
+        technicianEmail: technicianData.technicianEmail ||
+            technicianData.email
+    } : {
         techId: 1,
         technicianName: "Service Provider",
         serviceName: "General Service",
         technicianBio: "Professional technician ready to help with your service needs.",
-        feeCharge: "",
+        feeCharge: "500",
         imageFile: null,
         technicianPhone: "",
         technicianAddress: "",
@@ -665,23 +677,21 @@ const BookingDetail = () => {
         setIsSubmitting(true);
 
         try {
+            // Step 1: Create the service request booking
+            const appointmentDateTime = `${selectedDate}T${convertTo24Hour(selectedStartTime)}:00`;
+
             const bookingData = {
-                technicianId: provider.techId,
+                userEmail: formData.email,
                 technicianEmail: provider.technicianEmail,
-                customerName: formData.fullName,
-                customerEmail: formData.email,
-                customerPhone: formData.phone,
-                serviceAddress: formData.address,
-                serviceDescription: formData.description,
-                bookingDate: selectedDate,
-                bookingStartTime: selectedStartTime,
-                bookingEndTime: selectedEndTime,
-                serviceName: provider.serviceName,
-                serviceFee: parseFloat(provider.feeCharge)
+                serviceName: provider.serviceName?.replace(/[\[\]]/g, ''),
+                appointmentTime: appointmentDateTime,
+                description: formData.description || 'Service booking',
+                feeCharge: parseFloat(provider.feeCharge) || 500
             };
 
-            // Replace this with your actual booking API endpoint
-            const response = await fetch('/api/bookings/create', {
+            console.log('Booking data:', bookingData);
+
+            const bookingResponse = await fetch('/api/users/book-technician-for-service', {
                 method: 'POST',
                 credentials: 'include',
                 headers: {
@@ -690,18 +700,89 @@ const BookingDetail = () => {
                 body: JSON.stringify(bookingData)
             });
 
-            if (response.ok) {
-                setShowSuccess(true);
-                console.log('Booking submitted successfully');
-            } else {
-                throw new Error('Failed to create booking');
+            if (!bookingResponse.ok) {
+                const errorText = await bookingResponse.text();
+                throw new Error(`Booking failed: ${errorText}`);
             }
+
+            // Step 2: Get the created service request ID (you might need to modify backend to return this)
+            // For now, we'll assume you modify the booking endpoint to return the service request ID
+            const bookingResult = await bookingResponse.json();
+            const serviceRequestId = bookingResult.serviceRequestId; // You'll need to add this to your backend response
+
+            // Step 3: Initiate payment
+            const userEmail = formData.email;
+            const paymentResponse = await fetch(`/api/payments/initiate?requestId=${serviceRequestId}&userEmail=${userEmail}`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            if (!paymentResponse.ok) {
+                throw new Error('Payment initiation failed');
+            }
+
+            const paymentData = await paymentResponse.json();
+
+            // Step 4: Redirect to eSewa
+            redirectToEsewa(paymentData);
+
         } catch (error) {
-            console.error('Booking error:', error);
-            alert('Failed to create booking. Please try again.');
+            console.error('Booking/Payment error:', error);
+            alert(`Failed to process booking: ${error.message}`);
         } finally {
             setIsSubmitting(false);
         }
+    };
+
+    // Helper function to convert 12-hour to 24-hour format
+    const convertTo24Hour = (time12h) => {
+        const [time, period] = time12h.split(' ');
+        let [hours, minutes] = time.split(':');
+
+        if (period === 'AM' && hours === '12') {
+            hours = '00';
+        } else if (period === 'PM' && hours !== '12') {
+            hours = String(parseInt(hours, 10) + 12);
+        }
+
+        return `${hours.padStart(2, '0')}:${minutes}`;
+    };
+
+    // Helper function to redirect to eSewa
+    const redirectToEsewa = (paymentData) => {
+        // Create a form and submit to eSewa
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = 'https://rc-epay.esewa.com.np/api/epay/main/v2/form'; // eSewa sandbox URL
+
+        // Add form fields
+        const fields = {
+            'amount': paymentData.amount,
+            'total_amount': paymentData.total_amount,
+            'tax_amount': paymentData.tax_amount || '0',
+            'product_service_charge': paymentData.product_service_charge || '0',
+            'product_delivery_charge': paymentData.product_delivery_charge || '0',
+            'transaction_uuid': paymentData.transaction_uuid,
+            'product_code': paymentData.product_code,
+            'success_url': paymentData.success_url,
+            'failure_url': paymentData.failure_url,
+            'signed_field_names': paymentData.signed_field_names,
+            'signature': paymentData.signature
+        };
+
+        for (const [key, value] of Object.entries(fields)) {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = key;
+            input.value = value;
+            form.appendChild(input);
+        }
+
+        document.body.appendChild(form);
+        form.submit();
     };
 
     if (showSuccess) {
