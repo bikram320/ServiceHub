@@ -1,12 +1,26 @@
 /* Dashboard Specific Styles - CSS Module Version */
 
+/* Dashboard Wrapper - matches UserDashboard pattern */
+.dashboard-wrapper {
+    margin-left: 280px; /* Width of expanded sidebar */
+    min-height: 100vh;
+    transition: margin-left 0.3s ease;
+    background-color: #f8fafc;
+}
+
+/* When sidebar is collapsed */
+.dashboard-wrapper.sidebar-collapsed {
+    margin-left: 80px; /* Width of collapsed sidebar */
+}
+
 /* Profile Layout */
 .profile-content {
-    max-width: 1200px;
-    margin: 0 auto;
+    max-width: none; /* Remove max-width constraint */
+    margin: 0; /* Remove auto margins */
     padding: 2rem;
     background-color: #f8fafc;
     min-height: 100vh;
+    width: 100%; /* Take full available width */
 }
 
 .profile-form {
@@ -14,6 +28,8 @@
     border-radius: 12px;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     overflow: hidden;
+    width: 100%;
+    max-width: none; /* Remove any max-width constraints */
 }
 
 .profile-header {
@@ -49,7 +65,6 @@
     transform: translateY(0); /* Pushes the button down on click */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
-
 
 .profile-title {
     font-size: 2rem;
@@ -276,6 +291,11 @@
     font-size: 0.875rem;
 }
 
+.appointment-contact {
+    color: #6b7280;
+    font-size: 0.875rem;
+}
+
 .appointment-actions {
     display: flex;
     gap: 0.5rem;
@@ -310,6 +330,14 @@
 .action-btn.secondary:hover {
     background-color: #e5e7eb;
     color: #374151;
+}
+
+.status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: white;
 }
 
 /* Activity List */
@@ -535,8 +563,66 @@
     font-size: 0.875rem;
 }
 
+/* Loading and Error States */
+.loading-container,
+.error-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 2rem;
+    text-align: center;
+    color: #6b7280;
+}
+
+.loading-container p,
+.error-container p {
+    margin-top: 1rem;
+    font-size: 1.125rem;
+}
+
+.retry-btn {
+    margin-top: 1rem;
+    padding: 0.75rem 1.5rem;
+    background: #0ea5e9;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.retry-btn:hover {
+    background: #0284c7;
+}
+
+/* Empty States */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 2rem;
+    text-align: center;
+    color: #9ca3af;
+}
+
+.empty-state p {
+    margin-top: 1rem;
+    font-size: 1rem;
+}
+
 /* Responsive Adjustments */
 @media (max-width: 1024px) {
+    .dashboard-wrapper {
+        margin-left: 0; /* Remove margin on mobile/tablet */
+    }
+
+    .dashboard-wrapper.sidebar-collapsed {
+        margin-left: 0;
+    }
+
     .stats-grid {
         grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     }
@@ -558,6 +644,14 @@
 }
 
 @media (max-width: 768px) {
+    .dashboard-wrapper {
+        margin-left: 0;
+    }
+
+    .dashboard-wrapper.sidebar-collapsed {
+        margin-left: 0;
+    }
+
     .profile-content {
         padding: 1rem;
     }
@@ -627,5 +721,341 @@
     .activity-time {
         margin-left: 0;
         flex-basis: 100%;
+    }
+}
+
+/* Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(2px);
+}
+
+.modal-content {
+    background: white;
+    border-radius: 12px;
+    max-width: 600px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-50px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+    background: #f9fafb;
+    border-radius: 12px 12px 0 0;
+}
+
+.modal-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #6b7280;
+    padding: 0.25rem;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    transition: all 0.2s ease;
+}
+
+.modal-close:hover {
+    background: #f3f4f6;
+    color: #374151;
+    transform: scale(1.1);
+}
+
+.modal-close:active {
+    transform: scale(0.95);
+}
+
+.modal-body {
+    padding: 1.5rem;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    padding: 1.5rem;
+    border-top: 1px solid #e5e7eb;
+    background: #f9fafb;
+    border-radius: 0 0 12px 12px;
+}
+
+.appointment-details-modal {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #f3f4f6;
+    min-height: 40px;
+}
+
+.detail-row:last-child {
+    border-bottom: none;
+}
+
+.detail-label {
+    font-weight: 500;
+    color: #374151;
+    min-width: 120px;
+    flex-shrink: 0;
+}
+
+.detail-value {
+    color: #1f2937;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 1;
+    justify-content: flex-end;
+    text-align: right;
+}
+
+.appointment-summary {
+    background: #f0f9ff;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-top: 1rem;
+    border-left: 4px solid #0ea5e9;
+}
+
+.appointment-summary h4 {
+    margin: 0 0 0.5rem 0;
+    color: #1f2937;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.appointment-summary p {
+    margin: 0.25rem 0;
+    color: #6b7280;
+    font-size: 0.875rem;
+}
+
+.appointment-summary p strong {
+    color: #374151;
+}
+
+/* Modal Status Badge */
+.modal-overlay .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.375rem 0.75rem;
+    border-radius: 20px;
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: capitalize;
+}
+
+/* Modal Action Buttons */
+.modal-footer .action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 120px;
+    justify-content: center;
+}
+
+.modal-footer .action-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.modal-footer .action-btn:active {
+    transform: translateY(0);
+}
+
+.modal-footer .action-btn.primary {
+    background-color: #0ea5e9;
+    color: white;
+}
+
+.modal-footer .action-btn.primary:hover {
+    background-color: #0284c7;
+}
+
+.modal-footer .action-btn.secondary {
+    background-color: #f3f4f6;
+    color: #6b7280;
+    border: 1px solid #e5e7eb;
+}
+
+.modal-footer .action-btn.secondary:hover {
+    background-color: #e5e7eb;
+    color: #374151;
+}
+
+.modal-footer .action-btn.danger {
+    background-color: #ef4444;
+    color: white;
+}
+
+.modal-footer .action-btn.danger:hover {
+    background-color: #dc2626;
+}
+
+/* Confirmation Message Styling */
+.modal-body p {
+    font-size: 1rem;
+    color: #374151;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
+/* Loading State for Modal */
+.modal-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    color: #6b7280;
+}
+
+/* Success/Error Messages in Modal */
+.modal-message {
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+    font-size: 0.875rem;
+}
+
+.modal-message.success {
+    background-color: #d1fae5;
+    color: #065f46;
+    border: 1px solid #a7f3d0;
+}
+
+.modal-message.error {
+    background-color: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+}
+
+/* Responsive Modal Design */
+@media (max-width: 768px) {
+    .modal-content {
+        width: 95%;
+        margin: 1rem;
+        max-height: 90vh;
+    }
+
+    .modal-header {
+        padding: 1rem;
+    }
+
+    .modal-body {
+        padding: 1rem;
+    }
+
+    .modal-footer {
+        padding: 1rem;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .modal-footer .action-btn {
+        width: 100%;
+        min-width: auto;
+    }
+
+    .detail-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+        padding: 1rem 0;
+    }
+
+    .detail-label {
+        min-width: auto;
+        font-size: 0.875rem;
+        color: #6b7280;
+    }
+
+    .detail-value {
+        justify-content: flex-start;
+        text-align: left;
+    }
+
+    .appointment-summary {
+        padding: 0.75rem;
+    }
+
+    .modal-title {
+        font-size: 1.125rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .modal-content {
+        width: 100%;
+        height: 100vh;
+        max-height: 100vh;
+        border-radius: 0;
+        margin: 0;
+    }
+
+    .modal-header {
+        border-radius: 0;
+    }
+
+    .modal-footer {
+        border-radius: 0;
     }
 }

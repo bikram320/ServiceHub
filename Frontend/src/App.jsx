@@ -23,6 +23,7 @@ import BookingDetail from "./pages/User/BookingDetail.jsx";
 import FindServices from "./pages/User/FindServices.jsx";
 import PaymentSuccess from "./Components/questX/PaymentSuccess.jsx";
 import PaymentFailure from "./Components/questX/PaymentFailure.jsx";
+import ServiceRequests from "./pages/Technician/ServiceRequests.jsx";
 
 function ScrollToTop() {
     const { pathname } = useLocation();
@@ -57,6 +58,7 @@ function App() {
                <Route path="/FindServices/*" element={<FindServices />} />
                <Route path="/PaymentSuccess/*" element={<PaymentSuccess/>}/>
                <Route path="/PaymentFailure/*" element={<PaymentFailure/>}/>
+               <Route path="/ServiceRequests/*" element={<ServiceRequests/>}/>
            </Routes>
        </Router>
        //  <Test />

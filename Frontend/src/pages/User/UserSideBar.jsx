@@ -55,7 +55,7 @@ const UserSidebar = ({  activeTab,
             label: 'Appointment History',
             icon: Newspaper,
             path: '/user/appointment-history'
-            
+
         }
     ];
 

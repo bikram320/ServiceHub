@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import {
     Plus,
@@ -19,9 +18,11 @@ import {
     TrendingUp,
     RefreshCw
 } from 'lucide-react';
+import {useNavigate, useParams} from 'react-router-dom';
 import styles from '../../styles/TechnicianDashboard.module.css';
 
-const TechnicianDashboard = () => {
+const TechnicianDashboard = ({ isCollapsed = false }) => {
+    const navigate = useNavigate();
     const [selectedTimeRange, setSelectedTimeRange] = useState('week');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -34,6 +35,13 @@ const TechnicianDashboard = () => {
     const [receivedPayments, setReceivedPayments] = useState([]);
     const [dashboardOverview, setDashboardOverview] = useState(null);
     const [notifications, setNotifications] = useState([]);
+    const [modalState, setModalState] = useState({
+        isOpen: false,
+        type: '', // 'accept', 'reject', 'complete', 'details'
+        appointment: null,
+        title: '',
+        message: ''
+    });
 
     // Get technician email from localStorage or context
     const getTechnicianEmail = () => {
@@ -118,32 +126,204 @@ const TechnicianDashboard = () => {
         }
     };
 
-    const acceptServiceRequest = async (requestId) => {
+
+    // const acceptServiceRequest = async (requestId) => {
+    //     try {
+    //         await apiCall(`/technician/accept-service-request?requestId=${requestId}`, {
+    //             method: 'POST'
+    //         });
+    //
+    //         addNotification('success', 'Service request accepted successfully');
+    //         await refreshData();
+    //     } catch (error) {
+    //         console.error('Failed to accept service request:', error);
+    //         addNotification('error', 'Failed to accept service request');
+    //     }
+    // };
+    const handleAcceptRequest = (appointment) => {
+        setModalState({
+            isOpen: true,
+            type: 'accept',
+            appointment,
+            title: 'Accept Service Request',
+            message: 'Are you sure you want to accept this service request? You will be committed to providing this service.'
+        });
+    };
+
+    const confirmAcceptRequest = async () => {
+        const appointment = modalState.appointment;
         try {
-            await apiCall(`/technician/accept-service-request?requestId=${requestId}`, {
+            await apiCall(`/technician/accept-service-request?requestId=${appointment.id}`, {
                 method: 'POST'
             });
-
             addNotification('success', 'Service request accepted successfully');
             await refreshData();
+            setModalState({ isOpen: false, type: '', appointment: null, title: '', message: '' });
         } catch (error) {
             console.error('Failed to accept service request:', error);
             addNotification('error', 'Failed to accept service request');
         }
     };
 
-    const rejectServiceRequest = async (requestId) => {
+    // const rejectServiceRequest = async (requestId) => {
+    //     try {
+    //         await apiCall(`/technician/reject-service-request?requestId=${requestId}`, {
+    //             method: 'POST'
+    //         });
+    //
+    //         addNotification('success', 'Service request rejected');
+    //         await refreshData();
+    //     } catch (error) {
+    //         console.error('Failed to reject service request:', error);
+    //         addNotification('error', 'Failed to reject service request');
+    //     }
+    // };
+    const handleRejectRequest = (appointment) => {
+        setModalState({
+            isOpen: true,
+            type: 'reject',
+            appointment,
+            title: 'Reject Service Request',
+            message: 'Are you sure you want to reject this service request? This action cannot be undone.'
+        });
+    };
+
+    const confirmRejectRequest = async () => {
+        const appointment = modalState.appointment;
         try {
-            await apiCall(`/technician/reject-service-request?requestId=${requestId}`, {
+            await apiCall(`/technician/reject-service-request?requestId=${appointment.id}`, {
                 method: 'POST'
             });
-
             addNotification('success', 'Service request rejected');
             await refreshData();
+            setModalState({ isOpen: false, type: '', appointment: null, title: '', message: '' });
         } catch (error) {
             console.error('Failed to reject service request:', error);
             addNotification('error', 'Failed to reject service request');
         }
+    };
+
+    const handleViewServiceDetails = (appointment) => {
+        setModalState({
+            isOpen: true,
+            type: 'details',
+            appointment,
+            title: 'Service Request Details',
+            message: ''
+        });
+    };
+
+    const handleCompleteService = (appointment) => {
+        setModalState({
+            isOpen: true,
+            type: 'complete',
+            appointment,
+            title: 'Complete Service',
+            message: 'Mark this service as completed? The client will be notified and payment will be processed.'
+        });
+    };
+
+    const confirmCompleteService = async () => {
+        const appointment = modalState.appointment;
+        try {
+            await apiCall(`/technician/complete-service?requestId=${appointment.id}`, {
+                method: 'POST'
+            });
+            addNotification('success', 'Service marked as completed');
+            await refreshData();
+            setModalState({ isOpen: false, type: '', appointment: null, title: '', message: '' });
+        } catch (error) {
+            console.error('Failed to complete service:', error);
+            addNotification('error', 'Failed to complete service');
+        }
+    };
+
+    const handleCloseModal = () => {
+        setModalState({ isOpen: false, type: '', appointment: null, title: '', message: '' });
+    };
+
+    const ServiceModal = ({ isOpen, type, appointment, title, message, onClose, onConfirm }) => {
+        if (!isOpen) return null;
+
+        return (
+            <div className={styles['modal-overlay']} onClick={onClose}>
+                <div className={styles['modal-content']} onClick={(e) => e.stopPropagation()}>
+                    <div className={styles['modal-header']}>
+                        <h3 className={styles['modal-title']}>{title}</h3>
+                        <button className={styles['modal-close']} onClick={onClose}>×</button>
+                    </div>
+
+                    <div className={styles['modal-body']}>
+                        {type === 'details' && appointment ? (
+                            <div className={styles['appointment-details-modal']}>
+                                <div className={styles['detail-row']}>
+                                    <span className={styles['detail-label']}>Service:</span>
+                                    <span className={styles['detail-value']}>{appointment.service}</span>
+                                </div>
+                                <div className={styles['detail-row']}>
+                                    <span className={styles['detail-label']}>Client:</span>
+                                    <span className={styles['detail-value']}>{appointment.client}</span>
+                                </div>
+                                <div className={styles['detail-row']}>
+                                    <span className={styles['detail-label']}>Date & Time:</span>
+                                    <span className={styles['detail-value']}>{appointment.time}</span>
+                                </div>
+                                <div className={styles['detail-row']}>
+                                    <span className={styles['detail-label']}>Location:</span>
+                                    <span className={styles['detail-value']}>{appointment.location}</span>
+                                </div>
+                                <div className={styles['detail-row']}>
+                                    <span className={styles['detail-label']}>Phone:</span>
+                                    <span className={styles['detail-value']}>{appointment.phone || 'Not provided'}</span>
+                                </div>
+                                <div className={styles['detail-row']}>
+                                    <span className={styles['detail-label']}>Status:</span>
+                                    <span className={styles['status-badge']} style={{ backgroundColor: getStatusColor(appointment.status) }}>
+                                    {appointment.status}
+                                </span>
+                                </div>
+                            </div>
+                        ) : (
+                            <div>
+                                <p>{message}</p>
+                                {appointment && (
+                                    <div className={styles['appointment-summary']}>
+                                        <h4>{appointment.service}</h4>
+                                        <p><strong>Client:</strong> {appointment.client}</p>
+                                        <p><strong>Time:</strong> {appointment.time}</p>
+                                        <p><strong>Location:</strong> {appointment.location}</p>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
+
+                    <div className={styles['modal-footer']}>
+                        {type === 'details' ? (
+                            <button className={`${styles['action-btn']} ${styles.primary}`} onClick={onClose}>
+                                Close
+                            </button>
+                        ) : (
+                            <>
+                                <button className={`${styles['action-btn']} ${styles.secondary}`} onClick={onClose}>
+                                    Cancel
+                                </button>
+                                <button
+                                    className={`${styles['action-btn']} ${
+                                        type === 'reject' ? styles.danger : styles.primary
+                                    }`}
+                                    onClick={onConfirm}
+                                >
+                                    {type === 'accept' ? 'Accept Request' :
+                                        type === 'reject' ? 'Reject Request' :
+                                            'Complete Service'}
+                                </button>
+                            </>
+                        )}
+                    </div>
+                </div>
+            </div>
+        );
     };
 
     // Helper function to add notifications
@@ -401,10 +581,12 @@ const TechnicianDashboard = () => {
 
     if (loading) {
         return (
-            <div className={styles['profile-content']}>
-                <div className={styles['loading-container']}>
-                    <RefreshCw className="animate-spin" size={32} />
-                    <p>Loading dashboard data...</p>
+            <div className={`${styles['dashboard-wrapper']} ${isCollapsed ? styles['sidebar-collapsed'] : ''}`}>
+                <div className={styles['profile-content']}>
+                    <div className={styles['loading-container']}>
+                        <RefreshCw className="animate-spin" size={32} />
+                        <p>Loading dashboard data...</p>
+                    </div>
                 </div>
             </div>
         );
@@ -412,308 +594,313 @@ const TechnicianDashboard = () => {
 
     if (error) {
         return (
-            <div className={styles['profile-content']}>
-                <div className={styles['error-container']}>
-                    <AlertCircle size={32} color="#ef4444" />
-                    <p>{error}</p>
-                    <button onClick={refreshData} className={styles['retry-btn']}>
-                        Try Again
-                    </button>
+            <div className={`${styles['dashboard-wrapper']} ${isCollapsed ? styles['sidebar-collapsed'] : ''}`}>
+                <div className={styles['profile-content']}>
+                    <div className={styles['error-container']}>
+                        <AlertCircle size={32} color="#ef4444" />
+                        <p>{error}</p>
+                        <button onClick={refreshData} className={styles['retry-btn']}>
+                            Try Again
+                        </button>
+                    </div>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className={styles['profile-content']}>
-            <div className={styles['profile-form']}>
-                <div className={styles['profile-header']}>
-                    <div className={styles['header-content']}>
-                        <h1 className={styles['profile-title']}>Dashboard</h1>
-                        <p className={styles['profile-subtitle']}>Welcome back! Here's what's happening with your services.</p>
-                    </div>
-                    <button
-                        onClick={refreshData}
-                        className={styles['refresh-btn']}
-                        disabled={refreshing}
-                    >
-                        <RefreshCw size={16} className={refreshing ? 'animate-spin' : ''} />
-                        Refresh
-                    </button>
-                </div>
-
-                {/* Quick Stats Section */}
-                <section className={styles['form-section']}>
-                    <h3 className={styles['section-title']}>
-                        <BarChart3 size={20} style={{marginRight: '0.5rem'}} />
-                        Overview
-                    </h3>
-                    <div className={styles['stats-grid']}>
-                        <div className={styles['stat-card']}>
-                            <div className={styles['stat-icon']} style={{ backgroundColor: '#dbeafe' }}>
-                                <Calendar size={24} style={{ color: '#3b82f6' }} />
-                            </div>
-                            <div className={styles['stat-content']}>
-                                <div className={styles['stat-number']}>{metrics.totalBookings}</div>
-                                <div className={styles['stat-label']}>Total Bookings</div>
-                                <div className={`${styles['stat-change']} ${styles.positive}`}>All time</div>
-                            </div>
+        <div className={`${styles['dashboard-wrapper']} ${isCollapsed ? styles['sidebar-collapsed'] : ''}`}>
+            <div className={styles['profile-content']}>
+                <div className={styles['profile-form']}>
+                    <div className={styles['profile-header']}>
+                        <div className={styles['header-content']}>
+                            <h1 className={styles['profile-title']}>Dashboard</h1>
+                            <p className={styles['profile-subtitle']}>Welcome back! Here's what's happening with your services.</p>
                         </div>
-
-                        <div className={styles['stat-card']}>
-                            <div className={styles['stat-icon']} style={{ backgroundColor: '#fef3c7' }}>
-                                <Clock size={24} style={{ color: '#f59e0b' }} />
-                            </div>
-                            <div className={styles['stat-content']}>
-                                <div className={styles['stat-number']}>{metrics.activeRequests}</div>
-                                <div className={styles['stat-label']}>Active Requests</div>
-                                <div className={`${styles['stat-change']} ${styles.neutral}`}>Current</div>
-                            </div>
-                        </div>
-
-                        <div className={styles['stat-card']}>
-                            <div className={styles['stat-icon']} style={{ backgroundColor: '#d1fae5' }}>
-                                <CheckCircle size={24} style={{ color: '#10b981' }} />
-                            </div>
-                            <div className={styles['stat-content']}>
-                                <div className={styles['stat-number']}>{metrics.completedServices}</div>
-                                <div className={styles['stat-label']}>Completed Services</div>
-                                <div className={`${styles['stat-change']} ${styles.positive}`}>All time</div>
-                            </div>
-                        </div>
-
-                        <div className={styles['stat-card']}>
-                            <div className={styles['stat-icon']} style={{ backgroundColor: '#dcfce7' }}>
-                                <DollarSign size={24} style={{ color: '#16a34a' }} />
-                            </div>
-                            <div className={styles['stat-content']}>
-                                <div className={styles['stat-number']}>{formatCurrency(metrics.earnings)}</div>
-                                <div className={styles['stat-label']}>Total Earnings</div>
-                                <div className={`${styles['stat-change']} ${styles.positive}`}>Received</div>
-                            </div>
-                        </div>
-
-                        <div className={styles['stat-card']}>
-                            <div className={styles['stat-icon']} style={{ backgroundColor: '#fef7cd' }}>
-                                <Star size={24} style={{ color: '#eab308' }} />
-                            </div>
-                            <div className={styles['stat-content']}>
-                                <div className={styles['stat-number']}>{parseFloat(metrics.rating).toFixed(1)}</div>
-                                <div className={styles['stat-label']}>Average Rating</div>
-                                <div className={`${styles['stat-change']} ${styles.positive}`}>From reviews</div>
-                            </div>
-                        </div>
-
-                        <div className={styles['stat-card']}>
-                            <div className={styles['stat-icon']} style={{ backgroundColor: '#e0e7ff' }}>
-                                <Activity size={24} style={{ color: '#6366f1' }} />
-                            </div>
-                            <div className={styles['stat-content']}>
-                                <div className={styles['stat-number']}>{metrics.responseTime}</div>
-                                <div className={styles['stat-label']}>Avg Response Time</div>
-                                <div className={`${styles['stat-change']} ${styles.positive}`}>Average</div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                {/* Quick Actions */}
-                <section className={styles['form-section']}>
-                    <h3 className={styles['section-title']}>Quick Actions</h3>
-                    <div className={styles['quick-actions-grid']}>
-                        {quickActions.map((action, index) => (
-                            <button key={index} className={styles['quick-action-btn']} onClick={action.action}>
-                                <action.icon size={24} />
-                                <span>{action.label}</span>
-                            </button>
-                        ))}
-                    </div>
-                </section>
-
-                {/* Upcoming Appointments */}
-                <section className={styles['form-section']}>
-                    <div className={styles['section-header']}>
-                        <h3 className={styles['section-title']}>
-                            <Calendar size={20} style={{marginRight: '0.5rem'}} />
-                            Upcoming Appointments ({upcomingAppointments.length})
-                        </h3>
-                        <button className={styles['add-btn']}>
-                            <Eye size={16} />
-                            View All
+                        <button
+                            onClick={refreshData}
+                            className={styles['refresh-btn']}
+                            disabled={refreshing}
+                        >
+                            <RefreshCw size={16} className={refreshing ? 'animate-spin' : ''} />
+                            Refresh
                         </button>
                     </div>
-                    <div className={styles['appointments-list']}>
-                        {upcomingAppointments.length === 0 ? (
-                            <div className={styles['empty-state']}>
-                                <Calendar size={32} style={{ color: '#9ca3af' }} />
-                                <p>No upcoming appointments</p>
+
+                    {/* Quick Stats Section */}
+                    <section className={styles['form-section']}>
+                        <h3 className={styles['section-title']}>
+                            <BarChart3 size={20} style={{marginRight: '0.5rem'}} />
+                            Overview
+                        </h3>
+                        <div className={styles['stats-grid']}>
+                            <div className={styles['stat-card']}>
+                                <div className={styles['stat-icon']} style={{ backgroundColor: '#dbeafe' }}>
+                                    <Calendar size={24} style={{ color: '#3b82f6' }} />
+                                </div>
+                                <div className={styles['stat-content']}>
+                                    <div className={styles['stat-number']}>{metrics.totalBookings}</div>
+                                    <div className={styles['stat-label']}>Total Bookings</div>
+                                    <div className={`${styles['stat-change']} ${styles.positive}`}>All time</div>
+                                </div>
                             </div>
-                        ) : (
-                            upcomingAppointments.map((appointment) => (
-                                <div key={appointment.id} className={styles['appointment-card']}>
-                                    <div className={styles['appointment-time']}>
-                                        <Clock size={16} />
-                                        <span>{appointment.time}</span>
-                                    </div>
-                                    <div className={styles['appointment-content']}>
-                                        <div className={styles['appointment-service']}>{appointment.service}</div>
-                                        <div className={styles['appointment-client']}>Client: {appointment.client}</div>
-                                        <div className={styles['appointment-location']}>
-                                            <MapPin size={14} />
-                                            {appointment.location}
+
+                            <div className={styles['stat-card']}>
+                                <div className={styles['stat-icon']} style={{ backgroundColor: '#fef3c7' }}>
+                                    <Clock size={24} style={{ color: '#f59e0b' }} />
+                                </div>
+                                <div className={styles['stat-content']}>
+                                    <div className={styles['stat-number']}>{metrics.activeRequests}</div>
+                                    <div className={styles['stat-label']}>Active Requests</div>
+                                    <div className={`${styles['stat-change']} ${styles.neutral}`}>Current</div>
+                                </div>
+                            </div>
+
+                            <div className={styles['stat-card']}>
+                                <div className={styles['stat-icon']} style={{ backgroundColor: '#d1fae5' }}>
+                                    <CheckCircle size={24} style={{ color: '#10b981' }} />
+                                </div>
+                                <div className={styles['stat-content']}>
+                                    <div className={styles['stat-number']}>{metrics.completedServices}</div>
+                                    <div className={styles['stat-label']}>Completed Services</div>
+                                    <div className={`${styles['stat-change']} ${styles.positive}`}>All time</div>
+                                </div>
+                            </div>
+
+                            <div className={styles['stat-card']}>
+                                <div className={styles['stat-icon']} style={{ backgroundColor: '#dcfce7' }}>
+                                    <DollarSign size={24} style={{ color: '#16a34a' }} />
+                                </div>
+                                <div className={styles['stat-content']}>
+                                    <div className={styles['stat-number']}>{formatCurrency(metrics.earnings)}</div>
+                                    <div className={styles['stat-label']}>Total Earnings</div>
+                                    <div className={`${styles['stat-change']} ${styles.positive}`}>Received</div>
+                                </div>
+                            </div>
+
+                            <div className={styles['stat-card']}>
+                                <div className={styles['stat-icon']} style={{ backgroundColor: '#fef7cd' }}>
+                                    <Star size={24} style={{ color: '#eab308' }} />
+                                </div>
+                                <div className={styles['stat-content']}>
+                                    <div className={styles['stat-number']}>{parseFloat(metrics.rating).toFixed(1)}</div>
+                                    <div className={styles['stat-label']}>Average Rating</div>
+                                    <div className={`${styles['stat-change']} ${styles.positive}`}>From reviews</div>
+                                </div>
+                            </div>
+
+                            <div className={styles['stat-card']}>
+                                <div className={styles['stat-icon']} style={{ backgroundColor: '#e0e7ff' }}>
+                                    <Activity size={24} style={{ color: '#6366f1' }} />
+                                </div>
+                                <div className={styles['stat-content']}>
+                                    <div className={styles['stat-number']}>{metrics.responseTime}</div>
+                                    <div className={styles['stat-label']}>Avg Response Time</div>
+                                    <div className={`${styles['stat-change']} ${styles.positive}`}>Average</div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* Upcoming Appointments */}
+                    <section className={styles['form-section']}>
+                        <div className={styles['section-header']}>
+                            <h3 className={styles['section-title']}>
+                                <Calendar size={20} style={{marginRight: '0.5rem'}} />
+                                Upcoming Appointments ({upcomingAppointments.length})
+                            </h3>
+                            <button className={styles['add-btn']} onClick={() => navigate("/ServiceRequests")}>
+                                <Eye size={16} />
+                                View All
+                            </button>
+                        </div>
+                        <div className={styles['appointments-list']}>
+                            {upcomingAppointments.length === 0 ? (
+                                <div className={styles['empty-state']}>
+                                    <Calendar size={32} style={{ color: '#9ca3af' }} />
+                                    <p>No upcoming appointments</p>
+                                </div>
+                            ) : (
+                                upcomingAppointments.map((appointment) => (
+                                    <div key={appointment.id} className={styles['appointment-card']}>
+                                        <div className={styles['appointment-time']}>
+                                            <Clock size={16} />
+                                            <span>{appointment.time}</span>
                                         </div>
-                                        {appointment.phone && (
-                                            <div className={styles['appointment-contact']}>
-                                                <span>📞 {appointment.phone}</span>
+                                        <div className={styles['appointment-content']}>
+                                            <div className={styles['appointment-service']}>{appointment.service}</div>
+                                            <div className={styles['appointment-client']}>Client: {appointment.client}</div>
+                                            <div className={styles['appointment-location']}>
+                                                <MapPin size={14} />
+                                                {appointment.location}
                                             </div>
-                                        )}
-                                    </div>
-                                    <div className={styles['appointment-actions']}>
-                                        {appointment.status === 'PENDING' && (
-                                            <>
-                                                <button
-                                                    className={`${styles['action-btn']} ${styles.primary}`}
-                                                    onClick={() => acceptServiceRequest(appointment.id)}
-                                                >
-                                                    Accept
-                                                </button>
-                                                <button
-                                                    className={`${styles['action-btn']} ${styles.secondary}`}
-                                                    onClick={() => rejectServiceRequest(appointment.id)}
-                                                >
-                                                    Decline
-                                                </button>
-                                            </>
-                                        )}
-                                        {appointment.status === 'IN_PROGRESS' && (
-                                            <span className={styles['status-badge']} style={{ backgroundColor: '#3b82f6' }}>
+                                            {appointment.phone && (
+                                                <div className={styles['appointment-contact']}>
+                                                    <span> {appointment.phone}</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className={styles['appointment-actions']}>
+                                            {appointment.status === 'PENDING' && (
+                                                <>
+                                                    <button
+                                                        className={`${styles['action-btn']} ${styles.primary}`}
+                                                        onClick={() => handleAcceptRequest(appointment)}
+                                                    >
+                                                        Accept
+                                                    </button>
+                                                    <button
+                                                        className={`${styles['action-btn']} ${styles.secondary}`}
+                                                        onClick={() => handleRejectRequest(appointment)}
+                                                    >
+                                                        Decline
+                                                    </button>
+                                                </>
+                                            )}
+                                            {appointment.status === 'IN_PROGRESS' && (
+                                                <span className={styles['status-badge']} style={{ backgroundColor: '#3b82f6' }}>
                                                 In Progress
                                             </span>
-                                        )}
-                                    </div>
-                                </div>
-                            ))
-                        )}
-                    </div>
-                </section>
-
-                {/* Recent Activity */}
-                <section className={styles['form-section']}>
-                    <div className={styles['section-header']}>
-                        <h3 className={styles['section-title']}>
-                            <Activity size={20} style={{marginRight: '0.5rem'}} />
-                            Recent Activity
-                        </h3>
-                        <div className={styles['filter-controls']}>
-                            <select
-                                className={styles['time-filter']}
-                                value={selectedTimeRange}
-                                onChange={(e) => setSelectedTimeRange(e.target.value)}
-                            >
-                                <option value="day">Today</option>
-                                <option value="week">This Week</option>
-                                <option value="month">This Month</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div className={styles['activity-list']}>
-                        {recentActivities.length === 0 ? (
-                            <div className={styles['empty-state']}>
-                                <Activity size={32} style={{ color: '#9ca3af' }} />
-                                <p>No recent activity</p>
-                            </div>
-                        ) : (
-                            recentActivities.map((activity) => (
-                                <div key={activity.id} className={styles['activity-item']}>
-                                    <div
-                                        className={styles['activity-status']}
-                                        style={{ backgroundColor: getStatusColor(activity.status) }}
-                                    ></div>
-                                    <div className={styles['activity-content']}>
-                                        <div className={styles['activity-action']}>{activity.action}</div>
-                                        <div className={styles['activity-details']}>
-                                            <User size={14} />
-                                            <span>{activity.client}</span>
-                                            <span className={styles['activity-time']}>{activity.time}</span>
+                                            )}
                                         </div>
                                     </div>
-                                </div>
-                            ))
-                        )}
-                    </div>
-                </section>
+                                ))
+                            )}
+                        </div>
+                    </section>
 
-                {/* Notifications */}
-                <section className={styles['form-section']}>
-                    <div className={styles['section-header']}>
-                        <h3 className={styles['section-title']}>
-                            <Bell size={20} style={{marginRight: '0.5rem'}} />
-                            Notifications ({notifications.length})
-                        </h3>
-                        <button
-                            className={styles['clear-all-btn']}
-                            onClick={() => setNotifications([])}
-                        >
-                            Clear All
-                        </button>
-                    </div>
-                    <div className={styles['notifications-list']}>
-                        {notifications.length === 0 ? (
-                            <div className={styles['empty-state']}>
-                                <Bell size={32} style={{ color: '#9ca3af' }} />
-                                <p>No notifications</p>
+                    {/* Recent Activity */}
+                    <section className={styles['form-section']}>
+                        <div className={styles['section-header']}>
+                            <h3 className={styles['section-title']}>
+                                <Activity size={20} style={{marginRight: '0.5rem'}} />
+                                Recent Activity
+                            </h3>
+                            <div className={styles['filter-controls']}>
+                                <select
+                                    className={styles['time-filter']}
+                                    value={selectedTimeRange}
+                                    onChange={(e) => setSelectedTimeRange(e.target.value)}
+                                >
+                                    <option value="day">Today</option>
+                                    <option value="week">This Week</option>
+                                    <option value="month">This Month</option>
+                                </select>
                             </div>
-                        ) : (
-                            notifications.map((notification) => (
-                                <div key={notification.id} className={styles['notification-item']}>
-                                    <div className={styles['notification-icon']}>
-                                        {getNotificationIcon(notification.type)}
-                                    </div>
-                                    <div className={styles['notification-content']}>
-                                        <div className={styles['notification-message']}>{notification.message}</div>
-                                        <div className={styles['notification-time']}>{notification.time}</div>
-                                    </div>
-                                    <button
-                                        className={styles['notification-close']}
-                                        onClick={() => setNotifications(prev =>
-                                            prev.filter(n => n.id !== notification.id)
-                                        )}
-                                    >
-                                        ×
-                                    </button>
+                        </div>
+                        <div className={styles['activity-list']}>
+                            {recentActivities.length === 0 ? (
+                                <div className={styles['empty-state']}>
+                                    <Activity size={32} style={{ color: '#9ca3af' }} />
+                                    <p>No recent activity</p>
                                 </div>
-                            ))
-                        )}
-                    </div>
-                </section>
+                            ) : (
+                                recentActivities.map((activity) => (
+                                    <div key={activity.id} className={styles['activity-item']}>
+                                        <div
+                                            className={styles['activity-status']}
+                                            style={{ backgroundColor: getStatusColor(activity.status) }}
+                                        ></div>
+                                        <div className={styles['activity-content']}>
+                                            <div className={styles['activity-action']}>{activity.action}</div>
+                                            <div className={styles['activity-details']}>
+                                                <User size={14} />
+                                                <span>{activity.client}</span>
+                                                <span className={styles['activity-time']}>{activity.time}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    </section>
 
-                {/* Performance Chart Placeholder */}
-                <section className={styles['form-section']}>
-                    <div className={styles['section-header']}>
-                        <h3 className={styles['section-title']}>
-                            <TrendingUp size={20} style={{marginRight: '0.5rem'}} />
-                            Performance Trends
-                        </h3>
-                        <div className={styles['chart-controls']}>
-                            <button className={`${styles['chart-btn']} ${styles.active}`}>Bookings</button>
-                            <button className={styles['chart-btn']}>Revenue</button>
-                            <button className={styles['chart-btn']}>Rating</button>
+                    {/* Notifications */}
+                    <section className={styles['form-section']}>
+                        <div className={styles['section-header']}>
+                            <h3 className={styles['section-title']}>
+                                <Bell size={20} style={{marginRight: '0.5rem'}} />
+                                Notifications ({notifications.length})
+                            </h3>
+                            <button
+                                className={styles['clear-all-btn']}
+                                onClick={() => setNotifications([])}
+                            >
+                                Clear All
+                            </button>
                         </div>
-                    </div>
-                    <div className={styles['chart-placeholder']}>
-                        <div className={styles['chart-icon']}>
-                            <BarChart3 size={48} style={{ color: '#9ca3af' }} />
+                        <div className={styles['notifications-list']}>
+                            {notifications.length === 0 ? (
+                                <div className={styles['empty-state']}>
+                                    <Bell size={32} style={{ color: '#9ca3af' }} />
+                                    <p>No notifications</p>
+                                </div>
+                            ) : (
+                                notifications.map((notification) => (
+                                    <div key={notification.id} className={styles['notification-item']}>
+                                        <div className={styles['notification-icon']}>
+                                            {getNotificationIcon(notification.type)}
+                                        </div>
+                                        <div className={styles['notification-content']}>
+                                            <div className={styles['notification-message']}>{notification.message}</div>
+                                            <div className={styles['notification-time']}>{notification.time}</div>
+                                        </div>
+                                        <button
+                                            className={styles['notification-close']}
+                                            onClick={() => setNotifications(prev =>
+                                                prev.filter(n => n.id !== notification.id)
+                                            )}
+                                        >
+                                            ×
+                                        </button>
+                                    </div>
+                                ))
+                            )}
                         </div>
-                        <div className={styles['chart-message']}>
-                            <h4>Performance Chart</h4>
-                            <p>Your booking trends and performance metrics will be displayed here.</p>
-                            <p>Total Services: {metrics.totalBookings} | Completion Rate: {metrics.totalBookings > 0 ? Math.round((metrics.completedServices / metrics.totalBookings) * 100) : 0}%</p>
+                    </section>
+
+                    {/* Performance Chart Placeholder */}
+                    <section className={styles['form-section']}>
+                        <div className={styles['section-header']}>
+                            <h3 className={styles['section-title']}>
+                                <TrendingUp size={20} style={{marginRight: '0.5rem'}} />
+                                Performance Trends
+                            </h3>
+                            <div className={styles['chart-controls']}>
+                                <button className={`${styles['chart-btn']} ${styles.active}`}>Bookings</button>
+                                <button className={styles['chart-btn']}>Revenue</button>
+                                <button className={styles['chart-btn']}>Rating</button>
+                            </div>
                         </div>
-                    </div>
-                </section>
+                        <div className={styles['chart-placeholder']}>
+                            <div className={styles['chart-icon']}>
+                                <BarChart3 size={48} style={{ color: '#9ca3af' }} />
+                            </div>
+                            <div className={styles['chart-message']}>
+                                <h4>Performance Chart</h4>
+                                <p>Your booking trends and performance metrics will be displayed here.</p>
+                                <p>Total Services: {metrics.totalBookings} | Completion Rate: {metrics.totalBookings > 0 ? Math.round((metrics.completedServices / metrics.totalBookings) * 100) : 0}%</p>
+                            </div>
+                        </div>
+                    </section>
+                </div>
             </div>
+            <ServiceModal
+                isOpen={modalState.isOpen}
+                type={modalState.type}
+                appointment={modalState.appointment}
+                title={modalState.title}
+                message={modalState.message}
+                onClose={handleCloseModal}
+                onConfirm={
+                    modalState.type === 'accept' ? confirmAcceptRequest :
+                        modalState.type === 'reject' ? confirmRejectRequest :
+                            modalState.type === 'complete' ? confirmCompleteService :
+                                null
+                }
+            />
         </div>
     );
 };
 
-export default TechnicianDashboard;
+            export default TechnicianDashboard;

@@ -1,12 +1,13 @@
-/* TechnicianProfile.css */
 .profile-container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 1.5rem;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: #f3f4f6;
+    min-height: 100vh;
 }
 
-/* Breadcrumb */
+/* Breadcrumb Navigation */
 .breadcrumb {
     display: flex;
     align-items: center;
@@ -15,18 +16,26 @@
     margin-bottom: 1.5rem;
 }
 
-.breadcrumb-separator {
-    margin: 0 0.5rem;
-    color: #9ca3af;
+.back-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: transparent;
+    border: none;
+    color: #4b5563;
+    font-weight: 500;
+    cursor: pointer;
+    transition: color 0.2s ease-in-out;
 }
 
-.breadcrumb-current {
-    color: #111827;
+.back-button:hover {
+    color: #1f2937;
 }
 
-/* Profile Header (Top section) */
+/* Profile Header Section */
 .profile-header {
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
     padding: 1.5rem;
@@ -34,40 +43,45 @@
     border: 1px solid #e5e7eb;
     border-radius: 12px;
     margin-bottom: 2rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    gap: 1.5rem;
 }
 
 .profile-info {
-    display: grid;
-    grid-template-columns: auto 1fr auto; /* avatar - text - button */
-    align-items: center; /* vertically align */
-    gap: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex: 1;
 }
 
 .profile-avatar {
-    width: 80px;
-    height: 80px;
+    width: 120px;
+    height: 120px;
     border-radius: 50%;
     object-fit: cover;
     border: 3px solid #f3f4f6;
+    flex-shrink: 0;
 }
 
-.profile-info .profile-details {
-    justify-items: start;
+.profile-details {
+    overflow: hidden;
 }
 
 .profile-details h1 {
     font-size: 1.5rem;
-    font-weight: 700;
+    font-weight: 600;
     color: #111827;
-    margin: 0 0 0.25rem 0;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .profile-title {
     color: #2563eb;
     font-weight: 600;
     font-size: 0.95rem;
-    margin: 0 0 0.25rem 0;
+    margin: 0.25rem 0;
 }
 
 .profile-experience {
@@ -78,215 +92,167 @@
 
 /* Book Appointment Button */
 .book-button {
-    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    background-color: #76af8c;
     color: white;
     border: none;
-    padding: 0.75rem 18rem 0.75rem 18rem;
+    padding: 0.75rem 1.5rem;
     border-radius: 8px;
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    justify-self: stretch;  /* makes it take full column width */
+    flex-shrink: 0;
 }
 
 .book-button:hover {
-    background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+    background-color: #649677;
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    box-shadow: 0 4px 12px rgba(118, 175, 140, 0.3);
 }
 
-/* Main content block below the header */
+/* Main Content Sections */
 .profile-content {
-    display: grid;
-    grid-template-columns: 1fr;
-    background: white;
-    border: 1px solid #e5e7eb;
-    border-radius: 12px;
-    padding: 1.5rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    grid-template-rows: 1fr 1fr 1fr;
-    gap: 10px;
-}
-
-/* Tab Navigation */
-.tab-nav {
-    border-bottom: 1px solid #e5e7eb;
-    margin-bottom: 2rem;
-}
-
-.tab-list {
     display: flex;
+    flex-direction: column;
     gap: 2rem;
 }
 
-.tab-button {
-    background: none;
-    border: none;
-    padding: 1rem 0.25rem;
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: #6b7280;
-    cursor: pointer;
-    border-bottom: 2px solid transparent;
-    transition: all 0.2s ease;
-}
-
-.tab-button:hover {
-    color: #374151;
-    border-bottom-color: #d1d5db;
-}
-
-.tab-button.active {
-    color: #2563eb;
-    border-bottom-color: #2563eb;
-}
-
-/* Tab Content */
-.tab-content {
-    min-height: 400px;
-}
-
 .content-section {
-    margin-bottom: 1rem;
-    padding: 20px;
-    text-align: left;
+    background: white;
+    padding: 2rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 .content-title {
     font-size: 1.25rem;
     font-weight: 600;
     color: #111827;
-    margin-bottom: 1rem;
+    margin-bottom: 1.25rem;
+    border-bottom: 2px solid #e5e7eb;
+    padding-bottom: 0.5rem;
 }
 
 .about-text {
-    color: #374151;
     line-height: 1.6;
-    margin-bottom: 2rem;
+    color: #4b5563;
 }
 
-/* Expertise Section */
 .expertise-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
 }
 
 .expertise-card {
     display: flex;
     align-items: flex-start;
-    gap: 0.75rem;
-    padding: 1rem;
-    background: #f9fafb;
+    gap: 1rem;
+    background-color: #f9fafb;
+    padding: 1.25rem;
     border-radius: 8px;
     border: 1px solid #e5e7eb;
 }
 
 .expertise-icon {
-    padding: 0.5rem;
-    background: #dbeafe;
-    border-radius: 6px;
-    color: #2563eb;
+    background-color: #e0e7ff;
+    color: #3b82f6;
+    padding: 0.75rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     flex-shrink: 0;
 }
 
 .expertise-content h4 {
     font-size: 1rem;
     font-weight: 600;
-    color: #111827;
-    margin: 0 0 0.25rem 0;
+    color: #1f2937;
+    margin: 0;
 }
 
 .expertise-content p {
     font-size: 0.875rem;
     color: #6b7280;
-    margin: 0;
+    margin: 0.25rem 0 0;
 }
 
-/* Placeholder States */
-.placeholder-content {
-    text-align: center;
-    padding: 3rem 1rem;
-    background: #f9fafb;
+/* Reviews Section */
+.rating-reviews {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.reviews-list {
+    display: grid;
+    gap: 1rem;
+}
+
+.review-card {
+    background-color: #f9fafb;
+    padding: 1rem;
     border-radius: 8px;
-    border: 2px dashed #d1d5db;
+    border: 1px solid #e5e7eb;
 }
 
-.placeholder-title {
-    font-size: 1.125rem;
-    font-weight: 600;
-    color: #111827;
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 0.5rem;
 }
 
-.placeholder-text {
-    color: #6b7280;
+.review-user {
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.review-stars {
+    display: flex;
+    gap: 0.25rem;
+    color: #ffc107;
+}
+
+.review-comment {
+    font-size: 0.875rem;
+    color: #4b5563;
     margin: 0;
 }
 
-/* Responsive Design */
-@media (max-width: 1024px) {
-    .profile-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 1rem;
-    }
+.add-review-button {
+    align-self: flex-start;
+    background-color: #2563eb;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    border: none;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
+.add-review-button:hover {
+    background-color: #1d4ed8;
+}
+
+/* Responsive adjustments */
 @media (max-width: 768px) {
-    .profile-container {
-        padding: 1rem;
+    .profile-header {
+        flex-direction: column;
+        align-items: stretch;
     }
 
     .profile-info {
         flex-direction: column;
-        text-align: center;
-        gap: 0.75rem;
-    }
-
-    .profile-avatar {
-        width: 100px;
-        height: 100px;
-    }
-
-    .tab-list {
-        gap: 1rem;
-        justify-content: center;
-    }
-
-    .tab-button {
-        padding: 0.75rem 0.5rem;
-    }
-
-    .expertise-card {
-        flex-direction: column;
+        align-items: center;
         text-align: center;
     }
 
-    .expertise-icon {
-        align-self: center;
-    }
-}
-
-@media (max-width: 480px) {
-    .breadcrumb {
-        font-size: 0.8rem;
-    }
-
-    .profile-details h1 {
-        font-size: 1.25rem;
-    }
-
-    .tab-content {
-        min-height: 300px;
-    }
-
-    .content-title {
-        font-size: 1.125rem;
-    }
-
-    .expertise-grid {
-        gap: 1rem;
+    .book-button {
+        width: 100%;
     }
 }
