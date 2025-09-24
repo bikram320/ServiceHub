@@ -17,7 +17,7 @@ import ServiceRequests from "./Technician/ServiceRequests.jsx";
 import JobHistory from "./Technician/JobHistory.jsx";
 import AdminDashboard from "./Admin/AdminDashboard.jsx";
 import UserManagement from "./Admin/UserManagement.jsx";
-import TechnicianManagement from "./Admin/TechnicianManagement.jsx";
+// import TechnicianManagement from "./Admin/TechnicianManagement.jsx";
 import AdminLayout from "./Admin/AdminLayout.jsx";
 import UserLayout from "./User/UserLayout.jsx";
 import TechnicianLayout from "./Technician/TechnicianLayout.jsx";

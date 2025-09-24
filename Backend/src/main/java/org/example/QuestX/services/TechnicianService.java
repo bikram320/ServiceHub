@@ -347,4 +347,23 @@ public class TechnicianService {
         request.setStatus(ServiceStatus.COMPLETED);
         serviceRequestRepository.save(request);
     }
+
+    public List<FeedbackDto> getFeedbacks(String email){
+        var technician = technicianRepository.findByEmail(email);
+        if(technician == null){
+            throw new TechnicianNotFoundException("Technician not found");
+        }
+        var feedbacks = feedbackRepository.findAllByTechnician(technician.getId());
+        if(feedbacks.isEmpty()){
+            throw new ServiceNotFoundException("No Feedbacks Found");
+        }
+        return feedbacks.stream().map( feedback -> {
+            FeedbackDto feedbackDto = new FeedbackDto();
+            feedbackDto.setUsername(feedback.getRequest().getUser().getName());
+            feedbackDto.setRating(feedback.getRating());
+            feedbackDto.setComment(feedback.getComments());
+            feedbackDto.setDate(feedback.getCreatedAt());
+            return feedbackDto;
+        }).toList();
+    }
 }
