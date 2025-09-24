@@ -36,7 +36,7 @@ import {
 import FilterAndSearch from "../../Components/common/FilterAndSearch.jsx";
 import styles from '../../styles/JobHistory.module.css';
 
-const JobHistory = () => {
+const JobHistory = ({ isSidebarCollapsed = false }) => {
     const [selectedFilter, setSelectedFilter] = useState('all');
     const [sortBy, setSortBy] = useState('date');
     const [sortOrder, setSortOrder] = useState('desc');
@@ -539,7 +539,7 @@ const JobHistory = () => {
     // Error state for other errors
     if (error) {
         return (
-            <div className={styles.profileContent}>
+            <div className={`${styles['profile-content']} ${isSidebarCollapsed ? styles['sidebar-collapsed'] : ''}`}>
                 <div className={styles.profileForm}>
                     <div className={styles.errorState}>
                         <AlertCircle size={48} style={{ color: '#ef4444' }} />
@@ -558,7 +558,7 @@ const JobHistory = () => {
         );
     }
     return (
-        <div className={styles.profileContent}>
+        <div className={`${styles['profile-content']} ${isSidebarCollapsed ? styles['sidebar-collapsed'] : ''}`}>
             <div className={styles.profileForm}>
                 <div className={styles.profileHeader}>
                     <h1 className={styles.profileTitle}>Job History</h1>

@@ -156,7 +156,7 @@ const TechnicianLayout = () =>{
             case 'service-requests':
                 return <ServiceRequests technicianInfo={userInfo} isSidebarCollapsed={sidebarCollapsed}/>;
             case 'job-history':
-                return <JobHistory technicianInfo={userInfo} />;
+                return <JobHistory technicianInfo={userInfo} isSidebarCollapsed={sidebarCollapsed}/>;
             default:
                 return <TechnicianDashboard userInfo={userInfo} />;
         }
