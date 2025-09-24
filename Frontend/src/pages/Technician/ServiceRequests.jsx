@@ -1,34 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import {
-    Clock,
-    MapPin,
-    User,
-    Phone,
-    Mail,
-    Calendar,
-    DollarSign,
-    Star,
-    Filter,
-    Search,
-    ChevronDown,
-    MessageSquare,
+    AlertCircle,
     CheckCircle,
+    Clock,
     XCircle,
     Eye,
-    AlertCircle,
-    Wrench,
-    Home,
-    Zap,
-    Car,
-    Settings,
     RefreshCw,
-    SortAsc,
-    SortDesc
+    DollarSign,
+    Search,
+    Wrench,
+    Zap,
+    Home,
+    Settings,
+    Calendar,
+    MapPin,
+    Phone,
+    Mail,
+    Star
 } from 'lucide-react';
-import FilterAndSearch from '../../Components/common/FilterAndSearch';
 import styles from '../../styles/ServiceRequests.module.css';
+import FilterAndSearch from "../../Components/common/FilterAndSearch.jsx";
 
-const ServiceRequests = () => {
+const ServiceRequests = ({ isSidebarCollapsed = false }) => {
     const [selectedFilter, setSelectedFilter] = useState('all');
     const [sortBy, setSortBy] = useState('date');
     const [sortOrder, setSortOrder] = useState('desc');
@@ -566,7 +559,7 @@ const ServiceRequests = () => {
     // Loading state
     if (loading) {
         return (
-            <div className={styles['profile-content']}>
+            <div className={`${styles['profile-content']} ${isSidebarCollapsed ? styles['sidebar-collapsed'] : ''}`}>
                 <div className={styles['profile-form']}>
                     <div className={styles['loading-state']}>
                         <RefreshCw size={48} className={styles['spin']} />
@@ -580,7 +573,7 @@ const ServiceRequests = () => {
     // Error state for authentication issues
     if (error && error.includes('Authentication required')) {
         return (
-            <div className={styles['profile-content']}>
+            <div className={`${styles['profile-content']} ${isSidebarCollapsed ? styles['sidebar-collapsed'] : ''}`}>
                 <div className={styles['profile-form']}>
                     <div className={styles['error-state']}>
                         <AlertCircle size={48} style={{ color: '#ef4444' }} />
@@ -597,8 +590,9 @@ const ServiceRequests = () => {
             </div>
         );
     }
+
     return (
-        <div className={styles['profile-content']}>
+        <div className={`${styles['profile-content']} ${isSidebarCollapsed ? styles['sidebar-collapsed'] : ''}`}>
             <div className={styles['profile-form']}>
                 <div className={styles['profile-header']}>
                     <h1 className={styles['profile-title']}>Service Requests</h1>
@@ -671,7 +665,7 @@ const ServiceRequests = () => {
                     </div>
                 </section>
 
-                {/* Filters and Controls */}
+                {/* Filters and Controls - Assuming FilterAndSearch component exists */}
                 <FilterAndSearch
                     searchTerm={searchTerm}
                     onSearchChange={setSearchTerm}
@@ -696,7 +690,7 @@ const ServiceRequests = () => {
                         {sortedRequests.map((request) => {
                             const isProcessing = processingRequests.has(request.id);
                             return (
-                                <div key={`request-${request.id}`} className={styles['request-card']}>  {/* Fixed unique key */}
+                                <div key={`request-${request.id}`} className={styles['request-card']}>
                                     <div className={styles['request-header']}>
                                         <div className={styles['request-id-status']}>
                                             <span className={styles['request-id']}>#{request.requestId}</span>
@@ -871,6 +865,7 @@ const ServiceRequests = () => {
                         </div>
                     )}
                 </section>
+
                 {/* Confirmation Modal */}
                 {showConfirmModal && selectedRequest && (
                     <div className={styles['modal-overlay']}>

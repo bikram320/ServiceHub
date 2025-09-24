@@ -11,7 +11,7 @@ import {
 } from "../../Components/utils/locationApi.js";
 import styles from "../../styles/TechnicianProfileForm.module.css";
 
-const TechnicianProfileForm = ({ userInfo, onUpdateProfile }) => {
+const TechnicianProfileForm = ({ userInfo, onUpdateProfile,  sidebarCollapsed = false }) => {
     const [formData, setFormData] = useState({
         fullName: '',
         email: '',
@@ -502,7 +502,8 @@ const TechnicianProfileForm = ({ userInfo, onUpdateProfile }) => {
     const serviceTypes = ['Plumbing', 'Electrical', 'HVAC', 'Carpentry', 'General Maintenance', 'Appliance Repair'];
 
     return (
-        <div className={styles['profile-content']}>
+        <div className={`${styles['profile-wrapper']} ${sidebarCollapsed ? styles['sidebar-collapsed'] : ''}`}>
+            <div className={styles['profile-content']}>
             <div className={styles['profile-form']}>
                 <div className={styles['profile-header']}>
                     <h1 className={styles['profile-title']}>Technician Profile</h1>
@@ -530,22 +531,21 @@ const TechnicianProfileForm = ({ userInfo, onUpdateProfile }) => {
                             {formData.avatar ? (
                                 <img src={formData.avatar} className={styles['profile-image']} alt="Profile Avatar" />
                             ) : (
-                                <div className={styles['profile-placeholder']}>
-                                    {formData.fullName ? formData.fullName.charAt(0).toUpperCase() : <Wrench size={32} />}
+                                <div className={styles["profile-placeholder"]}>
+                                    <label htmlFor="avatar-upload" className={styles["camera-placeholder"]}>
+                                        <Camera size={40} />
+                                        <input
+                                            type='file'
+                                            id="avatar-upload"
+                                            accept="image/*"
+                                            onChange={handleAvatarChange}
+                                            style={{ display: 'none' }}
+                                        />
+                                    </label>
                                 </div>
                             )}
-                            <div className={styles['profile-picture-overlay']}>
-                                <label htmlFor="avatar-upload" className={styles['camera-btn']}>
-                                    <Camera size={20} />
-                                    <input
-                                        type='file'
-                                        id="avatar-upload"
-                                        accept="image/*"
-                                        onChange={handleAvatarChange}
-                                        style={{ display: 'none' }}
-                                    />
-                                </label>
-                            </div>
+
+
                         </div>
                     </div>
                     <div className={styles['profile-info']}>
@@ -949,6 +949,7 @@ const TechnicianProfileForm = ({ userInfo, onUpdateProfile }) => {
                         )}
                     </button>
                 </div>
+            </div>
             </div>
         </div>
     );
