@@ -25,6 +25,7 @@ const TechnicianProfileForm = ({ userInfo, onUpdateProfile,  sidebarCollapsed = 
         profileImageFile: null,
         serviceType: '',
         hourlyRate: '',
+        esewaId: '',
         // Verification fields
         citizenshipPhoto: null,
         citizenshipPhotoFile: null,
@@ -41,6 +42,7 @@ const TechnicianProfileForm = ({ userInfo, onUpdateProfile,  sidebarCollapsed = 
         phoneNumber: false,
         address: false,
         bio: false,
+        esewaId: '',
         serviceType: false,
         hourlyRate: false
     });
@@ -245,6 +247,7 @@ const TechnicianProfileForm = ({ userInfo, onUpdateProfile,  sidebarCollapsed = 
                     bio: data.bio || '',
                     serviceType: data.serviceType || '',
                     hourlyRate: data.feeCharged || '',
+                    esewaId: data.esewaId || '',
                     coordinates: (data.latitude && data.longitude) ?
                         {lat: data.latitude, lon: data.longitude} : null,
                     avatar: avatarUrl || null,
@@ -299,6 +302,9 @@ const TechnicianProfileForm = ({ userInfo, onUpdateProfile,  sidebarCollapsed = 
 
         if (formData.hourlyRate) {
             formDataToSend.append('feeCharged', parseFloat(formData.hourlyRate).toString());
+        }
+        if (formData.esewaId?.trim()) {
+            formDataToSend.append('esewa_id', formData.esewaId.trim());
         }
 
         if (formData.profileImageFile) {
@@ -716,6 +722,29 @@ const TechnicianProfileForm = ({ userInfo, onUpdateProfile,  sidebarCollapsed = 
                                     </div>
                                 )}
                             </div>
+                        </div>
+                    </div>
+                    <div className={styles['form-group']}>
+                        <label htmlFor="esewaId" className={styles['form-label']}>eSewa ID</label>
+                        <div className={styles['input-with-edit']}>
+                            {isEditing.esewaId ? (
+                                <input
+                                    type="text"
+                                    className={styles['form-input']}
+                                    value={formData.esewaId}
+                                    onChange={(e) => handleInputChange('esewaId', e.target.value)}
+                                    onBlur={() => toggleEdit('esewaId')}
+                                    placeholder="Enter your eSewa ID"
+                                    autoFocus
+                                />
+                            ) : (
+                                <div className={styles['form-display']}>
+                                    <span>{formData.esewaId || 'Not Provided'}</span>
+                                    <button className={styles['edit-btn']} onClick={() => toggleEdit('esewaId')}>
+                                        <Edit3 size={16} />
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     </div>
 
