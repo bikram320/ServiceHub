@@ -148,13 +148,13 @@ const TechnicianLayout = () =>{
                     <TechnicianProfileForm
                         userInfo={userInfo}
                         onUpdateProfile={handleUpdateProfile}
-                        isCollapsed={sidebarCollapsed}
+                        sidebarCollapsed={sidebarCollapsed}
                     />
                 );
             case 'profile':
                 return <TechnicianProfile userInfo={userInfo} />;
             case 'service-requests':
-                return <ServiceRequests technicianInfo={userInfo} />;
+                return <ServiceRequests technicianInfo={userInfo} isSidebarCollapsed={sidebarCollapsed}/>;
             case 'job-history':
                 return <JobHistory technicianInfo={userInfo} />;
             default:
