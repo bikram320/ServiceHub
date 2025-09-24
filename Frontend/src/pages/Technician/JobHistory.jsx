@@ -34,7 +34,7 @@ import {
     ExternalLink
 } from 'lucide-react';
 import FilterAndSearch from "../../Components/common/FilterAndSearch.jsx";
-import styles from '../../styles/JobHistory.module.css';
+import styles from '../../styles/ServiceRequests.module.css';
 
 const JobHistory = ({ isSidebarCollapsed = false }) => {
     const [selectedFilter, setSelectedFilter] = useState('all');
