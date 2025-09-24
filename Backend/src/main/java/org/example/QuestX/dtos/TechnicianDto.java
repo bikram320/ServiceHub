@@ -16,4 +16,5 @@ public class TechnicianDto {
     private String serviceType;
     private Double feeCharged;
     private String bio;
+    private String esewaId;
 }

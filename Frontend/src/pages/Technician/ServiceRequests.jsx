@@ -49,10 +49,10 @@ const ServiceRequests = () => {
         potentialEarnings: 0
     });
 
-    // API Configuration
-    const API_BASE_URL = 'http://localhost:8080';
-    const technicianEmail = 'debryune69@gmail.com'; // This should come from authenticated user context
-    const [isDevelopmentMode, setIsDevelopmentMode] = useState(false);
+    // Get technician email from localStorage (same pattern as UpcomingAppointments)
+    const getTechnicianEmail = () => {
+        return localStorage.getItem('userEmail'); // Assuming technician email is stored as userEmail
+    };
 
     // Enhanced token retrieval with better error handling
     const getAuthToken = () => {
@@ -82,12 +82,6 @@ const ServiceRequests = () => {
                 return localToken;
             }
 
-            // Check sessionStorage as well
-            const sessionToken = sessionStorage.getItem('authToken') || sessionStorage.getItem('accessToken');
-            if (sessionToken && sessionToken !== 'undefined' && sessionToken !== 'null') {
-                return sessionToken;
-            }
-
             return null;
         } catch (error) {
             console.error('Error retrieving auth token:', error);
@@ -95,232 +89,54 @@ const ServiceRequests = () => {
         }
     };
 
-    // Enhanced API request helper with better error handling
-    const apiRequest = async (endpoint, options = {}) => {
-        const token = getAuthToken();
-
-        if (!token) {
-            throw new Error('No authentication token found. Please log in again.');
-        }
-
-        const config = {
-            credentials:'true',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
-                ...options.headers,
-            },
-            ...options,
-        };
-
-        try {
-            const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
-
-            // Handle different HTTP status codes
-            if (response.status === 401) {
-                // Token might be expired or invalid
-                localStorage.removeItem('authToken');
-                localStorage.removeItem('accessToken');
-                sessionStorage.removeItem('authToken');
-                sessionStorage.removeItem('accessToken');
-                throw new Error('Authentication failed. Please log in again.');
-            }
-
-            if (response.status === 403) {
-                throw new Error('Access forbidden. You don\'t have permission to perform this action.');
-            }
-
-            if (response.status === 404) {
-                throw new Error('Resource not found. The requested endpoint may not exist.');
-            }
-
-            if (response.status >= 500) {
-                throw new Error('Server error. Please try again later.');
-            }
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const contentType = response.headers.get('content-type');
-            if (contentType && contentType.includes('application/json')) {
-                return await response.json();
-            }
-
-            return await response.text();
-        } catch (error) {
-            console.error('API request failed:', error);
-            throw error;
-        }
-    };
-
-    // Fetch current service requests with improved error handling
+    // Fetch current service requests using the correct endpoint
     const fetchCurrentRequests = async () => {
         try {
             setLoading(true);
             setError(null);
 
-            const data = await apiRequest(
-                `api/technician/get-current-request?email=${encodeURIComponent(technicianEmail)}`
-            );
-
-            // Transform API data to match component structure
-            const transformedData = transformApiDataToRequests(data);
-            setServiceRequests(transformedData);
-
-            // Update stats
-            updateStats(transformedData);
-
-        } catch (error) {
-            console.error('Error fetching requests:', error);
-
-            // Handle specific error types
-            if (error.message.includes('Authentication failed') || error.message.includes('No authentication token')) {
+            const technicianEmail = getTechnicianEmail();
+            if (!technicianEmail) {
                 setError('Authentication required. Please log in to view service requests.');
-                // Optionally redirect to login page
-                // window.location.href = '/login';
+                setLoading(false);
                 return;
             }
 
-            // Check if it's a connection error (backend not running)
-            if (error.message.includes('Failed to fetch') ||
-                error.message.includes('ERR_CONNECTION_REFUSED') ||
-                error.message.includes('NetworkError')) {
-                setIsDevelopmentMode(true);
-                // Use mock data for development
-                const mockData = getMockServiceRequests();
-                setServiceRequests(mockData);
-                updateStats(mockData);
-                setError('Backend server not available. Using mock data for development.');
+            const response = await fetch(`/api/technician/get-current-request?email=${encodeURIComponent(technicianEmail)}`, {
+                method: 'GET',
+                credentials: 'include', // Use cookies for authentication
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                const transformedData = transformApiDataToRequests(data);
+                setServiceRequests(transformedData);
+                updateStats(transformedData);
+                setError(null);
+            } else if (response.status === 404) {
+                // No current requests found
+                setServiceRequests([]);
+                updateStats([]);
+                setError(null);
+            } else if (response.status === 401) {
+                setError('Authentication required. Please log in to view service requests.');
             } else {
-                setError(`Failed to fetch service requests: ${error.message}`);
+                throw new Error(`Failed to fetch service requests: ${response.status}`);
             }
+        } catch (error) {
+            console.error('Error fetching requests:', error);
+            if (error.message.includes('Failed to fetch')) {
+                setError('Unable to connect to server. Please check your connection.');
+            } else {
+                setError(`Failed to load service requests: ${error.message}`);
+            }
+            setServiceRequests([]);
         } finally {
             setLoading(false);
         }
     };
 
-    // Mock data for development when backend is not available
-    const getMockServiceRequests = () => {
-        return [
-            {
-                id: 'SR001',
-                client: {
-                    name: 'John Doe',
-                    avatar: 'JD',
-                    phone: '+977-9841234567',
-                    email: 'john.doe@email.com',
-                    rating: 4.5,
-                    totalBookings: 12
-                },
-                service: {
-                    type: 'Plumbing Repair',
-                    category: 'plumbing',
-                    description: 'Kitchen sink is leaking and needs immediate repair. Water is dripping continuously.',
-                    urgency: 'high',
-                    estimatedDuration: '2-3 hours',
-                    preferredTime: 'Morning (9 AM - 12 PM)'
-                },
-                location: {
-                    address: 'Thamel, Ward 29, Kathmandu',
-                    distance: '2.5 km',
-                    coordinates: { lat: 27.7172, lng: 85.3240 }
-                },
-                pricing: {
-                    budget: '₨1,500 - ₨2,500',
-                    suggestedPrice: 2000,
-                    negotiable: true
-                },
-                timeline: {
-                    requestedDate: '2024-11-16',
-                    requestedTime: '10:00 AM',
-                    postedTime: '2 hours ago',
-                    responseDeadline: '6 hours'
-                },
-                status: 'pending',
-                priority: 'high',
-                attachments: ['kitchen-sink.jpg', 'water-damage.jpg']
-            },
-            {
-                id: 'SR002',
-                client: {
-                    name: 'Sarah Wilson',
-                    avatar: 'SW',
-                    phone: '+977-9851234567',
-                    email: 'sarah.wilson@email.com',
-                    rating: 4.8,
-                    totalBookings: 8
-                },
-                service: {
-                    type: 'House Cleaning',
-                    category: 'cleaning',
-                    description: 'Deep cleaning required for 2BHK apartment before moving in. All rooms, kitchen, and bathrooms.',
-                    urgency: 'medium',
-                    estimatedDuration: '4-5 hours',
-                    preferredTime: 'Afternoon (1 PM - 5 PM)'
-                },
-                location: {
-                    address: 'Patan Dhoka, Lalitpur',
-                    distance: '4.2 km',
-                    coordinates: { lat: 27.6588, lng: 85.3247 }
-                },
-                pricing: {
-                    budget: '₨3,000 - ₨4,000',
-                    suggestedPrice: 3500,
-                    negotiable: true
-                },
-                timeline: {
-                    requestedDate: '2024-11-17',
-                    requestedTime: '2:00 PM',
-                    postedTime: '4 hours ago',
-                    responseDeadline: '4 hours'
-                },
-                status: 'pending',
-                priority: 'medium',
-                attachments: ['apartment-layout.pdf']
-            },
-            {
-                id: 'SR003',
-                client: {
-                    name: 'Mike Johnson',
-                    avatar: 'MJ',
-                    phone: '+977-9861234567',
-                    email: 'mike.johnson@email.com',
-                    rating: 4.2,
-                    totalBookings: 15
-                },
-                service: {
-                    type: 'AC Installation',
-                    category: 'electrical',
-                    description: 'Need installation of new split AC unit in bedroom. Includes mounting and electrical connections.',
-                    urgency: 'low',
-                    estimatedDuration: '3-4 hours',
-                    preferredTime: 'Any time'
-                },
-                location: {
-                    address: 'Boudha, Kathmandu',
-                    distance: '8.1 km',
-                    coordinates: { lat: 27.7211, lng: 85.3621 }
-                },
-                pricing: {
-                    budget: '₨5,000 - ₨7,000',
-                    suggestedPrice: 6000,
-                    negotiable: false
-                },
-                timeline: {
-                    requestedDate: '2024-11-18',
-                    requestedTime: 'Flexible',
-                    postedTime: '1 day ago',
-                    responseDeadline: '2 hours'
-                },
-                status: 'pending',
-                priority: 'low',
-                attachments: ['ac-model.jpg', 'room-dimensions.pdf']
-            }
-        ];
-    };
-
-    // Transform API response to match component data structure
+    // Transform backend data to match frontend structure
     const transformApiDataToRequests = (apiData) => {
         if (!Array.isArray(apiData)) {
             console.warn('API response is not an array:', apiData);
@@ -328,45 +144,47 @@ const ServiceRequests = () => {
         }
 
         return apiData.map(item => ({
-            id: `SR${item.id || Math.random().toString().substr(2, 6)}`,
+            id: item.requestId || Math.random().toString().substr(2, 6),
+            requestId: `REQ${item.requestId}`,
             client: {
-                name: item.userName || 'Unknown Client',
-                avatar: (item.userName || 'UC').split(' ').map(n => n[0]).join('').substr(0, 2).toUpperCase(),
+                name: item.username || 'Unknown Client',
+                avatar: (item.username || 'UC').split(' ').map(n => n[0]).join('').substr(0, 2).toUpperCase(),
                 phone: item.userPhone || '+977-XXXXXXXXXX',
                 email: item.userEmail || 'N/A',
-                rating: item.userRating || 4.0,
-                totalBookings: item.userTotalBookings || 0
+                rating: 4.0, // Default rating as it's not in the DTO
+                totalBookings: 0 // Default as it's not in the DTO
             },
             service: {
-                type: item.serviceType || 'General Service',
-                category: getCategoryFromServiceType(item.serviceType),
-                description: item.serviceDescription || 'No description provided',
-                urgency: item.urgency || 'medium',
-                estimatedDuration: item.estimatedDuration || '2-3 hours',
-                preferredTime: item.preferredTime || 'Flexible'
+                type: item.serviceName || 'General Service',
+                category: getCategoryFromServiceType(item.serviceName),
+                description: `${item.serviceName} service requested`,
+                urgency: 'medium', // Default urgency
+                estimatedDuration: '2-3 hours',
+                preferredTime: formatTime(item.appointmentTime)
             },
             location: {
-                address: item.serviceLocation || 'Location not specified',
-                distance: calculateDistance(item.latitude, item.longitude) || 'N/A',
+                address: item.userAddress || 'Location not specified',
+                distance: 'N/A', // Distance calculation would need coordinates
                 coordinates: {
-                    lat: item.latitude || 27.7172,
-                    lng: item.longitude || 85.3240
+                    lat: 27.7172, // Default Kathmandu coordinates
+                    lng: 85.3240
                 }
             },
             pricing: {
-                budget: item.budgetRange || 'Budget not specified',
-                suggestedPrice: item.suggestedPrice || 0,
-                negotiable: item.negotiable !== false
+                budget: `₨${item.feeCharge || 0}`,
+                suggestedPrice: item.feeCharge || 0,
+                negotiable: true
             },
             timeline: {
-                requestedDate: item.serviceDate || new Date().toISOString().split('T')[0],
-                requestedTime: item.serviceTime || 'Flexible',
-                postedTime: formatTimeAgo(item.createdAt),
-                responseDeadline: calculateResponseDeadline(item.createdAt)
+                requestedDate: formatDate(item.appointmentTime),
+                requestedTime: formatTime(item.appointmentTime),
+                postedTime: formatTimeAgo(item.appointmentTime),
+                responseDeadline: calculateResponseDeadline(item.appointmentTime),
+                appointmentDateTime: new Date(item.appointmentTime)
             },
             status: mapApiStatusToComponentStatus(item.status),
-            priority: item.priority || 'medium',
-            attachments: item.attachments || []
+            priority: getPriorityFromAppointmentTime(item.appointmentTime),
+            attachments: []
         }));
     };
 
@@ -380,19 +198,34 @@ const ServiceRequests = () => {
         return 'general';
     };
 
-    const calculateDistance = (lat, lng) => {
-        // Simple distance calculation from Kathmandu center (27.7172, 85.3240)
-        if (!lat || !lng) return null;
-        const kathmandu = { lat: 27.7172, lng: 85.3240 };
-        const R = 6371; // Earth's radius in km
-        const dLat = (lat - kathmandu.lat) * Math.PI / 180;
-        const dLng = (lng - kathmandu.lng) * Math.PI / 180;
-        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-            Math.cos(kathmandu.lat * Math.PI / 180) * Math.cos(lat * Math.PI / 180) *
-            Math.sin(dLng/2) * Math.sin(dLng/2);
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-        const distance = R * c;
-        return `${distance.toFixed(1)} km`;
+    const formatDate = (dateTimeString) => {
+        if (!dateTimeString) return 'Date not set';
+        const date = new Date(dateTimeString);
+        const today = new Date();
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+
+        if (date.toDateString() === today.toDateString()) {
+            return 'Today';
+        } else if (date.toDateString() === tomorrow.toDateString()) {
+            return 'Tomorrow';
+        } else {
+            return date.toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric'
+            });
+        }
+    };
+
+    const formatTime = (dateTimeString) => {
+        if (!dateTimeString) return 'Time not set';
+        const date = new Date(dateTimeString);
+        return date.toLocaleTimeString('en-US', {
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true
+        });
     };
 
     const formatTimeAgo = (dateString) => {
@@ -408,40 +241,72 @@ const ServiceRequests = () => {
         return 'Just now';
     };
 
-    const calculateResponseDeadline = (createdAt) => {
-        if (!createdAt) return '6 hours';
-        const created = new Date(createdAt);
-        const deadline = new Date(created.getTime() + 6 * 60 * 60 * 1000); // 6 hours later
+    const calculateResponseDeadline = (appointmentTime) => {
+        if (!appointmentTime) return '6 hours';
+        const appointment = new Date(appointmentTime);
         const now = new Date();
-        const remaining = deadline - now;
-        const hours = Math.floor(remaining / (1000 * 60 * 60));
+        const timeDiff = appointment - now;
+        const hoursDiff = Math.floor(timeDiff / (1000 * 60 * 60));
 
-        if (hours <= 0) return 'Overdue';
-        return `${hours} hour${hours > 1 ? 's' : ''}`;
+        if (hoursDiff <= 0) return 'Overdue';
+        if (hoursDiff <= 2) return 'Urgent';
+        return `${hoursDiff} hours`;
+    };
+
+    const getPriorityFromAppointmentTime = (appointmentTime) => {
+        if (!appointmentTime) return 'medium';
+        const appointment = new Date(appointmentTime);
+        const now = new Date();
+        const hoursDiff = Math.floor((appointment - now) / (1000 * 60 * 60));
+
+        if (hoursDiff <= 2) return 'high';
+        if (hoursDiff <= 24) return 'medium';
+        return 'low';
     };
 
     const mapApiStatusToComponentStatus = (apiStatus) => {
         const status = (apiStatus || '').toLowerCase();
         switch (status) {
             case 'pending': return 'pending';
-            case 'accepted': return 'responded';
+            case 'in_progress': return 'in_progress';
+            case 'completed': return 'completed';
             case 'rejected': return 'declined';
-            case 'new': return 'new';
             default: return 'pending';
         }
     };
 
     const updateStats = (requests) => {
         const totalRequests = requests.length;
-        const urgentRequests = requests.filter(r => r.timeline.responseDeadline === 'Overdue').length;
+        const urgentRequests = requests.filter(r => r.timeline.responseDeadline === 'Urgent' || r.timeline.responseDeadline === 'Overdue').length;
         const potentialEarnings = requests.reduce((sum, r) => sum + (r.pricing.suggestedPrice || 0), 0);
 
         setStats({
             totalRequests,
             urgentResponses: urgentRequests,
-            responseRate: 85, // This could be calculated based on historical data
+            responseRate: 85,
             potentialEarnings
         });
+    };
+
+    // Validate appointment time before action
+    const validateAppointmentTime = (appointmentDateTime, action) => {
+        const now = new Date();
+        const appointment = new Date(appointmentDateTime);
+
+        if (action === 'complete') {
+            // For completing, check if appointment time has passed or is very close (within 30 minutes)
+            const timeDiff = appointment - now;
+            const minutesDiff = Math.floor(timeDiff / (1000 * 60));
+
+            if (minutesDiff > 30) {
+                return {
+                    valid: false,
+                    message: `Cannot complete service before appointment time. Appointment is scheduled for ${formatDate(appointment)} at ${formatTime(appointment)}.`
+                };
+            }
+        }
+
+        return { valid: true };
     };
 
     // Accept service request
@@ -449,49 +314,30 @@ const ServiceRequests = () => {
         setProcessingRequests(prev => new Set(prev).add(requestId));
 
         try {
-            if (isDevelopmentMode) {
-                // Simulate API delay for development
-                await new Promise(resolve => setTimeout(resolve, 1500));
+            const response = await fetch(`/api/technician/accept-service-request?requestId=${requestId}`, {
+                method: 'POST',
+                credentials: 'include',
+            });
 
-                // Update local state for development
-                setServiceRequests(prev =>
-                    prev.map(request =>
-                        request.id === requestId
-                            ? { ...request, status: 'responded' }
-                            : request
-                    )
-                );
-
-                alert(`Request ${requestId} has been accepted! (Development Mode)`);
-            } else {
-                const numericId = requestId.replace('SR', '');
-                await apiRequest(
-                    `/technician/accept-service-request?requestId=${numericId}`,
-                    { method: 'POST' }
-                );
-
+            if (response.ok) {
                 // Update local state
                 setServiceRequests(prev =>
                     prev.map(request =>
                         request.id === requestId
-                            ? { ...request, status: 'responded' }
+                            ? { ...request, status: 'in_progress' }
                             : request
                     )
                 );
-
-                alert(`Request ${requestId} has been accepted! You can now send a quote to the client.`);
+                alert('Request accepted successfully! The client has been notified.');
+                // Refresh to get updated data
+                fetchCurrentRequests();
+            } else {
+                const errorText = await response.text();
+                throw new Error(errorText || 'Failed to accept request');
             }
         } catch (error) {
             console.error('Error accepting request:', error);
-
-            // Show specific error message
-            if (error.message.includes('Authentication failed')) {
-                alert('Your session has expired. Please log in again.');
-            } else if (error.message.includes('Access forbidden')) {
-                alert('You don\'t have permission to accept this request.');
-            } else {
-                alert(`Failed to accept request: ${error.message}`);
-            }
+            alert(`Failed to accept request: ${error.message}`);
         } finally {
             setProcessingRequests(prev => {
                 const newSet = new Set(prev);
@@ -501,62 +347,86 @@ const ServiceRequests = () => {
         }
     };
 
-    // Decline service request - Enhanced with better confirmation
-    const handleDeclineRequest = (requestId) => {
+    // Complete service request (only for IN_PROGRESS)
+    const handleCompleteRequest = async (requestId) => {
         const request = serviceRequests.find(r => r.id === requestId);
-        setSelectedRequest(request);
-        setConfirmAction(() => () => performDeclineRequest(requestId));
-        setShowConfirmModal(true);
-    };
+        if (!request) return;
 
-    const performDeclineRequest = async (requestId) => {
+        // Validate appointment time
+        const timeValidation = validateAppointmentTime(request.timeline.appointmentDateTime, 'complete');
+        if (!timeValidation.valid) {
+            alert(timeValidation.message);
+            return;
+        }
+
+        if (request.status !== 'in_progress') {
+            alert('Only in-progress services can be marked as completed.');
+            return;
+        }
+
         setProcessingRequests(prev => new Set(prev).add(requestId));
 
         try {
-            if (isDevelopmentMode) {
-                // Simulate API delay for development
-                await new Promise(resolve => setTimeout(resolve, 1000));
+            const response = await fetch(`/api/technician/tick-completed-service?requestId=${requestId}`, {
+                method: 'POST',
+                credentials: 'include',
+            });
 
-                // Remove from local state for development
-                setServiceRequests(prev =>
-                    prev.filter(request => request.id !== requestId)
-                );
-
-                alert('Request declined successfully. (Development Mode)');
+            if (response.ok) {
+                alert('Service marked as completed successfully!');
+                // Refresh to get updated data (completed requests might be filtered out)
+                fetchCurrentRequests();
             } else {
-                const numericId = requestId.replace('SR', '');
-                await apiRequest(
-                    `/technician/reject-service-request?requestId=${numericId}`,
-                    { method: 'POST' }
-                );
-
-                // Remove from local state
-                setServiceRequests(prev =>
-                    prev.filter(request => request.id !== requestId)
-                );
-
-                alert('Request declined successfully. The client has been notified.');
+                const errorText = await response.text();
+                throw new Error(errorText || 'Failed to complete service');
             }
-
-            // Update stats after removal
-            const updatedRequests = serviceRequests.filter(request => request.id !== requestId);
-            updateStats(updatedRequests);
-
         } catch (error) {
-            console.error('Error declining request:', error);
+            console.error('Error completing service:', error);
+            alert(`Failed to complete service: ${error.message}`);
+        } finally {
+            setProcessingRequests(prev => {
+                const newSet = new Set(prev);
+                newSet.delete(requestId);
+                return newSet;
+            });
+        }
+    };
 
-            // Show specific error message
-            if (error.message.includes('Authentication failed')) {
-                alert('Your session has expired. Please log in again.');
-            } else if (error.message.includes('Access forbidden')) {
-                alert('You don\'t have permission to decline this request.');
-            } else if (error.message.includes('Resource not found')) {
-                alert('This request may have already been processed or no longer exists.');
-                // Remove from local state anyway since it doesn't exist on server
-                setServiceRequests(prev => prev.filter(request => request.id !== requestId));
+    // Reject service request (only for PENDING)
+    const handleRejectRequest = (requestId) => {
+        const request = serviceRequests.find(r => r.id === requestId);
+        if (!request) return;
+
+        if (request.status !== 'pending') {
+            alert('Only pending requests can be rejected.');
+            return;
+        }
+
+        setSelectedRequest(request);
+        setConfirmAction(() => () => performRejectRequest(requestId));
+        setShowConfirmModal(true);
+    };
+
+    const performRejectRequest = async (requestId) => {
+        setProcessingRequests(prev => new Set(prev).add(requestId));
+
+        try {
+            const response = await fetch(`/api/technician/reject-service-request?requestId=${requestId}`, {
+                method: 'POST',
+                credentials: 'include',
+            });
+
+            if (response.ok) {
+                alert('Request rejected successfully. The client has been notified.');
+                // Refresh to get updated data (rejected requests might be filtered out)
+                fetchCurrentRequests();
             } else {
-                alert(`Failed to decline request: ${error.message}`);
+                const errorText = await response.text();
+                throw new Error(errorText || 'Failed to reject request');
             }
+        } catch (error) {
+            console.error('Error rejecting request:', error);
+            alert(`Failed to reject request: ${error.message}`);
         } finally {
             setProcessingRequests(prev => {
                 const newSet = new Set(prev);
@@ -579,7 +449,7 @@ const ServiceRequests = () => {
         fetchCurrentRequests();
     }, []);
 
-    // Rest of your existing helper functions remain the same
+    // Rest of helper functions
     const getServiceIcon = (category) => {
         switch (category) {
             case 'plumbing': return <Wrench size={20} />;
@@ -601,10 +471,9 @@ const ServiceRequests = () => {
 
     const getStatusColor = (status) => {
         switch (status) {
-            case 'new': return '#3b82f6';
             case 'pending': return '#f59e0b';
-            case 'urgent': return '#ef4444';
-            case 'responded': return '#10b981';
+            case 'in_progress': return '#3b82f6';
+            case 'completed': return '#10b981';
             case 'declined': return '#ef4444';
             default: return '#6b7280';
         }
@@ -612,12 +481,21 @@ const ServiceRequests = () => {
 
     const getStatusText = (status) => {
         switch (status) {
-            case 'new': return 'New Request';
-            case 'pending': return 'Awaiting Response';
-            case 'urgent': return 'Response Overdue';
-            case 'responded': return 'Response Sent';
-            case 'declined': return 'Declined';
+            case 'pending': return 'Pending';
+            case 'in_progress': return 'In Progress';
+            case 'completed': return 'Completed';
+            case 'declined': return 'Rejected';
             default: return 'Unknown';
+        }
+    };
+
+    const getStatusIcon = (status) => {
+        switch (status) {
+            case 'pending': return <AlertCircle size={16} />;
+            case 'in_progress': return <Clock size={16} />;
+            case 'completed': return <CheckCircle size={16} />;
+            case 'declined': return <XCircle size={16} />;
+            default: return <Clock size={16} />;
         }
     };
 
@@ -635,16 +513,12 @@ const ServiceRequests = () => {
         const priorityOrder = { 'high': 3, 'medium': 2, 'low': 1 };
         switch (sortBy) {
             case 'date':
-                aValue = new Date(a.timeline.requestedDate);
-                bValue = new Date(b.timeline.requestedDate);
+                aValue = new Date(a.timeline.appointmentDateTime);
+                bValue = new Date(b.timeline.appointmentDateTime);
                 break;
             case 'price':
                 aValue = a.pricing.suggestedPrice;
                 bValue = b.pricing.suggestedPrice;
-                break;
-            case 'distance':
-                aValue = parseFloat(a.location.distance);
-                bValue = parseFloat(b.location.distance);
                 break;
             case 'priority':
                 aValue = priorityOrder[a.priority];
@@ -684,10 +558,9 @@ const ServiceRequests = () => {
 
     const filterOptions = [
         { value: 'all', label: 'All Requests', count: serviceRequests.length },
-        { value: 'new', label: 'New', count: serviceRequests.filter(r => r.status === 'new').length },
         { value: 'pending', label: 'Pending', count: serviceRequests.filter(r => r.status === 'pending').length },
-        { value: 'urgent', label: 'Urgent', count: serviceRequests.filter(r => r.status === 'urgent').length },
-        { value: 'responded', label: 'Responded', count: serviceRequests.filter(r => r.status === 'responded').length }
+        { value: 'in_progress', label: 'In Progress', count: serviceRequests.filter(r => r.status === 'in_progress').length },
+        { value: 'completed', label: 'Completed', count: serviceRequests.filter(r => r.status === 'completed').length }
     ];
 
     // Loading state
@@ -724,29 +597,13 @@ const ServiceRequests = () => {
             </div>
         );
     }
-
     return (
         <div className={styles['profile-content']}>
             <div className={styles['profile-form']}>
                 <div className={styles['profile-header']}>
                     <h1 className={styles['profile-title']}>Service Requests</h1>
                     <p className={styles['profile-subtitle']}>Manage and respond to incoming service requests from clients.</p>
-                    {isDevelopmentMode && (
-                        <div style={{
-                            backgroundColor: '#fef3c7',
-                            border: '1px solid #f59e0b',
-                            borderRadius: '8px',
-                            padding: '12px',
-                            marginTop: '8px',
-                            color: '#92400e'
-                        }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                <AlertCircle size={16} />
-                                <strong>Development Mode:</strong> Backend server not available. Using mock data for demonstration.
-                            </div>
-                        </div>
-                    )}
-                    {error && !isDevelopmentMode && (
+                    {error && !error.includes('Authentication required') && (
                         <div style={{
                             backgroundColor: '#fef2f2',
                             border: '1px solid #ef4444',
@@ -808,7 +665,7 @@ const ServiceRequests = () => {
                             <div className={styles['stat-content']}>
                                 <div className={styles['stat-number']}>₨{stats.potentialEarnings.toLocaleString()}</div>
                                 <div className={styles['stat-label']}>Potential Earnings</div>
-                                <div className={`${styles['stat-change']} ${styles['positive']}`}>From pending requests</div>
+                                <div className={`${styles['stat-change']} ${styles['positive']}`}>From current requests</div>
                             </div>
                         </div>
                     </div>
@@ -832,37 +689,37 @@ const ServiceRequests = () => {
                 <section className={styles['form-section']}>
                     <div className={styles['section-header']}>
                         <h3 className={styles['section-title']}>
-                            Requests ({sortedRequests.length})
+                            Current Requests ({sortedRequests.length})
                         </h3>
                     </div>
-
                     <div className={styles['requests-list']}>
                         {sortedRequests.map((request) => {
                             const isProcessing = processingRequests.has(request.id);
                             return (
-                                <div key={request.id} className={styles['request-card']}>
+                                <div key={`request-${request.id}`} className={styles['request-card']}>  {/* Fixed unique key */}
                                     <div className={styles['request-header']}>
                                         <div className={styles['request-id-status']}>
-                                            <span className={styles['request-id']}>#{request.id}</span>
+                                            <span className={styles['request-id']}>#{request.requestId}</span>
                                             <div className={styles['status-badges']}>
-                                            <span
-                                                className={styles['status-badge']}
-                                                style={{ backgroundColor: getStatusColor(request.status) }}
-                                            >
-                                                {getStatusText(request.status)}
-                                            </span>
+                                                <span
+                                                    className={styles['status-badge']}
+                                                    style={{ backgroundColor: getStatusColor(request.status) }}
+                                                >
+                                                    {getStatusIcon(request.status)}
+                                                    {getStatusText(request.status)}
+                                                </span>
                                                 <span
                                                     className={styles['priority-badge']}
                                                     style={{ backgroundColor: getPriorityColor(request.priority) }}
                                                 >
-                                                {request.priority.charAt(0).toUpperCase() + request.priority.slice(1)} Priority
-                                            </span>
+                                                    {request.priority.charAt(0).toUpperCase() + request.priority.slice(1)} Priority
+                                                </span>
                                             </div>
                                         </div>
                                         <div className={styles['request-time']}>
                                             <Clock size={14} />
-                                            <span>Posted {request.timeline.postedTime}</span>
-                                            <span className={styles['deadline']}>Respond within {request.timeline.responseDeadline}</span>
+                                            <span>Appointment: {request.timeline.requestedDate}</span>
+                                            <span className={styles['deadline']}>at {request.timeline.requestedTime}</span>
                                         </div>
                                     </div>
 
@@ -882,7 +739,7 @@ const ServiceRequests = () => {
                                                 <div className={styles['service-meta']}>
                                                     <div className={styles['meta-item']}>
                                                         <Calendar size={14} />
-                                                        <span>{request.timeline.requestedDate} at {request.timeline.requestedTime}</span>
+                                                        <span>Scheduled: {request.timeline.requestedDate} at {request.timeline.requestedTime}</span>
                                                     </div>
                                                     <div className={styles['meta-item']}>
                                                         <Clock size={14} />
@@ -890,7 +747,7 @@ const ServiceRequests = () => {
                                                     </div>
                                                     <div className={styles['meta-item']}>
                                                         <MapPin size={14} />
-                                                        <span>{request.location.address} ({request.location.distance} away)</span>
+                                                        <span>{request.location.address}</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -926,11 +783,11 @@ const ServiceRequests = () => {
                                         <div className={styles['request-pricing']}>
                                             <div className={styles['pricing-info']}>
                                                 <div className={styles['budget-range']}>
-                                                    <span className={styles['budget-label']}>Client Budget:</span>
+                                                    <span className={styles['budget-label']}>Service Fee:</span>
                                                     <span className={styles['budget-amount']}>{request.pricing.budget}</span>
                                                 </div>
                                                 <div className={styles['suggested-price']}>
-                                                    <span className={styles['suggested-label']}>Suggested:</span>
+                                                    <span className={styles['suggested-label']}>Amount:</span>
                                                     <span className={styles['suggested-amount']}>₨{request.pricing.suggestedPrice.toLocaleString()}</span>
                                                 </div>
                                                 {request.pricing.negotiable && (
@@ -950,22 +807,42 @@ const ServiceRequests = () => {
                                                 <Eye size={16} />
                                                 View Details
                                             </button>
-                                            <button
-                                                className={`${styles['action-btn']} ${styles['secondary']} ${styles['decline']}`}
-                                                onClick={() => handleDeclineRequest(request.id)}
-                                                disabled={isProcessing || request.status === 'declined' || request.status === 'responded'}
-                                            >
-                                                {isProcessing ? <RefreshCw size={16} className={styles['spin']} /> : <XCircle size={16} />}
-                                                {isProcessing ? 'Processing...' : 'Decline'}
-                                            </button>
-                                            <button
-                                                className={`${styles['action-btn']} ${styles['primary']}`}
-                                                onClick={() => handleAcceptRequest(request.id)}
-                                                disabled={isProcessing || request.status === 'declined' || request.status === 'responded'}
-                                            >
-                                                {isProcessing ? <RefreshCw size={16} className={styles['spin']} /> : <CheckCircle size={16} />}
-                                                {isProcessing ? 'Processing...' : 'Accept & Quote'}
-                                            </button>
+
+                                            {/* Reject button - only for pending requests */}
+                                            {request.status === 'pending' && (
+                                                <button
+                                                    className={`${styles['action-btn']} ${styles['secondary']} ${styles['decline']}`}
+                                                    onClick={() => handleRejectRequest(request.id)}
+                                                    disabled={isProcessing}
+                                                >
+                                                    {isProcessing ? <RefreshCw size={16} className={styles['spin']} /> : <XCircle size={16} />}
+                                                    {isProcessing ? 'Processing...' : 'Reject'}
+                                                </button>
+                                            )}
+
+                                            {/* Accept button - only for pending requests */}
+                                            {request.status === 'pending' && (
+                                                <button
+                                                    className={`${styles['action-btn']} ${styles['primary']}`}
+                                                    onClick={() => handleAcceptRequest(request.id)}
+                                                    disabled={isProcessing}
+                                                >
+                                                    {isProcessing ? <RefreshCw size={16} className={styles['spin']} /> : <CheckCircle size={16} />}
+                                                    {isProcessing ? 'Processing...' : 'Accept'}
+                                                </button>
+                                            )}
+
+                                            {/* Complete button - only for in_progress requests */}
+                                            {request.status === 'in_progress' && (
+                                                <button
+                                                    className={`${styles['action-btn']} ${styles['primary']} ${styles['complete']}`}
+                                                    onClick={() => handleCompleteRequest(request.id)}
+                                                    disabled={isProcessing}
+                                                >
+                                                    {isProcessing ? <RefreshCw size={16} className={styles['spin']} /> : <CheckCircle size={16} />}
+                                                    {isProcessing ? 'Processing...' : 'Mark Complete'}
+                                                </button>
+                                            )}
                                         </div>
 
                                         {request.attachments && request.attachments.length > 0 && (
@@ -994,7 +871,6 @@ const ServiceRequests = () => {
                         </div>
                     )}
                 </section>
-
                 {/* Confirmation Modal */}
                 {showConfirmModal && selectedRequest && (
                     <div className={styles['modal-overlay']}>
@@ -1011,13 +887,13 @@ const ServiceRequests = () => {
                             <div className={styles['modal-body']}>
                                 <div className={styles['confirmation-message']}>
                                     <AlertCircle size={48} className={styles['warning-icon']} />
-                                    <h4>Are you sure you want to decline this request?</h4>
-                                    <p>This action cannot be undone and the request will be permanently removed from your list. The client will be notified of your decision.</p>
+                                    <h4>Are you sure you want to reject this request?</h4>
+                                    <p>This action cannot be undone and the request will be marked as rejected. The client will be notified of your decision.</p>
                                 </div>
                                 <div className={styles['request-summary']}>
                                     <div className={styles['summary-row']}>
                                         <span className={styles['summary-label']}>Request ID:</span>
-                                        <span className={styles['summary-value']}>#{selectedRequest.id}</span>
+                                        <span className={styles['summary-value']}>#{selectedRequest.requestId}</span>
                                     </div>
                                     <div className={styles['summary-row']}>
                                         <span className={styles['summary-label']}>Client:</span>
@@ -1028,7 +904,11 @@ const ServiceRequests = () => {
                                         <span className={styles['summary-value']}>{selectedRequest.service.type}</span>
                                     </div>
                                     <div className={styles['summary-row']}>
-                                        <span className={styles['summary-label']}>Potential Earnings:</span>
+                                        <span className={styles['summary-label']}>Appointment:</span>
+                                        <span className={styles['summary-value']}>{selectedRequest.timeline.requestedDate} at {selectedRequest.timeline.requestedTime}</span>
+                                    </div>
+                                    <div className={styles['summary-row']}>
+                                        <span className={styles['summary-label']}>Service Fee:</span>
                                         <span className={styles['summary-value']}>₨{selectedRequest.pricing.suggestedPrice.toLocaleString()}</span>
                                     </div>
                                 </div>
@@ -1045,7 +925,7 @@ const ServiceRequests = () => {
                                     onClick={handleConfirmAction}
                                 >
                                     <XCircle size={16} />
-                                    Yes, Decline Request
+                                    Yes, Reject Request
                                 </button>
                             </div>
                         </div>
@@ -1057,7 +937,7 @@ const ServiceRequests = () => {
                     <div className={styles['modal-overlay']}>
                         <div className={styles['modal-content']} style={{ maxWidth: '800px' }}>
                             <div className={styles['modal-header']}>
-                                <h3 className={styles['modal-title']}>Request Details - #{selectedRequest.id}</h3>
+                                <h3 className={styles['modal-title']}>Request Details - #{selectedRequest.requestId}</h3>
                                 <button
                                     className={styles['modal-close']}
                                     onClick={() => setShowDetailsModal(false)}
@@ -1078,14 +958,25 @@ const ServiceRequests = () => {
                                             <span className={styles['details-value']}>{selectedRequest.service.description}</span>
                                         </div>
                                         <div className={styles['details-row']}>
+                                            <span className={styles['details-label']}>Category:</span>
+                                            <span className={styles['details-value']}>{selectedRequest.service.category}</span>
+                                        </div>
+                                        <div className={styles['details-row']}>
                                             <span className={styles['details-label']}>Duration:</span>
                                             <span className={styles['details-value']}>{selectedRequest.service.estimatedDuration}</span>
                                         </div>
                                         <div className={styles['details-row']}>
                                             <span className={styles['details-label']}>Priority:</span>
                                             <span className={`${styles['details-value']} ${styles['priority-badge']}`} style={{ backgroundColor: getPriorityColor(selectedRequest.priority) }}>
-                                            {selectedRequest.priority.charAt(0).toUpperCase() + selectedRequest.priority.slice(1)}
-                                        </span>
+                                                {selectedRequest.priority.charAt(0).toUpperCase() + selectedRequest.priority.slice(1)}
+                                            </span>
+                                        </div>
+                                        <div className={styles['details-row']}>
+                                            <span className={styles['details-label']}>Status:</span>
+                                            <span className={`${styles['details-value']} ${styles['status-badge']}`} style={{ backgroundColor: getStatusColor(selectedRequest.status) }}>
+                                                {getStatusIcon(selectedRequest.status)}
+                                                {getStatusText(selectedRequest.status)}
+                                            </span>
                                         </div>
                                     </div>
 
@@ -1118,43 +1009,39 @@ const ServiceRequests = () => {
                                     <div className={styles['details-section']}>
                                         <h4 className={styles['details-section-title']}>Schedule & Location</h4>
                                         <div className={styles['details-row']}>
-                                            <span className={styles['details-label']}>Requested Date:</span>
+                                            <span className={styles['details-label']}>Appointment Date:</span>
                                             <span className={styles['details-value']}>{selectedRequest.timeline.requestedDate}</span>
                                         </div>
                                         <div className={styles['details-row']}>
-                                            <span className={styles['details-label']}>Preferred Time:</span>
+                                            <span className={styles['details-label']}>Appointment Time:</span>
                                             <span className={styles['details-value']}>{selectedRequest.timeline.requestedTime}</span>
                                         </div>
                                         <div className={styles['details-row']}>
                                             <span className={styles['details-label']}>Location:</span>
                                             <span className={styles['details-value']}>{selectedRequest.location.address}</span>
                                         </div>
-                                        <div className={styles['details-row']}>
-                                            <span className={styles['details-label']}>Distance:</span>
-                                            <span className={styles['details-value']}>{selectedRequest.location.distance} away</span>
-                                        </div>
                                     </div>
 
                                     <div className={styles['details-section']}>
                                         <h4 className={styles['details-section-title']}>Pricing</h4>
                                         <div className={styles['details-row']}>
-                                            <span className={styles['details-label']}>Client Budget:</span>
+                                            <span className={styles['details-label']}>Service Fee:</span>
                                             <span className={styles['details-value']}>{selectedRequest.pricing.budget}</span>
                                         </div>
                                         <div className={styles['details-row']}>
-                                            <span className={styles['details-label']}>Suggested Price:</span>
+                                            <span className={styles['details-label']}>Amount:</span>
                                             <span className={styles['details-value']} style={{ color: '#059669', fontWeight: 'bold' }}>
-                                            ₨{selectedRequest.pricing.suggestedPrice.toLocaleString()}
-                                        </span>
+                                                ₨{selectedRequest.pricing.suggestedPrice.toLocaleString()}
+                                            </span>
                                         </div>
                                         <div className={styles['details-row']}>
                                             <span className={styles['details-label']}>Negotiable:</span>
                                             <span className={styles['details-value']}>
-                                            {selectedRequest.pricing.negotiable ?
-                                                <span className={styles['negotiable-yes']}>Yes</span> :
-                                                <span className={styles['negotiable-no']}>No</span>
-                                            }
-                                        </span>
+                                                {selectedRequest.pricing.negotiable ?
+                                                    <span className={styles['negotiable-yes']}>Yes</span> :
+                                                    <span className={styles['negotiable-no']}>No</span>
+                                                }
+                                            </span>
                                         </div>
                                     </div>
 
@@ -1164,8 +1051,8 @@ const ServiceRequests = () => {
                                             <div className={styles['attachments-list']}>
                                                 {selectedRequest.attachments.map((file, index) => (
                                                     <span key={index} className={styles['attachment-file']}>
-                                                    {file}
-                                                </span>
+                                                        {file}
+                                                    </span>
                                                 ))}
                                             </div>
                                         </div>
@@ -1179,17 +1066,48 @@ const ServiceRequests = () => {
                                 >
                                     Close
                                 </button>
-                                <button
-                                    className={`${styles['action-btn']} ${styles['primary']}`}
-                                    onClick={() => {
-                                        setShowDetailsModal(false);
-                                        handleAcceptRequest(selectedRequest.id);
-                                    }}
-                                    disabled={processingRequests.has(selectedRequest.id) || selectedRequest.status === 'declined' || selectedRequest.status === 'responded'}
-                                >
-                                    <CheckCircle size={16} />
-                                    Accept & Quote
-                                </button>
+
+                                {/* Show appropriate action button based on status */}
+                                {selectedRequest.status === 'pending' && (
+                                    <>
+                                        <button
+                                            className={`${styles['action-btn']} ${styles['decline']}`}
+                                            onClick={() => {
+                                                setShowDetailsModal(false);
+                                                handleRejectRequest(selectedRequest.id);
+                                            }}
+                                            disabled={processingRequests.has(selectedRequest.id)}
+                                        >
+                                            <XCircle size={16} />
+                                            Reject Request
+                                        </button>
+                                        <button
+                                            className={`${styles['action-btn']} ${styles['primary']}`}
+                                            onClick={() => {
+                                                setShowDetailsModal(false);
+                                                handleAcceptRequest(selectedRequest.id);
+                                            }}
+                                            disabled={processingRequests.has(selectedRequest.id)}
+                                        >
+                                            <CheckCircle size={16} />
+                                            Accept Request
+                                        </button>
+                                    </>
+                                )}
+
+                                {selectedRequest.status === 'in_progress' && (
+                                    <button
+                                        className={`${styles['action-btn']} ${styles['primary']} ${styles['complete']}`}
+                                        onClick={() => {
+                                            setShowDetailsModal(false);
+                                            handleCompleteRequest(selectedRequest.id);
+                                        }}
+                                        disabled={processingRequests.has(selectedRequest.id)}
+                                    >
+                                        <CheckCircle size={16} />
+                                        Mark Complete
+                                    </button>
+                                )}
                             </div>
                         </div>
                     </div>

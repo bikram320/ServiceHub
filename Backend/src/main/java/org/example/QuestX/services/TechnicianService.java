@@ -34,7 +34,7 @@ public class TechnicianService {
     public void technicianProfileSetup(String email , String phone, String address, Double latitude,
                                        Double longitude, String bio, MultipartFile profileImage,
                                        String serviceType , Double feeCharged,
-                                       MultipartFile identityDoc, MultipartFile validDoc) throws IOException {
+                                       MultipartFile identityDoc, MultipartFile validDoc, Long esewa_id) throws IOException {
         Technician technician = technicianRepository.findByEmail(email);
         if(technician == null){
             throw new TechnicianNotFoundException("Technician not found");
@@ -106,6 +106,10 @@ public class TechnicianService {
             identityDoc.transferTo(destFile);
             technician.setIdentityPath(docPath);
         }
+
+        if(esewa_id != 0){
+            technician.setEsewa_id(String.valueOf(esewa_id));
+        }
         technician.setStatus(Status.PENDING);
         technicianRepository.save(technician);
         technicianSkillRepository.save(technicianSkill);
@@ -159,6 +163,7 @@ public class TechnicianService {
         technicianDto.setPhone(tech.getPhone());
         technicianDto.setAddress(tech.getAddress());
         technicianDto.setStatus(tech.getStatus());
+        technicianDto.setEsewaId(tech.getEsewa_id());
         technicianDto.setProfileImagePath(tech.getProfileImagePath());
         technicianDto.setDocumentPath(tech.getValidDocumentPath());
         technicianDto.setIdentityPath(tech.getIdentityPath());
@@ -291,6 +296,7 @@ public class TechnicianService {
                 .map( serviceRequest ->
                 {
                     ServiceAndUserDetailsDto service = new ServiceAndUserDetailsDto();
+                    service.setRequestId(serviceRequest.getId());
                     service.setUsername(serviceRequest.getUser().getName());
                     service.setUserAddress(serviceRequest.getUser().getAddress());
                     service.setUserPhone(serviceRequest.getUser().getPhone());
@@ -330,5 +336,15 @@ public class TechnicianService {
                         }
                 )
                 .collect(Collectors.toList());
+    }
+
+    public void tickCompletedService(long requestId) {
+        ServiceRequest request = serviceRequestRepository.findById(requestId).orElseThrow(
+                () -> new ServiceNotFoundException("ServiceRequest  not found")
+        );
+        if(!request.getStatus().equals(ServiceStatus.IN_PROGRESS))
+            throw new StatusInvalidException("You can't complete this ServiceRequest Anymore");
+        request.setStatus(ServiceStatus.COMPLETED);
+        serviceRequestRepository.save(request);
     }
 }

@@ -31,9 +31,10 @@ public class TechnicianController {
             @RequestParam(required = false) Double feeCharged,
             @RequestParam(required = false) MultipartFile profile_image,
             @RequestParam(required = false) MultipartFile identity_doc,
-            @RequestParam(required = false) MultipartFile valid_doc
+            @RequestParam(required = false) MultipartFile valid_doc,
+            @RequestParam(required = false) long esewa_id
             ) throws IOException {
-        technicianService.technicianProfileSetup(email,phone,address,latitude,longitude,bio ,profile_image, serviceType , feeCharged,identity_doc,valid_doc);
+        technicianService.technicianProfileSetup(email,phone,address,latitude,longitude,bio ,profile_image, serviceType , feeCharged,identity_doc,valid_doc, esewa_id);
         return ResponseEntity.ok("Technician Profile Updated");
     }
     @GetMapping("/get-current-request")
@@ -48,6 +49,12 @@ public class TechnicianController {
     @GetMapping("/profile")
     public ResponseEntity<?> GetProfile(@RequestParam String email) {
         return ResponseEntity.ok(technicianService.getProfile(email));
+    }
+
+    @PostMapping("/tick-completed-service")
+    public ResponseEntity<?> tickCompletedService(@RequestParam long requestId) {
+        technicianService.tickCompletedService(requestId);
+        return ResponseEntity.ok("Service marked as completed");
     }
     @GetMapping("/get-previous-request")
     public ResponseEntity<?> getPreviousRequest(@RequestParam String email) {
