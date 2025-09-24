@@ -29,7 +29,7 @@ import {
     Home,
     Hammer
 } from 'lucide-react';
-import "../../styles/UserManagement.css";
+import "../../styles/UserManagement.module.css";
 
 const TechnicianManagement = () => {
     const [searchTerm, setSearchTerm] = useState('');

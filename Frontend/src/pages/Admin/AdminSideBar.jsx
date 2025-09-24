@@ -56,7 +56,7 @@ const AdminSidebar = ({ activeTab, onTabChange, onLogout }) => {
                 <div className="logo-section">
                     {!isCollapsed && (
                         <>
-                            <Header2 />
+                            <Header2 isSidebar={true}/>
                         </>
                     )}
                 </div>
