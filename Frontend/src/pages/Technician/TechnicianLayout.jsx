@@ -65,12 +65,13 @@ const TechnicianLayout = () =>{
     const renderActiveComponent = () => {
         switch (activeTab) {
             case 'dashboard':
-                return <TechnicianDashboard userInfo={userInfo} />;
+                return <TechnicianDashboard userInfo={userInfo} isCollapsed={sidebarCollapsed} />;
             case 'profile-form':
                 return (
                     <TechnicianProfileForm
                         userInfo={userInfo}
                         onUpdateProfile={handleUpdateProfile}
+                        isCollapsed={sidebarCollapsed}
                     />
                 );
             case 'profile':

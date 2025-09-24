@@ -258,7 +258,7 @@ function LandingPage() {
             {/* Popular Projects Section */}
             <section className={styles["popular-projects"]}>
                 <div className={styles.container}>
-                    <h2 className={styles["popular-projects-title"]}>Popular Projects</h2>
+                    <h2 className={styles["popular-projects-title"]}>Popular Tasks</h2>
 
                     <div className={styles["projects-grid"]}>
                         {PopularProjects.map((project, index) => (
