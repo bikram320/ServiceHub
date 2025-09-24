@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 import AdminSidebar from './AdminSidebar';
 import AdminDashboard from './AdminDashboard';
 import UserManagement from './UserManagement';
-// import TechnicianManagement from './TechnicianManagement';
-import {useNavigate} from "react-router-dom";
-
+import TechnicianManagement from './TechnicianManagement';
+import { useNavigate } from "react-router-dom";
 
 const AdminLayout = () => {
-    const navigate = useNavigate()
+    const navigate = useNavigate();
+    const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
     const [activeTab, setActiveTab] = useState('dashboard');
 
     const handleTabChange = (tabId) => {
@@ -23,7 +23,6 @@ const AdminLayout = () => {
 
             if (response.ok) {
                 console.log("User logged out successfully");
-                // Cookies are cleared by the backend, so no need to clear localStorage
                 navigate("/"); // redirect to homepage or login
             } else {
                 console.error("Logout failed:", await response.text());
@@ -38,13 +37,13 @@ const AdminLayout = () => {
     const renderContent = () => {
         switch (activeTab) {
             case 'dashboard':
-                return <AdminDashboard />;
+                return <AdminDashboard sidebarCollapsed={sidebarCollapsed} />;
             case 'users':
-                return <UserManagement />;
+                return <UserManagement sidebarCollapsed={sidebarCollapsed} />;
             case 'technicians':
-                return <TechnicianManagement />;
+                return <TechnicianManagement sidebarCollapsed={sidebarCollapsed} />;
             default:
-                return <AdminDashboard />;
+                return <AdminDashboard sidebarCollapsed={sidebarCollapsed} />;
         }
     };
 
@@ -54,6 +53,8 @@ const AdminLayout = () => {
                 activeTab={activeTab}
                 onTabChange={handleTabChange}
                 onLogout={handleLogout}
+                isCollapsed={sidebarCollapsed}
+                onToggleCollapse={setSidebarCollapsed}
             />
             <div className="admin-content">
                 {renderContent()}

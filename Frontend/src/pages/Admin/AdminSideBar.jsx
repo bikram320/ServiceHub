@@ -11,12 +11,18 @@ import {
     User,
     ChevronDown
 } from 'lucide-react';
-import "../../styles/AdminSideBar.css";
+import styles from "../../styles/UserSideBar.module.css";
 import Header2 from "../../Components/layout/Header2.jsx";
 
-const AdminSidebar = ({ activeTab, onTabChange, onLogout }) => {
-    const [isCollapsed, setIsCollapsed] = useState(false);
+const AdminSidebar = ({ activeTab,
+                          onTabChange,
+                          onLogout,
+                          isCollapsed,
+                          onToggleCollapse }) => {
     const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+    const handleToggleCollapse = () => {
+        onToggleCollapse(!isCollapsed);
+    };
 
     const navigationItems = [
         {
@@ -50,10 +56,10 @@ const AdminSidebar = ({ activeTab, onTabChange, onLogout }) => {
     };
 
     return (
-        <div className={`admin-sidebar ${isCollapsed ? 'collapsed' : ''}`}>
+        <div className={`${styles['user-sidebar']} ${isCollapsed ? styles.collapsed : ''}`}>
             {/* Sidebar Header */}
-            <div className="sidebar-header">
-                <div className="logo-section">
+            <div className={styles['sidebar-header']}>
+                <div className={styles['logo-section']}>
                     {!isCollapsed && (
                         <>
                             <Header2 isSidebar={true}/>
@@ -61,8 +67,8 @@ const AdminSidebar = ({ activeTab, onTabChange, onLogout }) => {
                     )}
                 </div>
                 <button
-                    className="collapse-btn"
-                    onClick={() => setIsCollapsed(!isCollapsed)}
+                    className={styles['collapse-btn']}
+                    onClick={handleToggleCollapse}
                     title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
                 >
                     {isCollapsed ? <Menu size={20} /> : <X size={20} />}
@@ -70,28 +76,28 @@ const AdminSidebar = ({ activeTab, onTabChange, onLogout }) => {
             </div>
 
             {/* Navigation Menu */}
-            <nav className="sidebar-nav">
-                <div className="nav-section">
-                    {!isCollapsed && <div className="nav-title">Main Menu</div>}
-                    <ul className="nav-list">
+            <nav className={styles['sidebar-nav']}>
+                <div className={styles['nav-section']}>
+                    {!isCollapsed && <div className={styles['nav-title']}>Main Menu</div>}
+                    <ul className={styles['nav-list']}>
                         {navigationItems.map((item) => {
                             const IconComponent = item.icon;
                             const isActive = activeTab === item.id;
 
                             return (
-                                <li key={item.id} className="nav-item">
+                                <li key={item.id} className={styles['nav-item']}>
                                     <button
-                                        className={`nav-link ${isActive ? 'active' : ''}`}
+                                        className={`${styles['nav-link']} ${isActive ? styles.active : ''}`}
                                         onClick={() => handleNavClick(item.id)}
                                         title={isCollapsed ? item.label : ''}
                                     >
-                                        <div className="nav-icon">
+                                        <div className={styles['nav-icon']}>
                                             <IconComponent size={20} />
                                         </div>
                                         {!isCollapsed && (
-                                            <span className="nav-label">{item.label}</span>
+                                            <span className={styles['nav-label']}>{item.label}</span>
                                         )}
-                                        {isActive && <div className="active-indicator" />}
+                                        {isActive && <div className={styles['active-indicator']} />}
                                     </button>
                                 </li>
                             );
@@ -101,24 +107,24 @@ const AdminSidebar = ({ activeTab, onTabChange, onLogout }) => {
             </nav>
 
             {/* Admin Profile Section */}
-            <div className="sidebar-footer">
-                <div className="admin-profile">
-                    <div className="profile-info">
-                        <div className="profile-avatar">
+            <div className={styles['sidebar-footer']}>
+                <div className={styles['user-profile']}>
+                    <div className={styles['profile-info']}>
+                        <div className={styles['profile-avatar']}>
                             <User size={20} />
                         </div>
                         {!isCollapsed && (
-                            <div className="profile-details">
-                                <div className="profile-name">Admin User</div>
-                                <div className="profile-role">System Administrator</div>
+                            <div className={styles['profile-details']}>
+                                <div className={styles['profile-name']}>Admin User</div>
+                                <div className={styles['profile-role']}>System Administrator</div>
                             </div>
                         )}
                     </div>
 
                     {!isCollapsed && (
-                        <div className="profile-actions">
+                        <div className={styles['profile-actions']}>
                             <button
-                                className="profile-dropdown-btn"
+                                className={styles['profile-dropdown-btn']}
                                 onClick={() => setShowProfileDropdown(!showProfileDropdown)}
                                 title="Profile options"
                             >
@@ -126,11 +132,10 @@ const AdminSidebar = ({ activeTab, onTabChange, onLogout }) => {
                             </button>
 
                             {showProfileDropdown && (
-                                <div className="profile-dropdown">
-
-                                    <div className="dropdown-divider" />
+                                <div className={styles['profile-dropdown']}>
+                                    <div className={styles['dropdown-divider']} />
                                     <button
-                                        className="dropdown-item logout"
+                                        className={`${styles['dropdown-item']} ${styles.logout}`}
                                         onClick={handleLogout}
                                     >
                                         <LogOut size={16} />
@@ -145,7 +150,7 @@ const AdminSidebar = ({ activeTab, onTabChange, onLogout }) => {
                 {/* Quick Logout Button (when collapsed) */}
                 {isCollapsed && (
                     <button
-                        className="quick-logout-btn"
+                        className={styles['quick-logout-btn']}
                         onClick={handleLogout}
                         title="Logout"
                     >
@@ -157,7 +162,7 @@ const AdminSidebar = ({ activeTab, onTabChange, onLogout }) => {
             {/* Overlay for mobile */}
             {!isCollapsed && (
                 <div
-                    className="sidebar-overlay"
+                    className={styles['sidebar-overlay']}
                     onClick={() => setIsCollapsed(true)}
                 />
             )}

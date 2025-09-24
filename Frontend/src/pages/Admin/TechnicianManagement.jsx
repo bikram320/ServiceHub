@@ -27,11 +27,15 @@ import {
     Droplets,
     Settings,
     Home,
-    Hammer
+    Hammer,
+    Plus,
+    Minus,
+    DollarSign
 } from 'lucide-react';
-import "../../styles/UserManagement.module.css";
+import '../../styles/TechnicianManagement.css';
+import styles from "../../styles/UserDashboard.module.css";
 
-const TechnicianManagement = () => {
+const TechnicianManagement = ({ sidebarCollapsed = false }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
     const [categoryFilter, setCategoryFilter] = useState('all');
@@ -60,6 +64,8 @@ const TechnicianManagement = () => {
             completedJobs: 0,
             rating: 0,
             totalEarnings: 0,
+            paymentReceived: 0,
+            paymentDeclined: 0,
             documents: ['citizenship_front.jpg', 'citizenship_back.jpg', 'license.jpg', 'experience_cert.pdf'],
             licenseNumber: 'EL-2024-001',
             licenseExpiry: '2025-11-15',
@@ -82,6 +88,8 @@ const TechnicianManagement = () => {
             completedJobs: 0,
             rating: 0,
             totalEarnings: 0,
+            paymentReceived: 0,
+            paymentDeclined: 0,
             documents: ['citizenship_front.jpg', 'license.jpg', 'training_cert.pdf'],
             licenseNumber: 'PL-2024-002',
             licenseExpiry: '2025-10-20',
@@ -104,6 +112,8 @@ const TechnicianManagement = () => {
             completedJobs: 45,
             rating: 4.8,
             totalEarnings: 125000,
+            paymentReceived: 118000,
+            paymentDeclined: 7000,
             documents: ['citizenship_front.jpg', 'license.jpg', 'experience_cert.pdf'],
             licenseNumber: 'EL-2023-045',
             licenseExpiry: '2025-03-15',
@@ -129,6 +139,8 @@ const TechnicianManagement = () => {
             completedJobs: 32,
             rating: 4.6,
             totalEarnings: 89000,
+            paymentReceived: 84500,
+            paymentDeclined: 4500,
             documents: ['citizenship_front.jpg', 'license.jpg', 'training_cert.pdf'],
             licenseNumber: 'PL-2023-028',
             licenseExpiry: '2025-05-10',
@@ -154,6 +166,8 @@ const TechnicianManagement = () => {
             completedJobs: 28,
             rating: 4.2,
             totalEarnings: 65000,
+            paymentReceived: 58500,
+            paymentDeclined: 6500,
             documents: ['citizenship_front.jpg', 'license.jpg'],
             licenseNumber: 'CR-2023-015',
             licenseExpiry: '2025-08-22',
@@ -331,6 +345,7 @@ const TechnicianManagement = () => {
     };
 
     return (
+        <div className={`${styles['admin-wrapper']} ${sidebarCollapsed ? styles['sidebar-collapsed'] : ''}`}>
         <div className="user-management">
             <div className="user-management-container">
                 {/* Header */}
@@ -461,9 +476,9 @@ const TechnicianManagement = () => {
                         <thead>
                         <tr>
                             <th>Technician</th>
-                            <th>Contact</th>
                             <th>Category & License</th>
                             <th>Performance</th>
+                            <th>Payment Status</th>
                             <th>Registration</th>
                             <th>Status</th>
                             <th>Actions</th>
@@ -494,18 +509,6 @@ const TechnicianManagement = () => {
                                         </div>
                                     </td>
                                     <td>
-                                        <div className="contact-info">
-                                            <div className="contact-item">
-                                                <Mail size={12} />
-                                                {tech.email}
-                                            </div>
-                                            <div className="contact-item">
-                                                <Phone size={12} />
-                                                {tech.phone}
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
                                         <div className="user-type">
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
                                                 <CategoryIcon size={14} color={categories[tech.category]?.color} />
@@ -531,6 +534,21 @@ const TechnicianManagement = () => {
                                             </div>
                                             <div className="specialization">
                                                 ₨{tech.totalEarnings?.toLocaleString() || 0}
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div className="user-type">
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', marginBottom: '0.25rem', color: '#10b981' }}>
+                                                <Plus size={12} />
+                                                <span>₨{tech.paymentReceived?.toLocaleString() || 0}</span>
+                                            </div>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', color: '#dc2626' }}>
+                                                <Minus size={12} />
+                                                <span>₨{tech.paymentDeclined?.toLocaleString() || 0}</span>
+                                            </div>
+                                            <div className="specialization">
+                                                Net: ₨{((tech.paymentReceived || 0) - (tech.paymentDeclined || 0)).toLocaleString()}
                                             </div>
                                         </div>
                                     </td>
@@ -643,73 +661,216 @@ const TechnicianManagement = () => {
                                         </button>
                                     </div>
                                     <div className="profile-details">
+                                        {/* Personal Information Section */}
                                         <div className="profile-section">
                                             <h4>Personal Information</h4>
                                             <div className="profile-grid">
                                                 <div className="profile-item">
-                                                    <label>Customer Satisfaction</label>
-                                                    <span>{selectedTechnician.customerSatisfaction}%</span>
+                                                    <label>Full Name</label>
+                                                    <span>{selectedTechnician.name}</span>
                                                 </div>
                                                 <div className="profile-item">
-                                                    <label>Response Time</label>
-                                                    <span>{selectedTechnician.responseTime}</span>
+                                                    <label>Email</label>
+                                                    <span>{selectedTechnician.email}</span>
                                                 </div>
                                                 <div className="profile-item">
-                                                    <label>Completion Rate</label>
-                                                    <span>{Math.round((selectedTechnician.completedJobs / (selectedTechnician.completedJobs + 2)) * 100)}%</span>
+                                                    <label>Phone</label>
+                                                    <span>{selectedTechnician.phone}</span>
                                                 </div>
                                                 <div className="profile-item">
-                                                    <label>Last 30 Days Jobs</label>
-                                                    <span>{Math.floor(selectedTechnician.completedJobs / 6) || 0}</span>
+                                                    <label>Address</label>
+                                                    <span>{selectedTechnician.address}</span>
+                                                </div>
+                                                <div className="profile-item">
+                                                    <label>Location</label>
+                                                    <span>{selectedTechnician.location}</span>
+                                                </div>
+                                                <div className="profile-item">
+                                                    <label>Experience</label>
+                                                    <span>{selectedTechnician.experience}</span>
                                                 </div>
                                             </div>
                                         </div>
 
+                                        {/* Professional Information Section */}
                                         <div className="profile-section">
-                                            <h4>Monthly Earnings Trend</h4>
-                                            <div style={{ display: 'flex', alignItems: 'end', gap: '8px', height: '120px', padding: '20px', background: '#f8fafc', borderRadius: '8px' }}>
-                                                {selectedTechnician.monthlyEarnings?.map((earning, index) => {
-                                                    const maxEarning = Math.max(...selectedTechnician.monthlyEarnings);
-                                                    const height = (earning / maxEarning) * 80;
-                                                    return (
-                                                        <div key={index} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1 }}>
-                                                            <div style={{
-                                                                width: '100%',
-                                                                height: `${height}px`,
-                                                                backgroundColor: '#0ea5e9',
-                                                                borderRadius: '4px 4px 0 0',
-                                                                marginBottom: '4px'
-                                                            }}></div>
-                                                            <span style={{ fontSize: '10px', color: '#64748b' }}>
-                                                                ₨{(earning/1000).toFixed(0)}k
+                                            <h4>Professional Information</h4>
+                                            <div className="profile-grid">
+                                                <div className="profile-item">
+                                                    <label>Category</label>
+                                                    <span>{selectedTechnician.category}</span>
+                                                </div>
+                                                <div className="profile-item">
+                                                    <label>License Number</label>
+                                                    <span>{selectedTechnician.licenseNumber}</span>
+                                                </div>
+                                                <div className="profile-item">
+                                                    <label>License Expiry</label>
+                                                    <span>{new Date(selectedTechnician.licenseExpiry).toLocaleDateString()}</span>
+                                                </div>
+                                                <div className="profile-item">
+                                                    <label>Registration Date</label>
+                                                    <span>{new Date(selectedTechnician.registrationDate).toLocaleDateString()}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Skills and Certifications */}
+                                        <div className="profile-section">
+                                            <h4>Skills & Certifications</h4>
+                                            <div className="profile-grid">
+                                                <div className="profile-item" style={{ gridColumn: '1 / -1' }}>
+                                                    <label>Skills</label>
+                                                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                                                        {selectedTechnician.skills?.map((skill, index) => (
+                                                            <span key={index} style={{
+                                                                background: '#e0f2fe',
+                                                                color: '#0369a1',
+                                                                padding: '4px 8px',
+                                                                borderRadius: '4px',
+                                                                fontSize: '12px'
+                                                            }}>
+                                                                {skill}
                                                             </span>
-                                                        </div>
-                                                    );
-                                                })}
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                                <div className="profile-item" style={{ gridColumn: '1 / -1' }}>
+                                                    <label>Certifications</label>
+                                                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                                                        {selectedTechnician.certifications?.map((cert, index) => (
+                                                            <span key={index} style={{
+                                                                background: '#f0fdf4',
+                                                                color: '#166534',
+                                                                padding: '4px 8px',
+                                                                borderRadius: '4px',
+                                                                fontSize: '12px'
+                                                            }}>
+                                                                {cert}
+                                                            </span>
+                                                        ))}
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
 
+                                        {/* Payment Information */}
                                         <div className="profile-section">
-                                            <h4>Performance Indicators</h4>
-                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                                    <span>Job Completion Rate</span>
-                                                    <div style={{ width: '60%', height: '8px', background: '#f1f5f9', borderRadius: '4px', overflow: 'hidden' }}>
-                                                        <div style={{ width: `${Math.round((selectedTechnician.completedJobs / (selectedTechnician.completedJobs + 2)) * 100)}%`, height: '100%', background: '#10b981' }}></div>
+                                            <h4>Payment Information</h4>
+                                            <div className="profile-grid">
+                                                <div className="profile-item">
+                                                    <label>Total Earnings</label>
+                                                    <span>₨{selectedTechnician.totalEarnings?.toLocaleString() || 0}</span>
+                                                </div>
+                                                <div className="profile-item">
+                                                    <label>Payment Received</label>
+                                                    <span style={{ color: '#10b981' }}>+₨{selectedTechnician.paymentReceived?.toLocaleString() || 0}</span>
+                                                </div>
+                                                <div className="profile-item">
+                                                    <label>Payment Declined</label>
+                                                    <span style={{ color: '#dc2626' }}>-₨{selectedTechnician.paymentDeclined?.toLocaleString() || 0}</span>
+                                                </div>
+                                                <div className="profile-item">
+                                                    <label>Net Payment</label>
+                                                    <span style={{ fontWeight: 'bold' }}>₨{((selectedTechnician.paymentReceived || 0) - (selectedTechnician.paymentDeclined || 0)).toLocaleString()}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Performance Metrics */}
+                                        {selectedTechnician.status === 'active' && (
+                                            <>
+                                                <div className="profile-section">
+                                                    <h4>Performance Metrics</h4>
+                                                    <div className="profile-grid">
+                                                        <div className="profile-item">
+                                                            <label>Customer Satisfaction</label>
+                                                            <span>{selectedTechnician.customerSatisfaction}%</span>
+                                                        </div>
+                                                        <div className="profile-item">
+                                                            <label>Response Time</label>
+                                                            <span>{selectedTechnician.responseTime}</span>
+                                                        </div>
+                                                        <div className="profile-item">
+                                                            <label>Completion Rate</label>
+                                                            <span>{Math.round((selectedTechnician.completedJobs / (selectedTechnician.completedJobs + 2)) * 100)}%</span>
+                                                        </div>
+                                                        <div className="profile-item">
+                                                            <label>Last 30 Days Jobs</label>
+                                                            <span>{Math.floor(selectedTechnician.completedJobs / 6) || 0}</span>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                                    <span>Customer Satisfaction</span>
-                                                    <div style={{ width: '60%', height: '8px', background: '#f1f5f9', borderRadius: '4px', overflow: 'hidden' }}>
-                                                        <div style={{ width: `${selectedTechnician.customerSatisfaction}%`, height: '100%', background: '#0ea5e9' }}></div>
+
+                                                <div className="profile-section">
+                                                    <h4>Monthly Earnings Trend</h4>
+                                                    <div style={{ display: 'flex', alignItems: 'end', gap: '8px', height: '120px', padding: '20px', background: '#f8fafc', borderRadius: '8px' }}>
+                                                        {selectedTechnician.monthlyEarnings?.map((earning, index) => {
+                                                            const maxEarning = Math.max(...selectedTechnician.monthlyEarnings);
+                                                            const height = (earning / maxEarning) * 80;
+                                                            return (
+                                                                <div key={index} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1 }}>
+                                                                    <div style={{
+                                                                        width: '100%',
+                                                                        height: `${height}px`,
+                                                                        backgroundColor: '#0ea5e9',
+                                                                        borderRadius: '4px 4px 0 0',
+                                                                        marginBottom: '4px'
+                                                                    }}></div>
+                                                                    <span style={{ fontSize: '10px', color: '#64748b' }}>
+                                                                        ₨{(earning/1000).toFixed(0)}k
+                                                                    </span>
+                                                                </div>
+                                                            );
+                                                        })}
                                                     </div>
                                                 </div>
-                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                                    <span>Rating Score</span>
-                                                    <div style={{ width: '60%', height: '8px', background: '#f1f5f9', borderRadius: '4px', overflow: 'hidden' }}>
-                                                        <div style={{ width: `${(selectedTechnician.rating / 5) * 100}%`, height: '100%', background: '#f59e0b' }}></div>
+
+                                                <div className="profile-section">
+                                                    <h4>Performance Indicators</h4>
+                                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                            <span>Job Completion Rate</span>
+                                                            <div style={{ width: '60%', height: '8px', background: '#f1f5f9', borderRadius: '4px', overflow: 'hidden' }}>
+                                                                <div style={{ width: `${Math.round((selectedTechnician.completedJobs / (selectedTechnician.completedJobs + 2)) * 100)}%`, height: '100%', background: '#10b981' }}></div>
+                                                            </div>
+                                                        </div>
+                                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                            <span>Customer Satisfaction</span>
+                                                            <div style={{ width: '60%', height: '8px', background: '#f1f5f9', borderRadius: '4px', overflow: 'hidden' }}>
+                                                                <div style={{ width: `${selectedTechnician.customerSatisfaction}%`, height: '100%', background: '#0ea5e9' }}></div>
+                                                            </div>
+                                                        </div>
+                                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                            <span>Rating Score</span>
+                                                            <div style={{ width: '60%', height: '8px', background: '#f1f5f9', borderRadius: '4px', overflow: 'hidden' }}>
+                                                                <div style={{ width: `${(selectedTechnician.rating / 5) * 100}%`, height: '100%', background: '#f59e0b' }}></div>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
+                                            </>
+                                        )}
+
+                                        {/* Documents */}
+                                        <div className="profile-section">
+                                            <h4>Documents</h4>
+                                            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                                                {selectedTechnician.documents?.map((doc, index) => (
+                                                    <span key={index} style={{
+                                                        background: '#fef3c7',
+                                                        color: '#92400e',
+                                                        padding: '4px 8px',
+                                                        borderRadius: '4px',
+                                                        fontSize: '12px',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        gap: '4px'
+                                                    }}>
+                                                        <FileText size={12} />
+                                                        {doc}
+                                                    </span>
+                                                ))}
                                             </div>
                                         </div>
                                     </div>
@@ -869,6 +1030,7 @@ const TechnicianManagement = () => {
                     )}
                 </Modal>
             </div>
+        </div>
         </div>
     );
 };
