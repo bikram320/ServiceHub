@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import AdminSidebar from './AdminSidebar';
 import AdminDashboard from './AdminDashboard';
 import UserManagement from './UserManagement';
-import TechnicianManagement from './TechnicianManagement';
+// import TechnicianManagement from './TechnicianManagement';
 import {useNavigate} from "react-router-dom";
 
 

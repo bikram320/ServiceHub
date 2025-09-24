@@ -74,6 +74,12 @@ public class TechnicianController {
         return ResponseEntity.ok("Service Booking Rejected");
     }
 
+    @GetMapping("/get-feedbacks")
+    public ResponseEntity<?> getFeedbacks(@RequestParam String email) {
+        var feedbacks = technicianService.getFeedbacks(email);
+        return ResponseEntity.ok(feedbacks);
+    }
+
     @GetMapping("/pending-payments")
     public ResponseEntity<?> getPendingPayment(@RequestParam String email) {
         List<PaymentDetailsDto> paymentDetails = technicianService.getPendingPayments(email);

@@ -49,181 +49,163 @@ const JobHistory = () => {
     const [repeatJobData, setRepeatJobData] = useState(null);
     const [exportFormat, setExportFormat] = useState('pdf');
     const [jobHistory, setJobHistory] = useState([]);
-    const [paymentHistory, setPaymentHistory] = useState([]);
+    const [feedbacks, setFeedbacks] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    // API Configuration
-    const API_BASE_URL = import.meta.env?.VITE_API_BASE_URL || 'http://localhost:8080';
-    const technicianEmail = 'tech@example.com'; // This should come from authenticated user context
-
-    // Get authorization token from cookies or localStorage
-    const getAuthToken = () => {
-        // Check for JWT in cookies first
-        const cookies = document.cookie.split(';');
-        const accessCookie = cookies.find(cookie => cookie.trim().startsWith('Access='));
-        if (accessCookie) {
-            return accessCookie.split('=')[1];
-        }
-
-        // Fallback to localStorage if needed
-        return localStorage.getItem('authToken');
+    // Get technician email from localStorage (same pattern as ServiceRequests)
+    const getTechnicianEmail = () => {
+        return localStorage.getItem('userEmail'); // Assuming technician email is stored as userEmail
     };
 
-    // API request helper
-    const apiRequest = async (endpoint, options = {}) => {
-        const token = getAuthToken();
-        const config = {
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
-                ...options.headers,
-            },
-            ...options,
-        };
-
+    // Fetch feedbacks from backend
+    const fetchFeedbacks = async () => {
         try {
-            const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
+            const technicianEmail = getTechnicianEmail();
+            if (!technicianEmail) return;
 
-            if (!response.ok) {
-                if (response.status === 401) {
-                    throw new Error('Authentication failed. Please log in again.');
-                } else if (response.status === 403) {
-                    throw new Error('Access denied. You do not have permission to access this resource.');
-                } else if (response.status === 404) {
-                    throw new Error('Requested resource not found.');
-                } else if (response.status >= 500) {
-                    throw new Error('Server error. Please try again later.');
-                } else {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
+            const response = await fetch(`/api/technician/get-feedbacks?email=${encodeURIComponent(technicianEmail)}`, {
+                method: 'GET',
+                credentials: 'include',
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                console.log('Raw Feedbacks Data:', data);
+                setFeedbacks(data);
+            } else if (response.status === 404) {
+                // No feedbacks found
+                setFeedbacks([]);
             }
-
-            const contentType = response.headers.get('content-type');
-            if (contentType && contentType.includes('application/json')) {
-                return await response.json();
-            }
-
-            return await response.text();
         } catch (error) {
-            console.error('API request failed:', error);
-            throw error;
+            console.error('Error fetching feedbacks:', error);
+            // Don't throw error for feedbacks as it's not critical
+            setFeedbacks([]);
         }
     };
 
-    // Fetch previous service requests (job history)
+    // Fetch previous service requests (job history) using correct endpoint
     const fetchJobHistory = async () => {
-        try {
-            const data = await apiRequest(
-                `/technician/get-previous-request?email=${encodeURIComponent(technicianEmail)}`
-            );
-
-            // Transform API data to match component structure
-            const transformedData = transformApiDataToJobs(data);
-            setJobHistory(transformedData);
-
-        } catch (error) {
-            console.error('Error fetching job history:', error);
-            throw error;
-        }
-    };
-
-    // Fetch payment history
-    const fetchPaymentHistory = async () => {
-        try {
-            // Fetch both received and pending payments
-            const [receivedPayments, pendingPayments] = await Promise.all([
-                apiRequest(`/technician/received-payments?email=${encodeURIComponent(technicianEmail)}`),
-                apiRequest(`/technician/pending-payments?email=${encodeURIComponent(technicianEmail)}`)
-            ]);
-
-            const allPayments = [
-                ...receivedPayments.map(p => ({ ...p, status: 'paid' })),
-                ...pendingPayments.map(p => ({ ...p, status: 'pending' }))
-            ];
-
-            setPaymentHistory(allPayments);
-
-        } catch (error) {
-            console.error('Error fetching payment history:', error);
-            throw error;
-        }
-    };
-
-    // Load all data
-    const loadAllData = async () => {
         try {
             setLoading(true);
             setError(null);
 
-            await Promise.all([
-                fetchJobHistory(),
-                fetchPaymentHistory()
-            ]);
+            const technicianEmail = getTechnicianEmail();
+            if (!technicianEmail) {
+                setError('Authentication required. Please log in to view job history.');
+                setLoading(false);
+                return;
+            }
 
+            const response = await fetch(`/api/technician/get-previous-request?email=${encodeURIComponent(technicianEmail)}`, {
+                method: 'GET',
+                credentials: 'include', // Use cookies for authentication
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                console.log('Raw API Data for Job History:', data); // Debug log
+                const transformedData = await transformApiDataToJobs(data); // Make async to handle feedbacks
+                setJobHistory(transformedData);
+                setError(null);
+            } else if (response.status === 404) {
+                // No previous requests found
+                setJobHistory([]);
+                setError(null);
+            } else if (response.status === 401) {
+                setError('Authentication required. Please log in to view job history.');
+            } else {
+                throw new Error(`Failed to fetch job history: ${response.status}`);
+            }
         } catch (error) {
-            console.error('Error loading data:', error);
-            setError(error.message || 'Failed to load job history. Please try again.');
+            console.error('Error fetching job history:', error);
+            if (error.message.includes('Failed to fetch')) {
+                setError('Unable to connect to server. Please check your connection.');
+            } else {
+                setError(`Failed to load job history: ${error.message}`);
+            }
+            setJobHistory([]);
         } finally {
             setLoading(false);
         }
     };
 
     // Transform API response to match component data structure
-    const transformApiDataToJobs = (apiData) => {
+    const transformApiDataToJobs = async (apiData) => {
         if (!Array.isArray(apiData)) {
             console.warn('API returned non-array data:', apiData);
             return [];
         }
 
-        return apiData.map(item => ({
-            id: `JOB${item.id || Math.random().toString().substr(2, 6)}`,
-            serviceRequestId: `SR${item.serviceRequestId || item.id}`,
-            client: {
-                name: item.userName || 'Unknown Client',
-                avatar: (item.userName || 'UC').split(' ').map(n => n[0]).join('').substr(0, 2).toUpperCase(),
-                phone: item.userPhone || '+977-XXXXXXXXXX',
-                email: item.userEmail || 'N/A',
-                rating: item.userRating || 4.0,
-                totalBookings: item.userTotalBookings || 0
-            },
-            service: {
-                type: item.serviceType || 'General Service',
-                category: getCategoryFromServiceType(item.serviceType),
-                description: item.serviceDescription || 'No description provided',
-                duration: calculateDuration(item.startTime, item.endTime) || '2-3 hours',
-                difficulty: item.difficulty || 'medium'
-            },
-            location: {
-                address: item.serviceLocation || 'Location not specified',
-                distance: calculateDistance(item.latitude, item.longitude) || 'N/A'
-            },
-            pricing: {
-                quotedPrice: item.quotedPrice || 0,
-                finalPrice: item.finalPrice || item.quotedPrice || 0,
-                additionalCharges: (item.finalPrice || 0) - (item.quotedPrice || 0),
-                paymentMethod: item.paymentMethod || 'Cash'
-            },
-            timeline: {
-                requestDate: item.requestDate || item.createdAt?.split('T')[0],
-                scheduledDate: item.serviceDate || item.scheduledDate,
-                startTime: item.startTime || 'N/A',
-                endTime: item.endTime || 'N/A',
-                completedDate: item.completedDate || item.serviceDate
-            },
-            status: mapApiStatusToComponentStatus(item.status),
-            rating: {
-                clientRating: item.clientRating || null,
-                clientReview: item.clientReview || null,
-                technicianNotes: item.technicianNotes || null
-            },
-            images: item.attachments || [],
-            payments: {
-                status: getPaymentStatus(item.id, paymentHistory),
-                paidDate: item.paidDate,
-                method: item.paymentMethod || 'Cash'
+        // Wait for feedbacks to be available
+        await fetchFeedbacks();
+
+        return apiData.map((item, index) => {
+            console.log(`Processing job item ${index}:`, item); // Debug each item
+
+            const requestId = item.requestId || item.id || null;
+
+            if (!requestId) {
+                console.error('No requestId found in job item:', item);
             }
-        }));
+
+            // Find feedback for this job
+            const jobFeedback = feedbacks.find(feedback =>
+                feedback.requestId === requestId || feedback.serviceRequestId === requestId
+            );
+
+            return {
+                id: `JOB${requestId || index}`, // For display
+                serviceRequestId: `SR${requestId || index}`, // For display
+                actualId: requestId, // Actual DB ID for operations
+                client: {
+                    name: item.username || 'Unknown Client',
+                    avatar: (item.username || 'UC').split(' ').map(n => n[0]).join('').substr(0, 2).toUpperCase(),
+                    phone: item.userPhone || '+977-XXXXXXXXXX',
+                    email: item.userEmail || 'N/A',
+                    rating: 4.0, // Default rating as it's not in the DTO
+                    totalBookings: 0 // Default as it's not in the DTO
+                },
+                service: {
+                    type: item.serviceName || 'General Service',
+                    category: getCategoryFromServiceType(item.serviceName),
+                    description: `${item.serviceName} service completed`,
+                    duration: '2-3 hours', // Default duration
+                    difficulty: 'medium' // Default difficulty
+                },
+                location: {
+                    address: item.userAddress || 'Location not specified',
+                    distance: 'N/A' // Distance calculation would need coordinates
+                },
+                pricing: {
+                    quotedPrice: item.feeCharge || 0,
+                    finalPrice: item.feeCharge || 0, // Use same as quoted for now
+                    additionalCharges: 0, // Default
+                    paymentMethod: 'Cash' // Default
+                },
+                timeline: {
+                    requestDate: formatDate(item.appointmentTime),
+                    scheduledDate: formatDate(item.appointmentTime),
+                    startTime: formatTime(item.appointmentTime),
+                    endTime: formatEndTime(item.appointmentTime), // Calculate end time
+                    completedDate: formatDate(item.appointmentTime),
+                    appointmentDateTime: new Date(item.appointmentTime)
+                },
+                status: mapApiStatusToComponentStatus(item.status),
+                rating: {
+                    clientRating: jobFeedback?.rating || null,
+                    clientReview: jobFeedback?.feedback || jobFeedback?.comment || null,
+                    technicianNotes: null // Not in DTO
+                },
+                images: [],
+                payments: {
+                    status: 'paid', // Assume completed jobs are paid
+                    paidDate: formatDate(item.appointmentTime),
+                    method: 'Cash'
+                },
+                hasFeedback: !!jobFeedback // Flag to show if feedback exists
+            };
+        });
     };
 
     // Helper functions
@@ -236,53 +218,53 @@ const JobHistory = () => {
         return 'general';
     };
 
-    const calculateDistance = (lat, lng) => {
-        if (!lat || !lng) return 'N/A';
-        const kathmandu = { lat: 27.7172, lng: 85.3240 };
-        const R = 6371; // Earth's radius in km
-        const dLat = (lat - kathmandu.lat) * Math.PI / 180;
-        const dLng = (lng - kathmandu.lng) * Math.PI / 180;
-        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-            Math.cos(kathmandu.lat * Math.PI / 180) * Math.cos(lat * Math.PI / 180) *
-            Math.sin(dLng/2) * Math.sin(dLng/2);
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-        const distance = R * c;
-        return `${distance.toFixed(1)} km`;
+    const formatDate = (dateTimeString) => {
+        if (!dateTimeString) return 'Date not set';
+        const date = new Date(dateTimeString);
+        return date.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+        });
     };
 
-    const calculateDuration = (startTime, endTime) => {
-        if (!startTime || !endTime) return null;
-        try {
-            const start = new Date(`2000-01-01 ${startTime}`);
-            const end = new Date(`2000-01-01 ${endTime}`);
-            const diffMs = end - start;
-            const hours = Math.floor(diffMs / (1000 * 60 * 60));
-            const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-            return `${hours} hours ${minutes} minutes`;
-        } catch (error) {
-            return null;
-        }
+    const formatTime = (dateTimeString) => {
+        if (!dateTimeString) return 'Time not set';
+        const date = new Date(dateTimeString);
+        return date.toLocaleTimeString('en-US', {
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true
+        });
+    };
+
+    const formatEndTime = (dateTimeString) => {
+        if (!dateTimeString) return 'Time not set';
+        const date = new Date(dateTimeString);
+        // Add 2 hours for end time (default service duration)
+        date.setHours(date.getHours() + 2);
+        return date.toLocaleTimeString('en-US', {
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true
+        });
     };
 
     const mapApiStatusToComponentStatus = (apiStatus) => {
+        // Previous requests should be completed, but handle other statuses
         const status = (apiStatus || '').toLowerCase();
         switch (status) {
             case 'completed': return 'completed';
             case 'in_progress': case 'in-progress': return 'in-progress';
             case 'cancelled': return 'cancelled';
-            case 'on_hold': case 'on-hold': return 'on-hold';
-            default: return 'completed';
+            case 'rejected': return 'cancelled';
+            default: return 'completed'; // Default for previous requests
         }
-    };
-
-    const getPaymentStatus = (jobId, payments) => {
-        const payment = payments.find(p => p.requestId === jobId || p.jobId === jobId);
-        return payment?.status || 'pending';
     };
 
     // Load data on component mount
     useEffect(() => {
-        loadAllData();
+        fetchJobHistory();
     }, []);
 
     const getServiceIcon = (category) => {
@@ -430,9 +412,9 @@ const JobHistory = () => {
 
         if (format === 'csv') {
             // CSV format
-            const headers = 'Job ID,Client Name,Service Type,Status,Date,Final Price,Rating,Location\n';
+            const headers = 'Job ID,Client Name,Service Type,Status,Date,Final Price,Location\n';
             const rows = sortedJobs.map(job =>
-                `${job.id},"${job.client.name}","${job.service.type}",${job.status},${job.timeline.completedDate || job.timeline.scheduledDate},${job.pricing.finalPrice || job.pricing.quotedPrice},${job.rating.clientRating || 'N/A'},"${job.location.address}"`
+                `${job.id},"${job.client.name}","${job.service.type}",${job.status},${job.timeline.completedDate || job.timeline.scheduledDate},${job.pricing.finalPrice || job.pricing.quotedPrice},"${job.location.address}"`
             ).join('\n');
             content = headers + rows;
             filename = `job-history-${new Date().toISOString().split('T')[0]}.csv`;
@@ -468,7 +450,7 @@ const JobHistory = () => {
         setSelectedJobs([]);
 
         // Reload data
-        loadAllData();
+        fetchJobHistory();
     };
 
     const handleRepeatJob = async (jobId) => {
@@ -488,17 +470,8 @@ const JobHistory = () => {
 
                 // Since there's no specific repeat job endpoint in the API docs,
                 // this would likely be implemented as a new service request creation
-                const response = await apiRequest('/service-request/create', {
-                    method: 'POST',
-                    body: JSON.stringify(repeatJobRequest)
-                });
-
-                alert(`New repeat job request created successfully! Request ID: ${response.id || 'N/A'}`);
-
-                // Refresh the job history to show the new request if it appears in the list
-                setTimeout(() => {
-                    loadAllData();
-                }, 1000);
+                console.log('Would create repeat job with data:', repeatJobRequest);
+                alert(`Repeat job feature would create a new request based on ${jobId}`);
 
             } catch (error) {
                 console.error('Error creating repeat job:', error);
@@ -520,12 +493,11 @@ const JobHistory = () => {
         .reduce((sum, job) => sum + (job.pricing.finalPrice || 0), 0);
     const avgRating = jobHistory
         .filter(job => job.rating.clientRating)
-        .reduce((sum, job, _, array) => sum + job.rating.clientRating / array.length, 0);
+        .reduce((sum, job, _, array) => sum + job.rating.clientRating / array.length, 0) || 4.0; // Default if no ratings
 
     const filterOptions = [
         { value: 'all', label: 'All Jobs', count: jobHistory.length },
         { value: 'completed', label: 'Completed', count: jobHistory.filter(j => j.status === 'completed').length },
-        { value: 'in-progress', label: 'In Progress', count: jobHistory.filter(j => j.status === 'in-progress').length },
         { value: 'cancelled', label: 'Cancelled', count: jobHistory.filter(j => j.status === 'cancelled').length }
     ];
 
@@ -543,7 +515,28 @@ const JobHistory = () => {
         );
     }
 
-    // Error state
+    // Error state for authentication issues
+    if (error && error.includes('Authentication required')) {
+        return (
+            <div className={styles.profileContent}>
+                <div className={styles.profileForm}>
+                    <div className={styles.errorState}>
+                        <AlertCircle size={48} style={{ color: '#ef4444' }} />
+                        <h3>Authentication Required</h3>
+                        <p>{error}</p>
+                        <button
+                            className={`${styles.actionBtn} ${styles.primary}`}
+                            onClick={() => window.location.href = '/LoginSignup'}
+                        >
+                            Go to Login
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    // Error state for other errors
     if (error) {
         return (
             <div className={styles.profileContent}>
@@ -564,13 +557,27 @@ const JobHistory = () => {
             </div>
         );
     }
-
     return (
         <div className={styles.profileContent}>
             <div className={styles.profileForm}>
                 <div className={styles.profileHeader}>
                     <h1 className={styles.profileTitle}>Job History</h1>
                     <p className={styles.profileSubtitle}>Track your completed jobs, earnings, and client feedback.</p>
+                    {error && !error.includes('Authentication required') && (
+                        <div style={{
+                            backgroundColor: '#fef2f2',
+                            border: '1px solid #ef4444',
+                            borderRadius: '8px',
+                            padding: '12px',
+                            marginTop: '8px',
+                            color: '#dc2626'
+                        }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <AlertCircle size={16} />
+                                <strong>Error:</strong> {error}
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 {/* Summary Cards */}
@@ -659,10 +666,9 @@ const JobHistory = () => {
                             </button>
                         </div>
                     </div>
-
                     <div className={styles.jobsList}>
                         {sortedJobs.map((job) => (
-                            <div key={job.id} className={`${styles.jobCard} ${styles[job.status]}`}>
+                            <div key={`job-${job.id}`} className={`${styles.jobCard} ${styles[job.status]}`}>
                                 <div className={styles.jobHeader}>
                                     <div className={styles.jobIdStatus}>
                                         <span className={styles.jobId}>#{job.id}</span>
@@ -673,18 +679,7 @@ const JobHistory = () => {
                                             >
                                                 {getStatusText(job.status)}
                                             </span>
-                                            <span
-                                                className={styles.difficultyBadge}
-                                                style={{ backgroundColor: getDifficultyColor(job.service.difficulty) }}
-                                            >
-                                                {job.service.difficulty.charAt(0).toUpperCase() + job.service.difficulty.slice(1)}
-                                            </span>
-                                            <span
-                                                className={styles.paymentBadge}
-                                                style={{ backgroundColor: getPaymentStatusColor(job.payments.status) }}
-                                            >
-                                                {job.payments.status.charAt(0).toUpperCase() + job.payments.status.slice(1)}
-                                            </span>
+                                            {/* Removed difficulty and payment badges */}
                                         </div>
                                     </div>
                                     <div className={styles.jobDate}>
@@ -748,6 +743,8 @@ const JobHistory = () => {
                                             </div>
                                             {job.pricing.finalPrice && (
                                                 <div className={`${styles.priceItem} ${styles.final}`}>
+                                                    <span className={styles.priceLabel}>Final:</span>
+                                                    <span className={styles.priceAmount}>₨{job.pricing.finalPrice.toLocaleString()}</span>
                                                 </div>
                                             )}
                                         </div>
@@ -768,7 +765,17 @@ const JobHistory = () => {
                                                 </div>
                                                 <span className={styles.ratingNumber}>{job.rating.clientRating}</span>
                                             </div>
-                                            <p className={styles.reviewText}>"{job.rating.clientReview}"</p>
+                                            {job.rating.clientReview && (
+                                                <p className={styles.reviewText}>"{job.rating.clientReview}"</p>
+                                            )}
+                                        </div>
+                                    )}
+
+                                    {/* Show feedback indicator if feedback exists but no rating displayed yet */}
+                                    {!job.rating.clientRating && job.hasFeedback && (
+                                        <div className={styles.feedbackIndicator}>
+                                            <Star size={16} fill="#fbbf24" color="#fbbf24" />
+                                            <span>Client feedback available - View details</span>
                                         </div>
                                     )}
 
@@ -801,14 +808,7 @@ const JobHistory = () => {
                                                 Repeat
                                             </button>
                                         )}
-                                        <button
-                                            className={`${styles.actionBtn} ${styles.primary}`}
-                                            onClick={() => handleContactClient(job.id)}
-                                            disabled
-                                        >
-                                            <MessageSquare size={16} />
-                                            Contact
-                                        </button>
+                                        {/* Removed Contact button */}
                                     </div>
 
                                     {job.images && job.images.length > 0 && (
@@ -875,6 +875,15 @@ const JobHistory = () => {
                                         {selectedJobDetails.service.difficulty.charAt(0).toUpperCase() + selectedJobDetails.service.difficulty.slice(1)}
                                     </span>
                                 </div>
+                                <div className={styles.modalDetail}>
+                                    <strong>Status:</strong>
+                                    <span
+                                        className={styles.statusTag}
+                                        style={{ backgroundColor: getStatusColor(selectedJobDetails.status) }}
+                                    >
+                                        {getStatusText(selectedJobDetails.status)}
+                                    </span>
+                                </div>
                             </div>
                         </div>
 
@@ -909,6 +918,9 @@ const JobHistory = () => {
                                 </div>
                                 <div className={styles.modalDetail}>
                                     <strong>Completed Date:</strong> {selectedJobDetails.timeline.completedDate}
+                                </div>
+                                <div className={styles.modalDetail}>
+                                    <strong>Time:</strong> {selectedJobDetails.timeline.startTime} - {selectedJobDetails.timeline.endTime}
                                 </div>
                                 <div className={styles.modalDetail}>
                                     <strong>Location:</strong> {selectedJobDetails.location.address}
@@ -1046,7 +1058,10 @@ const JobHistory = () => {
                                 Cancel
                             </button>
                             <button
-                                onClick={() => handleRepeatJob(repeatJobData.id)}
+                                onClick={() => {
+                                    handleRepeatJob(repeatJobData.id);
+                                    setShowRepeatJobModal(false);
+                                }}
                                 className={`${styles.actionBtn} ${styles.success}`}
                             >
                                 <RotateCcw size={16} />

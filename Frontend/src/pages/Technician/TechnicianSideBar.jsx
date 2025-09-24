@@ -170,7 +170,7 @@ const TechnicianSidebar = ({ activeTab,
                                     <button
                                         className={styles['dropdown-item']}
                                         onClick={() => {
-                                            handleNavClick('profile');
+                                            handleNavClick('profile-form');
                                             setShowProfileDropdown(false);
                                         }}
                                     >
