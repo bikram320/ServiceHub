@@ -504,9 +504,9 @@ const JobHistory = ({ isSidebarCollapsed = false }) => {
     // Loading state
     if (loading) {
         return (
-            <div className={styles.profileContent}>
-                <div className={styles.profileForm}>
-                    <div className={styles.loadingState}>
+            <div className={styles['profile-content']}>
+                <div className={styles['profile-form']}>
+                    <div className={styles['loading-state']}>
                         <RefreshCw size={48} className={styles.spin} />
                         <p>Loading job history...</p>
                     </div>
@@ -518,14 +518,14 @@ const JobHistory = ({ isSidebarCollapsed = false }) => {
     // Error state for authentication issues
     if (error && error.includes('Authentication required')) {
         return (
-            <div className={styles.profileContent}>
-                <div className={styles.profileForm}>
-                    <div className={styles.errorState}>
+            <div className={styles['profile-content']}>
+                <div className={styles['profile-form']}>
+                    <div className={styles['error-state']}>
                         <AlertCircle size={48} style={{ color: '#ef4444' }} />
                         <h3>Authentication Required</h3>
                         <p>{error}</p>
                         <button
-                            className={`${styles.actionBtn} ${styles.primary}`}
+                            className={`${styles['action-btn']} ${styles.primary}`}
                             onClick={() => window.location.href = '/LoginSignup'}
                         >
                             Go to Login
@@ -540,13 +540,13 @@ const JobHistory = ({ isSidebarCollapsed = false }) => {
     if (error) {
         return (
             <div className={`${styles['profile-content']} ${isSidebarCollapsed ? styles['sidebar-collapsed'] : ''}`}>
-                <div className={styles.profileForm}>
-                    <div className={styles.errorState}>
+                <div className={styles['profile-form']}>
+                    <div className={styles['error-state']}>
                         <AlertCircle size={48} style={{ color: '#ef4444' }} />
                         <h3>Error Loading Job History</h3>
                         <p>{error}</p>
                         <button
-                            className={`${styles.actionBtn} ${styles.primary}`}
+                            className={`${styles['action-btn']} ${styles.primary}`}
                             onClick={handleRefresh}
                         >
                             <RefreshCw size={16} />
@@ -559,10 +559,10 @@ const JobHistory = ({ isSidebarCollapsed = false }) => {
     }
     return (
         <div className={`${styles['profile-content']} ${isSidebarCollapsed ? styles['sidebar-collapsed'] : ''}`}>
-            <div className={styles.profileForm}>
-                <div className={styles.profileHeader}>
-                    <h1 className={styles.profileTitle}>Job History</h1>
-                    <p className={styles.profileSubtitle}>Track your completed jobs, earnings, and client feedback.</p>
+            <div className={styles['profile-form']}>
+                <div className={styles['profile-header']}>
+                    <h1 className={styles['profile-title']}>Job History</h1>
+                    <p className={styles['profile-subtitle']}>Track your completed jobs, earnings, and client feedback.</p>
                     {error && !error.includes('Authentication required') && (
                         <div style={{
                             backgroundColor: '#fef2f2',
@@ -581,49 +581,49 @@ const JobHistory = ({ isSidebarCollapsed = false }) => {
                 </div>
 
                 {/* Summary Cards */}
-                <section className={styles.formSection}>
-                    <div className={styles.statsGrid}>
-                        <div className={styles.statCard}>
-                            <div className={`${styles.statIcon} ${styles.blue}`}>
+                <section className={styles['form-section']}>
+                    <div className={styles['stats-grid']}>
+                        <div className={styles['stat-card']}>
+                            <div className={`${styles['stat-icon']} ${styles.blue}`}>
                                 <Activity size={24} />
                             </div>
-                            <div className={styles.statContent}>
-                                <div className={styles.statNumber}>{totalJobs}</div>
-                                <div className={styles.statLabel}>Total Jobs</div>
-                                <div className={`${styles.statChange} ${styles.positive}`}>+{completedJobs} completed</div>
+                            <div className={styles['stat-content']}>
+                                <div className={styles['stat-number']}>{totalJobs}</div>
+                                <div className={styles['stat-label']}>Total Jobs</div>
+                                <div className={`${styles['stat-change']} ${styles.positive}`}>+{completedJobs} completed</div>
                             </div>
                         </div>
 
-                        <div className={styles.statCard}>
-                            <div className={`${styles.statIcon} ${styles.green}`}>
+                        <div className={styles['stat-card']}>
+                            <div className={`${styles['stat-icon']} ${styles.green}`}>
                                 <CheckCircle size={24} />
                             </div>
-                            <div className={styles.statContent}>
-                                <div className={styles.statNumber}>{completedJobs}</div>
-                                <div className={styles.statLabel}>Completed Jobs</div>
-                                <div className={`${styles.statChange} ${styles.positive}`}>{Math.round((completedJobs/totalJobs)*100) || 0}% success rate</div>
+                            <div className={styles['stat-content']}>
+                                <div className={styles['stat-number']}>{completedJobs}</div>
+                                <div className={styles['stat-label']}>Completed Jobs</div>
+                                <div className={`${styles['stat-change']} ${styles.positive}`}>{Math.round((completedJobs/totalJobs)*100) || 0}% success rate</div>
                             </div>
                         </div>
 
-                        <div className={styles.statCard}>
-                            <div className={`${styles.statIcon} ${styles.emerald}`}>
+                        <div className={styles['stat-card']}>
+                            <div className={`${styles['stat-icon']} ${styles.emerald}`}>
                                 <DollarSign size={24} />
                             </div>
-                            <div className={styles.statContent}>
-                                <div className={styles.statNumber}>₨{totalEarnings.toLocaleString()}</div>
-                                <div className={styles.statLabel}>Total Earnings</div>
-                                <div className={`${styles.statChange} ${styles.positive}`}>From completed jobs</div>
+                            <div className={styles['stat-content']}>
+                                <div className={styles['stat-number']}>₨{totalEarnings.toLocaleString()}</div>
+                                <div className={styles['stat-label']}>Total Earnings</div>
+                                <div className={`${styles['stat-change']} ${styles.positive}`}>From completed jobs</div>
                             </div>
                         </div>
 
-                        <div className={styles.statCard}>
-                            <div className={`${styles.statIcon} ${styles.yellow}`}>
+                        <div className={styles['stat-card']}>
+                            <div className={`${styles['stat-icon']} ${styles.yellow}`}>
                                 <Star size={24} />
                             </div>
-                            <div className={styles.statContent}>
-                                <div className={styles.statNumber}>{avgRating.toFixed(1) || 'N/A'}</div>
-                                <div className={styles.statLabel}>Average Rating</div>
-                                <div className={`${styles.statChange} ${styles.positive}`}>From client reviews</div>
+                            <div className={styles['stat-content']}>
+                                <div className={styles['stat-number']}>{avgRating.toFixed(1) || 'N/A'}</div>
+                                <div className={styles['stat-label']}>Average Rating</div>
+                                <div className={`${styles['stat-change']} ${styles.positive}`}>From client reviews</div>
                             </div>
                         </div>
                     </div>
@@ -644,21 +644,21 @@ const JobHistory = ({ isSidebarCollapsed = false }) => {
                 />
 
                 {/* Job History List */}
-                <section className={styles.formSection}>
-                    <div className={styles.sectionHeader}>
-                        <h3 className={styles.sectionTitle}>
+                <section className={styles['form-section']}>
+                    <div className={styles['section-header']}>
+                        <h3 className={styles['section-title']}>
                             Job Records ({sortedJobs.length})
                         </h3>
-                        <div className={styles.sectionActions}>
+                        <div className={styles['section-actions']}>
                             <button
-                                className={`${styles.actionBtn} ${styles.secondary}`}
+                                className={`${styles['action-btn']} ${styles.secondary}`}
                                 onClick={() => handleExport('csv')}
                             >
                                 <Download size={16} />
                                 Export CSV
                             </button>
                             <button
-                                className={`${styles.actionBtn} ${styles.secondary}`}
+                                className={`${styles['action-btn']} ${styles.secondary}`}
                                 onClick={() => handleExport('json')}
                             >
                                 <Download size={16} />
@@ -666,52 +666,51 @@ const JobHistory = ({ isSidebarCollapsed = false }) => {
                             </button>
                         </div>
                     </div>
-                    <div className={styles.jobsList}>
+                    <div className={styles['requests-list']}>
                         {sortedJobs.map((job) => (
-                            <div key={`job-${job.id}`} className={`${styles.jobCard} ${styles[job.status]}`}>
-                                <div className={styles.jobHeader}>
-                                    <div className={styles.jobIdStatus}>
-                                        <span className={styles.jobId}>#{job.id}</span>
-                                        <div className={styles.statusBadges}>
+                            <div key={`job-${job.id}`} className={`${styles['request-card']} ${styles[job.status]}`}>
+                                <div className={styles['request-header']}>
+                                    <div className={styles['request-id-status']}>
+                                        <span className={styles['request-id']}>#{job.id}</span>
+                                        <div className={styles['status-badges']}>
                                             <span
-                                                className={styles.statusBadge}
+                                                className={styles['status-badge']}
                                                 style={{ backgroundColor: getStatusColor(job.status) }}
                                             >
                                                 {getStatusText(job.status)}
                                             </span>
-                                            {/* Removed difficulty and payment badges */}
                                         </div>
                                     </div>
-                                    <div className={styles.jobDate}>
+                                    <div className={styles['request-time']}>
                                         <Calendar size={14} />
                                         <span>{job.timeline.completedDate || job.timeline.scheduledDate}</span>
                                     </div>
                                 </div>
 
-                                <div className={styles.jobBody}>
-                                    <div className={styles.jobMain}>
-                                        <div className={styles.serviceInfo}>
-                                            <div className={styles.serviceHeader}>
-                                                <div className={styles.serviceIcon}>
+                                <div className={styles['request-body']}>
+                                    <div className={styles['request-main']}>
+                                        <div className={styles['service-info']}>
+                                            <div className={styles['service-header']}>
+                                                <div className={styles['service-icon']}>
                                                     {getServiceIcon(job.service.category)}
                                                 </div>
-                                                <div className={styles.serviceDetails}>
-                                                    <h4 className={styles.serviceTitle}>{job.service.type}</h4>
-                                                    <p className={styles.serviceDescription}>{job.service.description}</p>
+                                                <div className={styles['service-details']}>
+                                                    <h4 className={styles['service-title']}>{job.service.type}</h4>
+                                                    <p className={styles['service-description']}>{job.service.description}</p>
                                                 </div>
                                             </div>
 
-                                            <div className={styles.jobMeta}>
-                                                <div className={styles.metaItem}>
+                                            <div className={styles['service-meta']}>
+                                                <div className={styles['meta-item']}>
                                                     <Clock size={14} />
                                                     <span>Duration: {job.service.duration}</span>
                                                 </div>
-                                                <div className={styles.metaItem}>
+                                                <div className={styles['meta-item']}>
                                                     <MapPin size={14} />
                                                     <span>{job.location.address}</span>
                                                 </div>
                                                 {job.timeline.startTime && job.timeline.endTime && (
-                                                    <div className={styles.metaItem}>
+                                                    <div className={styles['meta-item']}>
                                                         <Calendar size={14} />
                                                         <span>{job.timeline.startTime} - {job.timeline.endTime}</span>
                                                     </div>
@@ -719,14 +718,14 @@ const JobHistory = ({ isSidebarCollapsed = false }) => {
                                             </div>
                                         </div>
 
-                                        <div className={styles.clientInfo}>
-                                            <div className={styles.clientHeader}>
-                                                <div className={styles.clientAvatar}>
+                                        <div className={styles['client-info']}>
+                                            <div className={styles['client-header']}>
+                                                <div className={styles['client-avatar']}>
                                                     {job.client.avatar}
                                                 </div>
-                                                <div className={styles.clientDetails}>
-                                                    <h5 className={styles.clientName}>{job.client.name}</h5>
-                                                    <div className={styles.clientRating}>
+                                                <div className={styles['client-details']}>
+                                                    <h5 className={styles['client-name']}>{job.client.name}</h5>
+                                                    <div className={styles['client-rating']}>
                                                         <Star size={12} fill="#fbbf24" color="#fbbf24" />
                                                         <span>{job.client.rating}</span>
                                                     </div>
@@ -735,25 +734,25 @@ const JobHistory = ({ isSidebarCollapsed = false }) => {
                                         </div>
                                     </div>
 
-                                    <div className={styles.jobPricing}>
-                                        <div className={styles.pricingDetails}>
-                                            <div className={styles.priceItem}>
-                                                <span className={styles.priceLabel}>Quoted:</span>
-                                                <span className={styles.priceAmount}>₨{job.pricing.quotedPrice.toLocaleString()}</span>
+                                    <div className={styles['request-pricing']}>
+                                        <div className={styles['pricing-info']}>
+                                            <div className={styles['budget-range']}>
+                                                <span className={styles['budget-label']}>Quoted:</span>
+                                                <span className={styles['budget-amount']}>₨{job.pricing.quotedPrice.toLocaleString()}</span>
                                             </div>
                                             {job.pricing.finalPrice && (
-                                                <div className={`${styles.priceItem} ${styles.final}`}>
-                                                    <span className={styles.priceLabel}>Final:</span>
-                                                    <span className={styles.priceAmount}>₨{job.pricing.finalPrice.toLocaleString()}</span>
+                                                <div className={styles['suggested-price']}>
+                                                    <span className={styles['suggested-label']}>Final:</span>
+                                                    <span className={styles['suggested-amount']}>₨{job.pricing.finalPrice.toLocaleString()}</span>
                                                 </div>
                                             )}
                                         </div>
                                     </div>
 
                                     {job.rating.clientRating && (
-                                        <div className={styles.jobReview}>
-                                            <div className={styles.reviewRating}>
-                                                <div className={styles.ratingStars}>
+                                        <div className={styles['request-pricing']}>
+                                            <div className={styles['rating-display']}>
+                                                <div>
                                                     {[...Array(5)].map((_, i) => (
                                                         <Star
                                                             key={i}
@@ -763,37 +762,37 @@ const JobHistory = ({ isSidebarCollapsed = false }) => {
                                                         />
                                                     ))}
                                                 </div>
-                                                <span className={styles.ratingNumber}>{job.rating.clientRating}</span>
+                                                <span>{job.rating.clientRating}</span>
                                             </div>
                                             {job.rating.clientReview && (
-                                                <p className={styles.reviewText}>"{job.rating.clientReview}"</p>
+                                                <p style={{ margin: '0.5rem 0 0 0', fontStyle: 'italic', color: '#6b7280' }}>"{job.rating.clientReview}"</p>
                                             )}
                                         </div>
                                     )}
 
                                     {/* Show feedback indicator if feedback exists but no rating displayed yet */}
                                     {!job.rating.clientRating && job.hasFeedback && (
-                                        <div className={styles.feedbackIndicator}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '1rem', backgroundColor: '#fef3c7', borderRadius: '8px' }}>
                                             <Star size={16} fill="#fbbf24" color="#fbbf24" />
                                             <span>Client feedback available - View details</span>
                                         </div>
                                     )}
 
                                     {job.rating.technicianNotes && (
-                                        <div className={styles.technicianNotes}>
-                                            <div className={styles.notesHeader}>
+                                        <div style={{ padding: '1rem', backgroundColor: '#f3f4f6', borderRadius: '8px' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
                                                 <FileText size={16} />
                                                 <span>Notes:</span>
                                             </div>
-                                            <p className={styles.notesText}>{job.rating.technicianNotes}</p>
+                                            <p style={{ margin: 0, color: '#6b7280' }}>{job.rating.technicianNotes}</p>
                                         </div>
                                     )}
                                 </div>
 
-                                <div className={styles.jobActions}>
-                                    <div className={styles.actionButtons}>
+                                <div className={styles['request-actions']}>
+                                    <div className={styles['action-buttons']}>
                                         <button
-                                            className={`${styles.actionBtn} ${styles.secondary}`}
+                                            className={`${styles['action-btn']} ${styles.secondary}`}
                                             onClick={() => handleViewDetails(job.id)}
                                         >
                                             <Eye size={16} />
@@ -801,21 +800,20 @@ const JobHistory = ({ isSidebarCollapsed = false }) => {
                                         </button>
                                         {job.status === 'completed' && (
                                             <button
-                                                className={`${styles.actionBtn} ${styles.success}`}
+                                                className={`${styles['action-btn']} ${styles.complete}`}
                                                 onClick={() => handleRepeatJob(job.id)}
                                             >
                                                 <RotateCcw size={16} />
                                                 Repeat
                                             </button>
                                         )}
-                                        {/* Removed Contact button */}
                                     </div>
 
                                     {job.images && job.images.length > 0 && (
-                                        <div className={styles.jobAttachments}>
-                                            <span className={styles.attachmentsLabel}>Files:</span>
+                                        <div className={styles.attachments}>
+                                            <span className={styles['attachments-label']}>Files:</span>
                                             {job.images.map((file, index) => (
-                                                <span key={index} className={styles.attachmentFile}>{file}</span>
+                                                <span key={index} className={styles['attachment-file']}>{file}</span>
                                             ))}
                                         </div>
                                     )}
@@ -825,11 +823,11 @@ const JobHistory = ({ isSidebarCollapsed = false }) => {
                     </div>
 
                     {sortedJobs.length === 0 && (
-                        <div className={styles.emptyState}>
-                            <div className={styles.emptyIcon}>
+                        <div className={styles['empty-state']}>
+                            <div className={styles['empty-icon']}>
                                 <Activity size={48} />
                             </div>
-                            <div className={styles.emptyMessage}>
+                            <div className={styles['empty-message']}>
                                 <h4>No jobs found</h4>
                                 <p>Try adjusting your filters or search terms to find relevant job history.</p>
                             </div>
@@ -840,174 +838,206 @@ const JobHistory = ({ isSidebarCollapsed = false }) => {
 
             {/* Job Details Modal */}
             {showJobDetails && selectedJobDetails && (
-                <div className={styles.modalOverlay}>
-                    <div className={styles.modalContent}>
-                        <div className={styles.modalHeader}>
-                            <h2 className={styles.modalTitle}>
+                <div className={styles['modal-overlay']}>
+                    <div className={styles['modal-content']}>
+                        <div className={styles['modal-header']}>
+                            <h2 className={styles['modal-title']}>
                                 Job Details - {selectedJobDetails.id}
                             </h2>
                             <button
                                 onClick={() => setShowJobDetails(false)}
-                                className={styles.modalCloseBtn}
+                                className={styles['modal-close']}
                             >
                                 <X size={24} color="#6b7280" />
                             </button>
                         </div>
 
-                        <div className={styles.modalSection}>
-                            <h3 className={styles.modalSectionTitle}>Service Information</h3>
-                            <div className={styles.modalSectionContent}>
-                                <div className={styles.modalDetail}>
-                                    <strong>Service Type:</strong> {selectedJobDetails.service.type}
-                                </div>
-                                <div className={styles.modalDetail}>
-                                    <strong>Description:</strong> {selectedJobDetails.service.description}
-                                </div>
-                                <div className={styles.modalDetail}>
-                                    <strong>Duration:</strong> {selectedJobDetails.service.duration}
-                                </div>
-                                <div className={styles.modalDetail}>
-                                    <strong>Difficulty:</strong>
-                                    <span
-                                        className={styles.difficultyTag}
-                                        style={{ backgroundColor: getDifficultyColor(selectedJobDetails.service.difficulty) }}
-                                    >
-                                        {selectedJobDetails.service.difficulty.charAt(0).toUpperCase() + selectedJobDetails.service.difficulty.slice(1)}
-                                    </span>
-                                </div>
-                                <div className={styles.modalDetail}>
-                                    <strong>Status:</strong>
-                                    <span
-                                        className={styles.statusTag}
-                                        style={{ backgroundColor: getStatusColor(selectedJobDetails.status) }}
-                                    >
-                                        {getStatusText(selectedJobDetails.status)}
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className={styles.modalSection}>
-                            <h3 className={styles.modalSectionTitle}>Client Information</h3>
-                            <div className={styles.modalSectionContent}>
-                                <div className={styles.modalClientInfo}>
-                                    <div className={styles.clientAvatar}>
-                                        {selectedJobDetails.client.avatar}
+                        <div className={styles['modal-body']}>
+                            <div className={styles['details-section']}>
+                                <h3 className={styles['details-section-title']}>Service Information</h3>
+                                <div>
+                                    <div className={styles['details-row']}>
+                                        <span className={styles['details-label']}>Service Type:</span>
+                                        <span className={styles['details-value']}>{selectedJobDetails.service.type}</span>
                                     </div>
-                                    <div>
-                                        <h4 className={styles.clientNameModal}>
-                                            {selectedJobDetails.client.name}
-                                        </h4>
-                                        <div className={styles.clientContact}>
-                                            <span>{selectedJobDetails.client.phone}</span>
-                                            <span>{selectedJobDetails.client.email}</span>
-                                        </div>
+                                    <div className={styles['details-row']}>
+                                        <span className={styles['details-label']}>Description:</span>
+                                        <span className={styles['details-value']}>{selectedJobDetails.service.description}</span>
                                     </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className={styles.modalSection}>
-                            <h3 className={styles.modalSectionTitle}>Timeline & Location</h3>
-                            <div className={styles.modalSectionContent}>
-                                <div className={styles.modalDetail}>
-                                    <strong>Request Date:</strong> {selectedJobDetails.timeline.requestDate}
-                                </div>
-                                <div className={styles.modalDetail}>
-                                    <strong>Scheduled Date:</strong> {selectedJobDetails.timeline.scheduledDate}
-                                </div>
-                                <div className={styles.modalDetail}>
-                                    <strong>Completed Date:</strong> {selectedJobDetails.timeline.completedDate}
-                                </div>
-                                <div className={styles.modalDetail}>
-                                    <strong>Time:</strong> {selectedJobDetails.timeline.startTime} - {selectedJobDetails.timeline.endTime}
-                                </div>
-                                <div className={styles.modalDetail}>
-                                    <strong>Location:</strong> {selectedJobDetails.location.address}
-                                </div>
-                                <div className={styles.modalDetail}>
-                                    <strong>Distance:</strong> {selectedJobDetails.location.distance}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className={styles.modalSection}>
-                            <h3 className={styles.modalSectionTitle}>Pricing & Payment</h3>
-                            <div className={styles.modalSectionContent}>
-                                <div className={styles.modalDetail}>
-                                    <strong>Quoted Price:</strong> ₨{selectedJobDetails.pricing.quotedPrice.toLocaleString()}
-                                </div>
-                                <div className={styles.modalDetail}>
-                                    <strong>Final Price:</strong> ₨{selectedJobDetails.pricing.finalPrice.toLocaleString()}
-                                </div>
-                                {selectedJobDetails.pricing.additionalCharges !== 0 && (
-                                    <div className={styles.modalDetail}>
-                                        <strong>Additional Charges:</strong>
-                                        <span className={selectedJobDetails.pricing.additionalCharges > 0 ? styles.positive : styles.negative}>
-                                            {selectedJobDetails.pricing.additionalCharges > 0 ? '+' : ''}₨{Math.abs(selectedJobDetails.pricing.additionalCharges).toLocaleString()}
+                                    <div className={styles['details-row']}>
+                                        <span className={styles['details-label']}>Duration:</span>
+                                        <span className={styles['details-value']}>{selectedJobDetails.service.duration}</span>
+                                    </div>
+                                    <div className={styles['details-row']}>
+                                        <span className={styles['details-label']}>Difficulty:</span>
+                                        <span
+                                            className={styles['details-value']}
+                                            style={{
+                                                backgroundColor: getDifficultyColor(selectedJobDetails.service.difficulty),
+                                                color: 'white',
+                                                padding: '0.25rem 0.5rem',
+                                                borderRadius: '4px',
+                                                fontSize: '0.75rem'
+                                            }}
+                                        >
+                                            {selectedJobDetails.service.difficulty.charAt(0).toUpperCase() + selectedJobDetails.service.difficulty.slice(1)}
                                         </span>
                                     </div>
-                                )}
-                                <div className={styles.modalDetail}>
-                                    <strong>Payment Method:</strong> {selectedJobDetails.pricing.paymentMethod}
-                                </div>
-                                <div className={styles.modalDetail}>
-                                    <strong>Payment Status:</strong>
-                                    <span
-                                        className={styles.paymentTag}
-                                        style={{ backgroundColor: getPaymentStatusColor(selectedJobDetails.payments.status) }}
-                                    >
-                                        {selectedJobDetails.payments.status.charAt(0).toUpperCase() + selectedJobDetails.payments.status.slice(1)}
-                                    </span>
+                                    <div className={styles['details-row']}>
+                                        <span className={styles['details-label']}>Status:</span>
+                                        <span
+                                            className={styles['details-value']}
+                                            style={{
+                                                backgroundColor: getStatusColor(selectedJobDetails.status),
+                                                color: 'white',
+                                                padding: '0.25rem 0.5rem',
+                                                borderRadius: '4px',
+                                                fontSize: '0.75rem'
+                                            }}
+                                        >
+                                            {getStatusText(selectedJobDetails.status)}
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        {selectedJobDetails.rating.clientRating && (
-                            <div className={styles.modalSection}>
-                                <h3 className={styles.modalSectionTitle}>Client Feedback</h3>
-                                <div className={styles.modalSectionContent}>
-                                    <div className={styles.modalDetail}>
-                                        <strong>Rating:</strong>
-                                        <div className={styles.ratingDisplay}>
-                                            {[...Array(5)].map((_, i) => (
-                                                <Star
-                                                    key={i}
-                                                    size={16}
-                                                    fill={i < selectedJobDetails.rating.clientRating ? "#fbbf24" : "none"}
-                                                    color="#fbbf24"
-                                                />
-                                            ))}
-                                            <span className={styles.ratingValue}>{selectedJobDetails.rating.clientRating}</span>
+                            <div className={styles['details-section']}>
+                                <h3 className={styles['details-section-title']}>Client Information</h3>
+                                <div>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
+                                        <div className={styles['client-avatar']}>
+                                            {selectedJobDetails.client.avatar}
+                                        </div>
+                                        <div>
+                                            <h4 style={{ margin: '0 0 0.5rem 0', fontSize: '1.125rem', fontWeight: '600', color: '#1f2937' }}>
+                                                {selectedJobDetails.client.name}
+                                            </h4>
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', fontSize: '0.875rem', color: '#6b7280' }}>
+                                                <span>{selectedJobDetails.client.phone}</span>
+                                                <span>{selectedJobDetails.client.email}</span>
+                                            </div>
                                         </div>
                                     </div>
-                                    {selectedJobDetails.rating.clientReview && (
-                                        <div className={styles.modalDetail}>
-                                            <strong>Review:</strong>
-                                            <p className={styles.reviewQuote}>
-                                                "{selectedJobDetails.rating.clientReview}"
-                                            </p>
+                                </div>
+                            </div>
+
+                            <div className={styles['details-section']}>
+                                <h3 className={styles['details-section-title']}>Timeline & Location</h3>
+                                <div>
+                                    <div className={styles['details-row']}>
+                                        <span className={styles['details-label']}>Request Date:</span>
+                                        <span className={styles['details-value']}>{selectedJobDetails.timeline.requestDate}</span>
+                                    </div>
+                                    <div className={styles['details-row']}>
+                                        <span className={styles['details-label']}>Scheduled Date:</span>
+                                        <span className={styles['details-value']}>{selectedJobDetails.timeline.scheduledDate}</span>
+                                    </div>
+                                    <div className={styles['details-row']}>
+                                        <span className={styles['details-label']}>Completed Date:</span>
+                                        <span className={styles['details-value']}>{selectedJobDetails.timeline.completedDate}</span>
+                                    </div>
+                                    <div className={styles['details-row']}>
+                                        <span className={styles['details-label']}>Time:</span>
+                                        <span className={styles['details-value']}>{selectedJobDetails.timeline.startTime} - {selectedJobDetails.timeline.endTime}</span>
+                                    </div>
+                                    <div className={styles['details-row']}>
+                                        <span className={styles['details-label']}>Location:</span>
+                                        <span className={styles['details-value']}>{selectedJobDetails.location.address}</span>
+                                    </div>
+                                    <div className={styles['details-row']}>
+                                        <span className={styles['details-label']}>Distance:</span>
+                                        <span className={styles['details-value']}>{selectedJobDetails.location.distance}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className={styles['details-section']}>
+                                <h3 className={styles['details-section-title']}>Pricing & Payment</h3>
+                                <div>
+                                    <div className={styles['details-row']}>
+                                        <span className={styles['details-label']}>Quoted Price:</span>
+                                        <span className={styles['details-value']}>₨{selectedJobDetails.pricing.quotedPrice.toLocaleString()}</span>
+                                    </div>
+                                    <div className={styles['details-row']}>
+                                        <span className={styles['details-label']}>Final Price:</span>
+                                        <span className={styles['details-value']}>₨{selectedJobDetails.pricing.finalPrice.toLocaleString()}</span>
+                                    </div>
+                                    {selectedJobDetails.pricing.additionalCharges !== 0 && (
+                                        <div className={styles['details-row']}>
+                                            <span className={styles['details-label']}>Additional Charges:</span>
+                                            <span className={`${styles['details-value']} ${selectedJobDetails.pricing.additionalCharges > 0 ? styles.positive : styles.negative}`}>
+                                                {selectedJobDetails.pricing.additionalCharges > 0 ? '+' : ''}₨{Math.abs(selectedJobDetails.pricing.additionalCharges).toLocaleString()}
+                                            </span>
                                         </div>
                                     )}
+                                    <div className={styles['details-row']}>
+                                        <span className={styles['details-label']}>Payment Method:</span>
+                                        <span className={styles['details-value']}>{selectedJobDetails.pricing.paymentMethod}</span>
+                                    </div>
+                                    <div className={styles['details-row']}>
+                                        <span className={styles['details-label']}>Payment Status:</span>
+                                        <span
+                                            className={styles['details-value']}
+                                            style={{
+                                                backgroundColor: getPaymentStatusColor(selectedJobDetails.payments.status),
+                                                color: 'white',
+                                                padding: '0.25rem 0.5rem',
+                                                borderRadius: '4px',
+                                                fontSize: '0.75rem'
+                                            }}
+                                        >
+                                            {selectedJobDetails.payments.status.charAt(0).toUpperCase() + selectedJobDetails.payments.status.slice(1)}
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
-                        )}
 
-                        {selectedJobDetails.rating.technicianNotes && (
-                            <div className={styles.modalSection}>
-                                <h3 className={styles.modalSectionTitle}>Technician Notes</h3>
-                                <div className={styles.modalSectionContent}>
-                                    <p className={styles.technicianNotesModal}>
-                                        {selectedJobDetails.rating.technicianNotes}
-                                    </p>
+                            {selectedJobDetails.rating.clientRating && (
+                                <div className={styles['details-section']}>
+                                    <h3 className={styles['details-section-title']}>Client Feedback</h3>
+                                    <div>
+                                        <div className={styles['details-row']}>
+                                            <span className={styles['details-label']}>Rating:</span>
+                                            <div className={styles['rating-display']}>
+                                                {[...Array(5)].map((_, i) => (
+                                                    <Star
+                                                        key={i}
+                                                        size={16}
+                                                        fill={i < selectedJobDetails.rating.clientRating ? "#fbbf24" : "none"}
+                                                        color="#fbbf24"
+                                                    />
+                                                ))}
+                                                <span style={{ marginLeft: '0.5rem' }}>{selectedJobDetails.rating.clientRating}</span>
+                                            </div>
+                                        </div>
+                                        {selectedJobDetails.rating.clientReview && (
+                                            <div className={styles['details-row']}>
+                                                <span className={styles['details-label']}>Review:</span>
+                                                <p style={{ margin: 0, fontStyle: 'italic', color: '#6b7280' }}>
+                                                    "{selectedJobDetails.rating.clientReview}"
+                                                </p>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
-                            </div>
-                        )}
+                            )}
 
-                        <div className={styles.modalFooter}>
+                            {selectedJobDetails.rating.technicianNotes && (
+                                <div className={styles['details-section']}>
+                                    <h3 className={styles['details-section-title']}>Technician Notes</h3>
+                                    <div>
+                                        <p style={{ margin: 0, color: '#6b7280' }}>
+                                            {selectedJobDetails.rating.technicianNotes}
+                                        </p>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className={styles['modal-actions']}>
                             <button
                                 onClick={() => setShowJobDetails(false)}
-                                className={`${styles.actionBtn} ${styles.primary}`}
+                                className={`${styles['action-btn']} ${styles.primary}`}
                             >
                                 Close
                             </button>
@@ -1018,42 +1048,46 @@ const JobHistory = ({ isSidebarCollapsed = false }) => {
 
             {/* Repeat Job Modal */}
             {showRepeatJobModal && repeatJobData && (
-                <div className={styles.modalOverlay}>
-                    <div className={styles.modalContent}>
-                        <div className={styles.modalHeader}>
-                            <h2 className={styles.modalTitle}>Create Repeat Job</h2>
+                <div className={styles['modal-overlay']}>
+                    <div className={styles['modal-content']}>
+                        <div className={styles['modal-header']}>
+                            <h2 className={styles['modal-title']}>Create Repeat Job</h2>
                             <button
                                 onClick={() => setShowRepeatJobModal(false)}
-                                className={styles.modalCloseBtn}
+                                className={styles['modal-close']}
                             >
                                 <X size={24} color="#6b7280" />
                             </button>
                         </div>
 
-                        <div className={styles.modalSection}>
-                            <div className={styles.modalSectionContent}>
-                                <p className={styles.repeatJobDescription}>
+                        <div className={styles['modal-body']}>
+                            <div>
+                                <p style={{ marginBottom: '1.5rem', color: '#6b7280' }}>
                                     Create a new job request based on the previous job details.
                                 </p>
-                                <div className={styles.modalDetail}>
-                                    <strong>Service:</strong> {repeatJobData.service.type}
+                                <div className={styles['details-row']}>
+                                    <span className={styles['details-label']}>Service:</span>
+                                    <span className={styles['details-value']}>{repeatJobData.service.type}</span>
                                 </div>
-                                <div className={styles.modalDetail}>
-                                    <strong>Client:</strong> {repeatJobData.client.name}
+                                <div className={styles['details-row']}>
+                                    <span className={styles['details-label']}>Client:</span>
+                                    <span className={styles['details-value']}>{repeatJobData.client.name}</span>
                                 </div>
-                                <div className={styles.modalDetail}>
-                                    <strong>Location:</strong> {repeatJobData.location.address}
+                                <div className={styles['details-row']}>
+                                    <span className={styles['details-label']}>Location:</span>
+                                    <span className={styles['details-value']}>{repeatJobData.location.address}</span>
                                 </div>
-                                <div className={styles.modalDetail}>
-                                    <strong>Price:</strong> ₨{repeatJobData.pricing.quotedPrice.toLocaleString()}
+                                <div className={styles['details-row']}>
+                                    <span className={styles['details-label']}>Price:</span>
+                                    <span className={styles['details-value']}>₨{repeatJobData.pricing.quotedPrice.toLocaleString()}</span>
                                 </div>
                             </div>
                         </div>
 
-                        <div className={styles.modalFooter}>
+                        <div className={styles['modal-actions']}>
                             <button
                                 onClick={() => setShowRepeatJobModal(false)}
-                                className={`${styles.actionBtn} ${styles.secondary}`}
+                                className={`${styles['action-btn']} ${styles.secondary}`}
                             >
                                 Cancel
                             </button>
@@ -1062,7 +1096,7 @@ const JobHistory = ({ isSidebarCollapsed = false }) => {
                                     handleRepeatJob(repeatJobData.id);
                                     setShowRepeatJobModal(false);
                                 }}
-                                className={`${styles.actionBtn} ${styles.success}`}
+                                className={`${styles['action-btn']} ${styles.complete}`}
                             >
                                 <RotateCcw size={16} />
                                 Create Repeat Job
