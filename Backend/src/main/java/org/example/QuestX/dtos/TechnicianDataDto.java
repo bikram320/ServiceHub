@@ -1,6 +1,7 @@
 package org.example.QuestX.dtos;
 
 import lombok.Data;
+import org.example.QuestX.Model.Status;
 
 import java.time.LocalDateTime;
 
@@ -10,6 +11,8 @@ public class TechnicianDataDto {
     private String email;
     private String phone ;
     private String address;
+    private Status status;
+    private String serviceCategory;
     private Boolean isEmailVerified;
     private String profileImagePath;
     private String documentPath;

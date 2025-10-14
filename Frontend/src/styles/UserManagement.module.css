@@ -645,7 +645,34 @@
 .btnBlock:hover {
     background: #b91c1c;
 }
+/* Admin Wrapper for Sidebar Compatibility */
+.admin-wrapper {
+    margin-left: 250px;
+    transition: margin-left 0.3s ease;
+    min-height: 100vh;
+}
 
+.admin-wrapper.sidebar-collapsed {
+    margin-left: 80px;
+}
+
+/* Adjust the main container */
+.userManagement {
+    padding: 2rem;
+    background-color: #f8fafc;
+    min-height: 100vh;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .admin-wrapper {
+        margin-left: 0;
+    }
+
+    .admin-wrapper.sidebar-collapsed {
+        margin-left: 0;
+    }
+}
 /* Responsive Design */
 @media (max-width: 1200px) {
     .profileGrid {

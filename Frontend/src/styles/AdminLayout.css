@@ -1,0 +1,28 @@
+/* AdminLayout.css */
+.admin-layout {
+    display: flex;
+    min-height: 100vh;
+    background-color: #f8fafc;
+}
+
+.admin-content {
+    flex: 1;
+    margin-left: 280px; /* Width of expanded sidebar */
+    transition: margin-left 0.3s ease;
+    min-height: 100vh;
+}
+
+.admin-content.sidebar-collapsed {
+    margin-left: 80px; /* Width of collapsed sidebar */
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+    .admin-content {
+        margin-left: 0;
+    }
+
+    .admin-content.sidebar-collapsed {
+        margin-left: 0;
+    }
+}

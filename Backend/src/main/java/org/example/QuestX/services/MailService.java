@@ -98,7 +98,8 @@ public class MailService {
 
         if (status.equals(Status.VERIFIED)) {
             helper.setText(
-                    "Your profile has been " + status + ". You now have access to perform various actions!" +
+                    "Your profile has been " + status +
+                            ". You now have access to perform various actions!" +
                             " Please check your profile for more details." +
                             "\n\nRegards,\nQuestX"
             );

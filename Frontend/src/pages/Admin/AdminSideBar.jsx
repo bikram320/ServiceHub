@@ -115,7 +115,7 @@ const AdminSidebar = ({ activeTab,
                         </div>
                         {!isCollapsed && (
                             <div className={styles['profile-details']}>
-                                <div className={styles['profile-name']}>Admin User</div>
+                                <div className={styles['profile-name']}>Admin</div>
                                 <div className={styles['profile-role']}>System Administrator</div>
                             </div>
                         )}

@@ -273,15 +273,15 @@
     overflow: hidden;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
-    cursor: pointer;
+    /*cursor: pointer;*/
     border: 1px solid #e5e7eb;
 }
 
-.project-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15);
-    border-color: #22c55e;
-}
+/*.project-card:hover {*/
+/*    transform: translateY(-5px);*/
+/*    box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15);*/
+/*    border-color: #22c55e;*/
+/*}*/
 
 .project-image-wrapper {
     position: relative;

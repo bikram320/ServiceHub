@@ -9,6 +9,31 @@
     margin: 0 auto;
 }
 
+/* Layout integration styles */
+.admin-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+.admin-content {
+    flex: 1;
+    transition: all 0.3s ease;
+}
+
+.admin-wrapper {
+    margin-left: 280px; /* Width of expanded sidebar */
+    min-height: 100vh;
+    transition: margin-left 0.3s ease;
+    background-color: #f8fafc;
+    width: calc(100vw - 280px); /* Ensure proper width calculation */
+}
+
+/* When sidebar is collapsed */
+.admin-wrapper.sidebar-collapsed {
+    margin-left: 80px; /* Width of collapsed sidebar */
+    width: calc(100vw - 80px); /* Adjust width for collapsed state */
+}
+
 /* Page Header */
 .page-header {
     margin-bottom: 2rem;
@@ -685,8 +710,20 @@
     transform: translateY(-1px);
 }
 
-/* Responsive Design */
-@media (max-width: 1200px) {
+/* Responsive Design - Match UserDashboard pattern */
+@media (max-width: 1024px) {
+    /* Remove sidebar spacing on tablet and mobile */
+    .admin-wrapper {
+        margin-left: 0;
+    }
+
+    .admin-wrapper.sidebar-collapsed {
+        margin-left: 0;
+    }
+
+    .profile-content {
+        padding: 1rem;
+    }
     .profile-grid {
         grid-template-columns: 1fr;
     }
@@ -697,6 +734,7 @@
 }
 
 @media (max-width: 768px) {
+
     .user-management {
         padding: 1rem;
     }

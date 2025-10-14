@@ -4,7 +4,7 @@ import AdminDashboard from './AdminDashboard';
 import UserManagement from './UserManagement';
 import TechnicianManagement from './TechnicianManagement';
 import { useNavigate } from "react-router-dom";
-
+import  '../../styles/AdminLayout.css';
 const AdminLayout = () => {
     const navigate = useNavigate();
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -18,12 +18,12 @@ const AdminLayout = () => {
         try {
             const response = await fetch("http://localhost:8080/auth/logout", {
                 method: "POST",
-                credentials: "include", // important to send cookies
+                credentials: "include",
             });
 
             if (response.ok) {
                 console.log("User logged out successfully");
-                navigate("/"); // redirect to homepage or login
+                navigate("/");
             } else {
                 console.error("Logout failed:", await response.text());
                 alert("Failed to logout. Please try again.");
@@ -56,7 +56,7 @@ const AdminLayout = () => {
                 isCollapsed={sidebarCollapsed}
                 onToggleCollapse={setSidebarCollapsed}
             />
-            <div className="admin-content">
+            <div className={`admin-content ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
                 {renderContent()}
             </div>
         </div>

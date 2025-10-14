@@ -48,7 +48,7 @@ const TechnicianLayout = () =>{
     const fetchUserData = async () => {
         try {
             // Get email from localStorage
-            const email = localStorage.getItem('technicianEmail');
+            const email = localStorage.getItem('userEmail');
             if (!email) {
                 console.error('No email found in localStorage');
                 // Redirect to login if no email found
@@ -79,8 +79,8 @@ const TechnicianLayout = () =>{
                 }));
 
                 // Update localStorage with fresh data
-                if (data.username) localStorage.setItem('technicianName', data.username);
-                if (data.email) localStorage.setItem('technicianEmail', data.email);
+                // if (data.username) localStorage.setItem('technicianName', data.username);
+                // if (data.email) localStorage.setItem('technicianEmail', data.email);
 
             } else if (response.status === 401) {
                 // User not authenticated, redirect to login
@@ -126,8 +126,8 @@ const TechnicianLayout = () =>{
             if (response.ok) {
                 console.log("User logged out successfully");
                 // Clear localStorage
-                localStorage.removeItem('technicianEmail');
-                localStorage.removeItem('technicianName');
+                localStorage.removeItem('userEmail');
+                localStorage.removeItem('userName');
                 navigate("/"); // redirect to homepage or login
             } else {
                 console.error("Logout failed:", await response.text());

@@ -56,7 +56,7 @@ function App() {
                <Route path="/TechnicianProfile/*" element={<TechnicianProfile />} />
                <Route path="/BookingDetail/*" element={<BookingDetail />} />
                <Route path="/FindServices/*" element={<FindServices />} />
-               <Route path="/PaymentSuccess/*" element={<PaymentSuccess/>}/>
+               <Route path="/Payment/success/*" element={<PaymentSuccess/>}/>
                <Route path="/PaymentFailure/*" element={<PaymentFailure/>}/>
                <Route path="/ServiceRequests/*" element={<ServiceRequests/>}/>
            </Routes>

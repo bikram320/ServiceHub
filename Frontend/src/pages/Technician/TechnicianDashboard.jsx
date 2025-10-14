@@ -45,7 +45,7 @@ const TechnicianDashboard = ({ isCollapsed = false }) => {
 
     // Get technician email from localStorage or context
     const getTechnicianEmail = () => {
-        return localStorage.getItem('technicianEmail') || 'tech@example.com';
+        return localStorage.getItem('userEmail');
     };
 
     // API configuration
