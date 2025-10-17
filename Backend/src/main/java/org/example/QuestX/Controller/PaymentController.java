@@ -75,14 +75,4 @@ public class PaymentController {
         return ResponseEntity.badRequest().body("Payment verification failed");
     }
 
-    // 4) Release payment (protected — call when service complete)
-    @PostMapping("/release/{id}")
-    public ResponseEntity<?> release(@PathVariable Long id) {
-        try {
-            PaymentReleaseResponseDto p = paymentService.releasePayment(id);
-            return ResponseEntity.ok(p);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
 }

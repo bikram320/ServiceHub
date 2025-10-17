@@ -77,7 +77,7 @@ public class AdminController {
     }
 
     @PostMapping("/users-unblock")
-    public ResponseEntity<?> unblockUser(@RequestParam String email) throws MessagingException {
+    public ResponseEntity<?> unblockUser(@RequestParam String email)  {
         adminService.unblockUser(email);
         return ResponseEntity.ok("User has been unblocked");
     }
@@ -126,7 +126,7 @@ public class AdminController {
     }
 
     @PostMapping("/technician-unblock")
-    public ResponseEntity<?> unblockTechnicians(@RequestParam String email) throws MessagingException {
+    public ResponseEntity<?> unblockTechnicians(@RequestParam String email)  {
         adminService.unblockTechnician(email);
         return ResponseEntity.ok("User has been unblocked");
     }
@@ -137,10 +137,37 @@ public class AdminController {
         return new ResponseEntity<>(technicianServiceCategories, HttpStatus.OK);
     }
 
+    //Services and payments related methods
+
+    @GetMapping("/service-dashboard")
+    public ResponseEntity<?> serviceDashboard() {
+        ServiceDashboardDto serviceDashboardDto = adminService.getServiceDashboard();
+        return new ResponseEntity<>(serviceDashboardDto, HttpStatus.OK);
+    }
     @GetMapping("/track-service-request")
     public ResponseEntity<?> trackServiceRequest(){
         List<ServiceRequestDetailsDto> serviceRequestDetails = adminService.getAllServiceRequests();
         return new ResponseEntity<>(serviceRequestDetails, HttpStatus.OK);
+    }
+
+    @PostMapping("/release/{id}")
+    public ResponseEntity<?> release(@PathVariable Long id) {
+        try {
+            PaymentReleaseResponseDto p = adminService.releasePayment(id);
+            return ResponseEntity.ok(p);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/refund/{id}")
+    public ResponseEntity<?> refund(@PathVariable Long id) {
+        try {
+            PaymentRefundDto refundPayment= adminService.refundPayment(id);
+            return ResponseEntity.ok(refundPayment);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
 }

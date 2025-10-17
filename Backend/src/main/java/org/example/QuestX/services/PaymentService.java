@@ -111,36 +111,4 @@ public class PaymentService {
             return false;
         }
     }
-    public PaymentReleaseResponseDto releasePayment(Long paymentId) {
-        Payment payment = paymentRepository.findById(paymentId)
-                .orElseThrow(() -> new RuntimeException("Payment not found"));
-
-        if (payment.getStatus() != PaymentStatus.HOLD) {
-            throw new StatusInvalidException("Payment is not in HOLD state, cannot release.");
-        }
-
-        // ✅ Mark payment as released
-        payment.setStatus(PaymentStatus.RELEASED);
-        payment.setReleasedAt(LocalDateTime.now());
-        paymentRepository.save(payment);
-
-        // ✅ Update technician earnings
-        Technician tech = payment.getTech();
-        if (tech != null) {
-            BigDecimal newEarnings = tech.getEarnedAmount().add(payment.getAmount());
-            tech.setEarnedAmount(newEarnings);
-            // save updated technician
-            // make sure TechnicianRepository is injected into PaymentService
-            technicianRepository.save(tech);
-        }
-
-        // ✅ Return clean DTO instead of entity
-        return new PaymentReleaseResponseDto(
-                payment.getId(),
-                payment.getAmount(),
-                payment.getTech() != null ? payment.getTech().getName() : null,
-                payment.getStatus().name(),
-                payment.getReleasedAt()
-        );
-    }
 }

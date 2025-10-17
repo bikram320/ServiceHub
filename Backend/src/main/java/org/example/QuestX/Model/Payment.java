@@ -54,4 +54,7 @@ public class Payment {
     @Column(name = "released_at")
     private LocalDateTime releasedAt;
 
+    @Column(name = "refunded_at")
+    private LocalDateTime refundedAt;
+
 }

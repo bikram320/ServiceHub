@@ -2,6 +2,7 @@ package org.example.QuestX.services;
 
 import jakarta.mail.MessagingException;
 import lombok.AllArgsConstructor;
+import org.apache.coyote.Response;
 import org.example.QuestX.Model.*;
 import org.example.QuestX.Repository.*;
 import org.example.QuestX.dtos.*;
@@ -29,6 +30,7 @@ public class AdminService {
     private final AdminRepository adminRepository;
     private final ServiceRequestRepository serviceRequestRepository;
     private final SkillRepository skillRepository;
+    private final PaymentRepository paymentRepository;
 
 
     public AdminDashboardOverviewDto getDashboardOverview() {
@@ -463,5 +465,72 @@ public class AdminService {
                 .collect(Collectors.toList());
 
     }
+
+    public ServiceDashboardDto getServiceDashboard() {
+        long totalServices = serviceRequestRepository.count();
+        long completedServices = countServicesByStatus(ServiceStatus.COMPLETED);
+        long ongoingServices = countServicesByStatus(ServiceStatus.IN_PROGRESS);
+        long cancelledServices = countServicesByStatus(ServiceStatus.CANCELLED);
+        ServiceDashboardDto dashboard = new ServiceDashboardDto();
+        dashboard.setTotalServices(totalServices);
+        dashboard.setCompletedServices(completedServices);
+        dashboard.setOngoingServices(ongoingServices);
+        dashboard.setCancelledServices(cancelledServices);
+        return dashboard;
+
+    }
+    public long countServicesByStatus(ServiceStatus status) {
+        return serviceRequestRepository.countByStatus(status);
+    }
+
+    public PaymentReleaseResponseDto releasePayment(Long paymentId) {
+        Payment payment = paymentRepository.findById(paymentId)
+                .orElseThrow(() -> new RuntimeException("Payment not found"));
+
+        if (payment.getStatus() != PaymentStatus.HOLD) {
+            throw new StatusInvalidException("Payment is not in HOLD state, cannot release.");
+        }
+
+        // ✅ Mark payment as released
+        payment.setStatus(PaymentStatus.RELEASED);
+        payment.setReleasedAt(LocalDateTime.now());
+        paymentRepository.save(payment);
+
+        // ✅ Update technician earnings
+        Technician tech = payment.getTech();
+        if (tech != null) {
+            BigDecimal newEarnings = tech.getEarnedAmount().add(payment.getAmount());
+            tech.setEarnedAmount(newEarnings);
+            technicianRepository.save(tech);
+        }
+
+        // ✅ Return clean DTO instead of entity
+        return new PaymentReleaseResponseDto(
+                payment.getId(),
+                payment.getAmount(),
+                payment.getTech() != null ? payment.getTech().getName() : null,
+                payment.getStatus().name(),
+                payment.getReleasedAt()
+        );
+    }
+
+    public PaymentRefundDto refundPayment(Long paymentId) {
+            Payment payment = paymentRepository.findById(paymentId)
+                    .orElseThrow(() -> new RuntimeException("Payment not found"));
+            if (payment.getStatus() != PaymentStatus.HOLD) {
+                throw new StatusInvalidException("Payment is not in HOLD state, cannot refund.");
+            }
+            payment.setStatus(PaymentStatus.REFUNDED);
+            payment.setRefundedAt(LocalDateTime.now());
+            paymentRepository.save(payment);
+
+            return new PaymentRefundDto(
+                    payment.getUser().getId(),
+                    payment.getUser().getName(),
+                    payment.getId(),
+                    payment.getAmount()
+            );
+    }
+
 
 }

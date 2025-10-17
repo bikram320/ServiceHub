@@ -83,4 +83,7 @@ public interface ServiceRequestRepository extends JpaRepository<ServiceRequest, 
 
     @Query("SELECT COUNT(DISTINCT sr.user.email) FROM ServiceRequest sr WHERE sr.createdAt >= :date")
     long countDistinctUsersByCreatedAtAfter(@Param("date") LocalDateTime date);
+
+    @Query("SELECT COUNT(sr) FROM ServiceRequest sr WHERE sr.status = :status")
+    long countByStatus(ServiceStatus status);
 }
