@@ -5,6 +5,7 @@ import UserManagement from './UserManagement';
 import TechnicianManagement from './TechnicianManagement';
 import { useNavigate } from "react-router-dom";
 import  '../../styles/AdminLayout.css';
+import ServiceManagement from "./ServiceManagement.jsx";
 const AdminLayout = () => {
     const navigate = useNavigate();
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -42,6 +43,8 @@ const AdminLayout = () => {
                 return <UserManagement sidebarCollapsed={sidebarCollapsed} />;
             case 'technicians':
                 return <TechnicianManagement sidebarCollapsed={sidebarCollapsed} />;
+            case 'services':
+                return <ServiceManagement sidebarCollapsed={sidebarCollapsed} />;
             default:
                 return <AdminDashboard sidebarCollapsed={sidebarCollapsed} />;
         }

@@ -16,7 +16,7 @@ const PrivacyPolicy = () => {
             </div>
 
             <div className="last-updated-top">
-                <p><strong>Effective Date:</strong> [Insert Date] | <strong>Last Updated:</strong> [Insert Date]</p>
+                <p><strong>Effective Date:</strong> 2025-10-10 | <strong>Last Updated:</strong> 2025-10-10</p>
             </div>
 
             <h2><span className="section-number">1.</span> Information We Collect</h2>

@@ -9,4 +9,6 @@ public class ServiceDashboardDto {
     long CompletedServices;
     long OngoingServices;
     long CancelledServices;
+    long rejectedServices;
+    long pendingServices;
 }

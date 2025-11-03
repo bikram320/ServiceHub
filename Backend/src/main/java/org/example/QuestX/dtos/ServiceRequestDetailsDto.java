@@ -1,6 +1,7 @@
 package org.example.QuestX.dtos;
 
 import lombok.Data;
+import org.example.QuestX.Model.PaymentStatus;
 import org.example.QuestX.Model.ServiceStatus;
 
 import java.math.BigDecimal;
@@ -9,6 +10,7 @@ import java.time.LocalDateTime;
 @Data
 public class ServiceRequestDetailsDto {
     Long requestId;
+    long paymentId;
     String userName;
     String userEmail;
     String serviceName;
@@ -18,4 +20,5 @@ public class ServiceRequestDetailsDto {
     LocalDateTime appointmentTime;
     BigDecimal feeCharge;
     ServiceStatus status;
+    PaymentStatus paymentStatus;
 }

@@ -150,24 +150,16 @@ public class AdminController {
         return new ResponseEntity<>(serviceRequestDetails, HttpStatus.OK);
     }
 
-    @PostMapping("/release/{id}")
-    public ResponseEntity<?> release(@PathVariable Long id) {
-        try {
-            PaymentReleaseResponseDto p = adminService.releasePayment(id);
-            return ResponseEntity.ok(p);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    @PostMapping("/release/{paymentId}")
+    public ResponseEntity<?> release(@PathVariable Long paymentId) {
+            PaymentReleaseResponseDto releasePayment = adminService.releasePayment(paymentId);
+            return new ResponseEntity<>(releasePayment, HttpStatus.OK);
     }
 
-    @PostMapping("/refund/{id}")
-    public ResponseEntity<?> refund(@PathVariable Long id) {
-        try {
-            PaymentRefundDto refundPayment= adminService.refundPayment(id);
-            return ResponseEntity.ok(refundPayment);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    @PostMapping("/refund/{paymentId}")
+    public ResponseEntity<?> refund(@PathVariable Long paymentId) {
+            PaymentRefundDto refundPayment= adminService.refundPayment(paymentId);
+            return new ResponseEntity<>(refundPayment, HttpStatus.OK);
     }
 
 }

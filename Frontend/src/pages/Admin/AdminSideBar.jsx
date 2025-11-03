@@ -9,7 +9,8 @@ import {
     Settings,
     Bell,
     User,
-    ChevronDown
+    ChevronDown,
+    TrendingUp
 } from 'lucide-react';
 import styles from "../../styles/UserSideBar.module.css";
 import Header2 from "../../Components/layout/Header2.jsx";
@@ -42,6 +43,12 @@ const AdminSidebar = ({ activeTab,
             label: 'Technician Management',
             icon: Wrench,
             path: '/admin/technicians'
+        },
+        {
+            id: 'services',
+            label: 'Service Management',
+            icon: TrendingUp,
+            path: '/admin/services'
         }
     ];
 

@@ -450,6 +450,7 @@ public class AdminService {
                         {
                             ServiceRequestDetailsDto serviceDetails = new ServiceRequestDetailsDto();
                             serviceDetails.setRequestId(serviceRequest.getId());
+                            serviceDetails.setPaymentId(serviceRequest.getPayment().getId());
                             serviceDetails.setUserName(serviceRequest.getUser().getName());
                             serviceDetails.setUserEmail(serviceRequest.getUser().getEmail());
                             serviceDetails.setServiceName(serviceRequest.getSkill().getName());
@@ -459,6 +460,7 @@ public class AdminService {
                             serviceDetails.setStatus(serviceRequest.getStatus());
                             serviceDetails.setAppointmentTime(serviceRequest.getAppointmentTime());
                             serviceDetails.setFeeCharge(serviceRequest.getFeeCharged());
+                            serviceDetails.setPaymentStatus(serviceRequest.getPayment().getStatus());
                             return serviceDetails;
                         }
                 )
@@ -471,11 +473,15 @@ public class AdminService {
         long completedServices = countServicesByStatus(ServiceStatus.COMPLETED);
         long ongoingServices = countServicesByStatus(ServiceStatus.IN_PROGRESS);
         long cancelledServices = countServicesByStatus(ServiceStatus.CANCELLED);
+        long rejectedServices = countServicesByStatus(ServiceStatus.REJECTED);
+        long pendingServices = countServicesByStatus(ServiceStatus.PENDING);
         ServiceDashboardDto dashboard = new ServiceDashboardDto();
+        dashboard.setPendingServices(pendingServices);
         dashboard.setTotalServices(totalServices);
         dashboard.setCompletedServices(completedServices);
         dashboard.setOngoingServices(ongoingServices);
         dashboard.setCancelledServices(cancelledServices);
+        dashboard.setRejectedServices(rejectedServices);
         return dashboard;
 
     }
