@@ -143,7 +143,7 @@ I (Bikram320) handled:
 
 ## 🙌 Acknowledgements
 
-Thanks to my contributors who worked and inspired this project.
+Thanks to my contributors who worked in and inspired this project.
 
 # 🤝 Team members
 * Bikram Bk (bikram320)
